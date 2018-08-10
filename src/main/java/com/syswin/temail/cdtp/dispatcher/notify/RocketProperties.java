@@ -1,4 +1,4 @@
-package com.syswin.temail.cdtp.dispatcher.push;
+package com.syswin.temail.cdtp.dispatcher.notify;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -13,5 +13,5 @@ public class RocketProperties {
     private String namesrvAddr;
     private String producerGroup = "cdtp-dispatcher-producer";
     private String consumerGroup = "cdtp-dispatcher-consumer";
-    private String topic = "cdtp-push";
+    private String topic = "cdtp-notify";
 }

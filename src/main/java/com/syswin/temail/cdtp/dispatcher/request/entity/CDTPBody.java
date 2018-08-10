@@ -1,4 +1,4 @@
-package com.syswin.temail.cdtp.dispatcher.receive.entity;
+package com.syswin.temail.cdtp.dispatcher.request.entity;
 
 import lombok.Data;
 

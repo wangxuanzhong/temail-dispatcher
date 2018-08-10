@@ -1,13 +1,13 @@
-package com.syswin.temail.cdtp.dispatcher.receive.entity;
+package com.syswin.temail.cdtp.dispatcher.request.entity;
 
 import lombok.Data;
 
 /**
  * @author 姚华成
- * @date 2018-8-8
+ * @date 2018-8-10
  */
 @Data
-public class CDTPPackage {
+public class CDTPHeader {
     private int command;
     private int version;
     private int algorithm;
@@ -19,5 +19,4 @@ public class CDTPPackage {
     private String to;
     private String senderPK;
     private String receiverPK;
-    private CDTPBody data;
 }

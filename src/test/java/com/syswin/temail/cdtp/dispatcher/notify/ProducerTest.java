@@ -1,4 +1,4 @@
-package com.syswin.temail.cdtp.dispatcher.push;
+package com.syswin.temail.cdtp.dispatcher.notify;
 
 import com.google.gson.Gson;
 import org.apache.rocketmq.client.producer.DefaultMQProducer;
@@ -19,7 +19,7 @@ public class ProducerTest {
         pushMsgBody.setToTemail("yaohuacheng@syswin.com");
         Gson gson = new Gson();
         for (int i = 0; i < 10; i++) {
-            Message msg = new Message("cdtp-push",
+            Message msg = new Message("cdtp-notify",
                     (gson.toJson(pushMsgBody)).getBytes());
             SendResult sendResult = producer.send(msg);
             System.out.println("消息" + sendResult.getOffsetMsgId()

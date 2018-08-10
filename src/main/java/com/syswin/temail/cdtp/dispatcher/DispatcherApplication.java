@@ -1,6 +1,6 @@
 package com.syswin.temail.cdtp.dispatcher;
 
-import com.syswin.temail.cdtp.dispatcher.push.RocketProperties;
+import com.syswin.temail.cdtp.dispatcher.notify.RocketProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;

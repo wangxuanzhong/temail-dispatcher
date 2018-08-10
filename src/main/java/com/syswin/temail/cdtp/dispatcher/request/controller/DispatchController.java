@@ -1,9 +1,12 @@
-package com.syswin.temail.cdtp.dispatcher.receive.controller;
+package com.syswin.temail.cdtp.dispatcher.request.controller;
 
+import com.google.gson.Gson;
 import com.syswin.temail.cdtp.dispatcher.DispatcherProperties;
-import com.syswin.temail.cdtp.dispatcher.receive.entity.CDTPBody;
-import com.syswin.temail.cdtp.dispatcher.receive.entity.CDTPPackage;
+import com.syswin.temail.cdtp.dispatcher.request.entity.CDTPBody;
+import com.syswin.temail.cdtp.dispatcher.request.entity.CDTPHeader;
+import com.syswin.temail.cdtp.dispatcher.request.entity.CDTPPackage;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.http.*;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -23,12 +26,13 @@ import java.util.Map;
  */
 @Slf4j
 @RestController
-public class DispatcherController {
+public class DispatchController {
     public static final String CONTENT_TYPE = "Content-Type";
     @Resource
     private RestTemplate restTemplate;
     @Resource
     private DispatcherProperties properties;
+    private Gson gson = new Gson();
 
     @PostMapping(value = "/dispatch")
     public String dispatch(@RequestBody CDTPPackage cdtpPackage) {
@@ -87,17 +91,9 @@ public class DispatcherController {
     }
 
     private void addCDTPHeaders(MultiValueMap<String, String> headers, CDTPPackage cdtpPackage) {
-        headers.add("command", String.valueOf(cdtpPackage.getCommand()));
-        headers.add("version", String.valueOf(cdtpPackage.getVersion()));
-        headers.add("algorithm", String.valueOf(cdtpPackage.getAlgorithm()));
-        headers.add("sign", cdtpPackage.getSign());
-        headers.add("dem", String.valueOf(cdtpPackage.getDem()));
-        headers.add("timestamp", String.valueOf(cdtpPackage.getTimestamp()));
-        headers.add("pkgId", cdtpPackage.getPkgId());
-        headers.add("from", cdtpPackage.getFrom());
-        headers.add("to", cdtpPackage.getTo());
-        headers.add("senderPK", cdtpPackage.getReceiverPK());
-        headers.add("receiverPK", cdtpPackage.getSenderPK());
+        CDTPHeader cdtpHeader = new CDTPHeader();
+        BeanUtils.copyProperties(cdtpPackage, cdtpHeader);
+        headers.add("CDTP-Header", gson.toJson(cdtpHeader));
     }
 
 }

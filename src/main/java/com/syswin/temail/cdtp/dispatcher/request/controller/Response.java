@@ -1,4 +1,4 @@
-package com.syswin.temail.cdtp.dispatcher.receive.controller;
+package com.syswin.temail.cdtp.dispatcher.request.controller;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;

@@ -1,4 +1,4 @@
-package com.syswin.temail.cdtp.dispatcher.push;
+package com.syswin.temail.cdtp.dispatcher.notify;
 
 import org.apache.rocketmq.client.consumer.DefaultMQPushConsumer;
 import org.apache.rocketmq.client.consumer.MQConsumer;
@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
  * @author 姚华成
  * @date 2018/8/7
  */
-//@Configuration
+@Configuration
 public class RocketMqConfiguration {
     @Bean
     public MQConsumer consumer(RocketProperties properties, MQProducer producer) throws Exception {

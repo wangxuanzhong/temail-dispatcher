@@ -1,4 +1,4 @@
-package com.syswin.temail.cdtp.dispatcher.receive.controller;
+package com.syswin.temail.cdtp.dispatcher.request.controller;
 
 import com.google.gson.GsonBuilder;
 import org.springframework.http.converter.HttpMessageConverter;

@@ -1,4 +1,4 @@
-package com.syswin.temail.cdtp.dispatcher.receive.controller;
+package com.syswin.temail.cdtp.dispatcher.request.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.ControllerAdvice;

@@ -10,9 +10,15 @@ temail.cdtp.dispatcher:
     hello:
       url: http://localhost:8081/hello
       method: GET
+    usermailGet:
+      url: http://192.168.15.186:8090/usermail
+      method: GET
+    usermailPost:
+      url: http://192.168.15.186:8090/usermail
+      method: POST
   auth-verify-url: http://localhost:8081/verify
   rocketmq:
     namesrvAddr: 172.28.43.18:9876
     producerGroup: cdtp-dispatcher-producer
     consumerGroup: cdtp-dispatcher-consumer
-    topic: cdtp-push
+    topic: cdtp-notify

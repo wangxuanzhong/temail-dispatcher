@@ -1,6 +1,7 @@
-package com.syswin.temail.cdtp.dispatcher.push;
+package com.syswin.temail.cdtp.dispatcher.notify;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyContext;
 import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyStatus;
@@ -31,11 +32,16 @@ public class DispatchListener implements MessageListenerConcurrently {
             for (MessageExt msg : msgs) {
                 String msgData = new String(msg.getBody());
                 System.out.println("接收到的消息是：" + msgData);
-                PushMsgBody pushMsgBody = gson.fromJson(msgData, PushMsgBody.class);
-                String topic = getTopicByTemail(pushMsgBody.getToTemail());
-                if (StringUtils.hasText(topic)) {
-                    Message sendMsg = new Message(topic, pushMsgBody.getData().getBytes());
-                    producer.send(sendMsg);
+                PushMsgBody pushMsgBody;
+                try {
+                    pushMsgBody = gson.fromJson(msgData, PushMsgBody.class);
+                    String topic = getTopicByTemail(pushMsgBody.getToTemail());
+                    if (StringUtils.hasText(topic)) {
+                        Message sendMsg = new Message(topic, pushMsgBody.getData().getBytes());
+                        producer.send(sendMsg);
+                    }
+                } catch (JsonSyntaxException e) {
+                    // 不处理
                 }
             }
 
