@@ -1,4 +1,4 @@
-package com.syswin.temail.cdtp.dispatcher.receive.application;
+package com.syswin.temail.cdtp.dispatcher.request.application;
 
 import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED;
@@ -25,16 +25,13 @@ public class AuthService {
     this.authUrl = authUrl;
     this.restTemplate = restTemplate;
 
-    this.restTemplate.setErrorHandler(new SilentResponseErrorHandler());
     this.headers.setContentType(APPLICATION_FORM_URLENCODED);
   }
 
-  public Response<String> verify(MultiValueMap<String, String> body) {
+  public ResponseEntity<Response<String>> verify(MultiValueMap<String, String> body) {
     HttpEntity<?> requestEntity = new HttpEntity<>(body, headers);
-    ResponseEntity<Response<String>> responseEntity =
-        restTemplate.exchange(authUrl, POST, requestEntity, responseType);
 
-    return responseEntity.getBody();
+    return restTemplate.exchange(authUrl, POST, requestEntity, responseType);
   }
 
   private ParameterizedTypeReference<Response<String>> responseType() {

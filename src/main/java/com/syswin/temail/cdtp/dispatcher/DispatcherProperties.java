@@ -1,17 +1,11 @@
 package com.syswin.temail.cdtp.dispatcher;
 
+import java.util.HashMap;
+import java.util.Map;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.http.HttpMethod;
 
-import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
-
-/**
- * @author 姚华成
- * @date 2018/8/8
- */
 @Data
 @ConfigurationProperties(prefix = "temail.cdtp.dispatcher")
 public class DispatcherProperties {
@@ -19,7 +13,7 @@ public class DispatcherProperties {
     private String authVerifyUrl;
 
     @Data
-    public static class Request{
+    public static class Request {
         private String url;
         private HttpMethod method;
     }

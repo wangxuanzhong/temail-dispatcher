@@ -16,7 +16,7 @@ temail.cdtp.dispatcher:
     usermailPost:
       url: http://192.168.15.186:8090/usermail
       method: POST
-  auth-verify-url: http://localhost:8081/verify
+  auth-verify-url: http://temail-auth:8081/verify
   rocketmq:
     namesrvAddr: 172.28.43.18:9876
     producerGroup: cdtp-dispatcher-producer

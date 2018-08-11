@@ -1,4 +1,4 @@
-package com.syswin.temail.cdtp.dispatcher.receive;
+package com.syswin.temail.cdtp.dispatcher.request;
 
 import static java.util.Collections.singletonMap;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -15,10 +15,13 @@ import au.com.dius.pact.consumer.dsl.PactDslWithProvider;
 import au.com.dius.pact.model.RequestResponsePact;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.syswin.temail.cdtp.dispatcher.receive.application.AuthService;
-import com.syswin.temail.cdtp.dispatcher.receive.application.Response;
+import com.syswin.temail.cdtp.dispatcher.request.application.AuthService;
+import com.syswin.temail.cdtp.dispatcher.request.application.Response;
+import com.syswin.temail.cdtp.dispatcher.request.application.SilentResponseErrorHandler;
 import java.util.HashMap;
 import java.util.Map;
+import org.junit.Before;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
@@ -26,6 +29,12 @@ import org.springframework.web.client.RestTemplate;
 public class AuthConsumerVerificationTest extends ConsumerPactTestMk2 {
 
   private final ObjectMapper objectMapper = new ObjectMapper();
+  private final RestTemplate restTemplate = new RestTemplate();
+
+  @Before
+  public void setUp() {
+    restTemplate.setErrorHandler(new SilentResponseErrorHandler());
+  }
 
   @Override
   public RequestResponsePact createPact(PactDslWithProvider pactDslWithProvider) {
@@ -72,16 +81,16 @@ public class AuthConsumerVerificationTest extends ConsumerPactTestMk2 {
   @Override
   public void runTest(MockServer mockServer) {
     String url = mockServer.getUrl() + "/verify";
-    AuthService authService = new AuthService(new RestTemplate(), url);
+    AuthService authService = new AuthService(restTemplate, url);
 
-    Response<String> response = authService.verify(httpEntityOf("mike@t.email", "abc", "xyz"));
-    assertThat(response.getCode()).isEqualTo(OK.value());
+    ResponseEntity<Response<String>> response = authService.verify(httpEntityOf("mike@t.email", "abc", "xyz"));
+    assertThat(response.getStatusCode()).isEqualTo(OK);
 
     response = authService.verify(httpEntityOf("jane@t.email", "abc", "xyz"));
-    assertThat(response.getCode()).isEqualTo(FORBIDDEN.value());
+    assertThat(response.getStatusCode()).isEqualTo(FORBIDDEN);
 
     response = authService.verify(null);
-    assertThat(response.getCode()).isEqualTo(BAD_REQUEST.value());
+    assertThat(response.getStatusCode()).isEqualTo(BAD_REQUEST);
   }
 
   @Override
