@@ -1,5 +1,6 @@
 package com.syswin.temail.cdtp.dispatcher.request.controller;
 
+import com.syswin.temail.cdtp.dispatcher.receive.application.Response;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -7,10 +8,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 
-/**
- * @author 姚华成
- * @date 2018-8-9
- */
 @Slf4j
 @ControllerAdvice
 public class GlobaleExceptionHandler {
