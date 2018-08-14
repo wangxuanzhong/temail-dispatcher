@@ -1,10 +1,10 @@
 package com.syswin.temail.cdtp.dispatcher.request.application;
 
+import static org.springframework.http.HttpStatus.OK;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import org.springframework.http.HttpStatus;
-
-import static org.springframework.http.HttpStatus.OK;
 
 @JsonInclude(Include.NON_NULL)
 public class Response<T> {
@@ -12,6 +12,24 @@ public class Response<T> {
   private Integer code;
   private String message;
   private T data;
+
+  private Response() {
+  }
+
+  private Response(HttpStatus status) {
+    this.code = status.value();
+  }
+
+  private Response(HttpStatus status, String message) {
+    this.code = status.value();
+    this.message = message;
+  }
+
+  private Response(HttpStatus status, String message, T data) {
+    this.code = status.value();
+    this.message = message;
+    this.data = data;
+  }
 
   public static <T> Response<T> ok() {
     return new Response<>(OK);
@@ -35,24 +53,6 @@ public class Response<T> {
 
   static <T> Response<T> failed(HttpStatus status, String message, T body) {
     return new Response<>(status, message, body);
-  }
-
-  private Response() {
-  }
-
-  private Response(HttpStatus status) {
-    this.code = status.value();
-  }
-
-  private Response(HttpStatus status, String message) {
-    this.code = status.value();
-    this.message = message;
-  }
-
-  private Response(HttpStatus status, String message, T data) {
-    this.code = status.value();
-    this.message = message;
-    this.data = data;
   }
 
   public Integer getCode() {

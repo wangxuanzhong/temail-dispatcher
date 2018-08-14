@@ -1,4 +1,4 @@
-package com.syswin.temail.cdtp.dispatcher.exceptions;
+package com.syswin.temail.cdtp.dispatcher.request.exceptions;
 
 public class TeMailUnsupportedCommandException extends RuntimeException {
 

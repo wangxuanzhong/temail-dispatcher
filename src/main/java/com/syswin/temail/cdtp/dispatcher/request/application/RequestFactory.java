@@ -9,7 +9,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.syswin.temail.cdtp.dispatcher.DispatcherProperties;
 import com.syswin.temail.cdtp.dispatcher.DispatcherProperties.Request;
-import com.syswin.temail.cdtp.dispatcher.exceptions.TeMailUnsupportedCommandException;
+import com.syswin.temail.cdtp.dispatcher.request.exceptions.TeMailUnsupportedCommandException;
 import com.syswin.temail.cdtp.dispatcher.request.entity.CDTPBody;
 import com.syswin.temail.cdtp.dispatcher.request.entity.CDTPBody.CDTPParams;
 import com.syswin.temail.cdtp.dispatcher.request.entity.CDTPPackage;
@@ -40,19 +40,13 @@ class RequestFactory {
       })
       .create();
 
-  private final Gson gson;
   private final DispatcherProperties properties;
 
   RequestFactory(DispatcherProperties properties) {
-    this(properties, BODY_EXCLUSIVE_GSON);
-  }
-
-  private RequestFactory(DispatcherProperties properties, Gson gson) {
-    this.gson = gson;
     this.properties = properties;
   }
 
-  TeMailRequest toRequest(CDTPPackage<CDTPBody> cdtpPackage) {
+  TeMailRequest toRequest(CDTPPackage cdtpPackage) {
     CDTPBody cdtpBody = cdtpPackage.getData();
     CDTPParams params = cdtpBody.getParams();
     Request request = properties.getCmdRequestMap().get(cdtpBody.getCommand());
@@ -67,7 +61,7 @@ class RequestFactory {
     return new TeMailRequest(url, request.getMethod(), entity);
   }
 
-  private MultiValueMap<String, String> addHeaders(CDTPPackage<CDTPBody> cdtpPackage, CDTPParams params) {
+  private MultiValueMap<String, String> addHeaders(CDTPPackage cdtpPackage, CDTPParams params) {
     Map<String, List<String>> paramsHeaders = params.getHeader();
     MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
     if (paramsHeaders != null && !paramsHeaders.isEmpty()) {
@@ -75,7 +69,7 @@ class RequestFactory {
         headers.addAll(entry.getKey(), entry.getValue());
       }
     }
-    headers.add(CDTP_HEADER, gson.toJson(cdtpPackage));
+    headers.add(CDTP_HEADER, BODY_EXCLUSIVE_GSON.toJson(cdtpPackage));
     return headers;
   }
 
@@ -91,7 +85,7 @@ class RequestFactory {
     return url;
   }
 
-  private HttpEntity<?> composeRequestBody(CDTPPackage<CDTPBody> cdtpPackage,
+  private HttpEntity<?> composeRequestBody(CDTPPackage cdtpPackage,
       CDTPParams params,
       Request request) {
 
@@ -103,7 +97,7 @@ class RequestFactory {
         return new HttpEntity<>(headers);
       case POST:
       case PUT:
-        String body = params.getBody();
+        Map<String, Object> body = params.getBody();
         if (body != null) {
           headers.add(CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE);
           return new HttpEntity<>(body, headers);

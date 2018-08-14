@@ -17,13 +17,16 @@ import static org.springframework.http.HttpMethod.TRACE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.syswin.temail.cdtp.dispatcher.DispatcherProperties;
 import com.syswin.temail.cdtp.dispatcher.DispatcherProperties.Request;
-import com.syswin.temail.cdtp.dispatcher.exceptions.TeMailUnsupportedCommandException;
+import com.syswin.temail.cdtp.dispatcher.request.exceptions.TeMailUnsupportedCommandException;
 import com.syswin.temail.cdtp.dispatcher.request.entity.CDTPBody;
 import com.syswin.temail.cdtp.dispatcher.request.entity.CDTPPackage;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.List;
+import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.HttpMethod;
@@ -31,16 +34,17 @@ import org.springframework.util.LinkedMultiValueMap;
 
 public class RequestFactoryTest {
 
-  private static final String bodyJson = "{\n"
+  private static final Map<String, Object> bodyJson = new Gson().fromJson("{\n"
       + "  \"foo\": \"bar\",\n"
       + "  \"hello\": \"world\"\n"
-      + "}";
+      + "}", new TypeToken<Map<String, Object>>() {
+  }.getType());
 
   private final DispatcherProperties properties = new DispatcherProperties();
   private final Request request = new Request();
   private final String baseUrl = "http://localhost:" + nextInt(1000);
   private final String command = uniquify("command");
-  private final CDTPPackage<CDTPBody> cdtpPackage = initCDTPPackage();
+  private final CDTPPackage cdtpPackage = initCDTPPackage();
 
   private final HttpMethod[] methods = {GET, POST, PUT, DELETE};
 
@@ -119,20 +123,20 @@ public class RequestFactoryTest {
     }
   }
 
-  @Test (expected = TeMailUnsupportedCommandException.class)
+  @Test(expected = TeMailUnsupportedCommandException.class)
   public void blowsUpWhenCommandIsNotMapped() {
     cdtpPackage.getData().setCommand(uniquify("command"));
     requestFactory.toRequest(cdtpPackage);
   }
 
-  @Test (expected = TeMailUnsupportedCommandException.class)
+  @Test(expected = TeMailUnsupportedCommandException.class)
   public void blowsUpWhenMethodIsNotSupported() {
     request.setMethod(TRACE);
     requestFactory.toRequest(cdtpPackage);
   }
 
-  private CDTPPackage<CDTPBody> initCDTPPackage() {
-    CDTPPackage<CDTPBody> cdtpPackage = new CDTPPackage<>();
+  private CDTPPackage initCDTPPackage() {
+    CDTPPackage cdtpPackage = new CDTPPackage();
     cdtpPackage.setCommand(nextInt(10));
     cdtpPackage.setVersion(nextInt(10));
     cdtpPackage.setAlgorithm(nextInt(10));

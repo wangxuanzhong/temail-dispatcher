@@ -18,12 +18,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.syswin.temail.cdtp.dispatcher.request.application.AuthService;
 import com.syswin.temail.cdtp.dispatcher.request.application.Response;
 import com.syswin.temail.cdtp.dispatcher.request.application.SilentResponseErrorHandler;
+import com.syswin.temail.cdtp.dispatcher.request.entity.AuthData;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.Before;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 public class AuthConsumerVerificationTest extends ConsumerPactTestMk2 {
@@ -44,34 +43,35 @@ public class AuthConsumerVerificationTest extends ConsumerPactTestMk2 {
     try {
       return pactDslWithProvider
           .given("Verify - User Mike exists")
-            .uponReceiving("request for user Mike")
-            .method("POST")
-            .body("TeMail=mike%40t.email&UNSIGNED_BYTES=abc&SIGNATURE=xyz")
-            .headers(headers)
-            .path("/verify")
-            .willRespondWith()
-            .status(200)
-            .headers(singletonMap(CONTENT_TYPE, APPLICATION_JSON_VALUE))
-            .body(objectMapper.writeValueAsString(Response.ok(OK, "Success")))
+          .uponReceiving("request for user Mike")
+          .method("POST")
+          .body("TeMail=mike%40t.email&UNSIGNED_BYTES=abc&SIGNATURE=xyz")
+          .headers(headers)
+          .path("/verify")
+          .willRespondWith()
+          .status(200)
+          .headers(singletonMap(CONTENT_TYPE, APPLICATION_JSON_VALUE))
+          .body(objectMapper.writeValueAsString(Response.ok(OK, "Success")))
           .given("Verify - User Jane does not exist")
-            .uponReceiving("request for user Jane")
-            .method("POST")
-            .body("TeMail=jane%40t.email&UNSIGNED_BYTES=abc&SIGNATURE=xyz")
-            .headers(headers)
-            .path("/verify")
-            .willRespondWith()
-            .status(FORBIDDEN.value())
-            .headers(singletonMap(CONTENT_TYPE, APPLICATION_JSON_VALUE))
-            .body(objectMapper.writeValueAsString(Response.failed(FORBIDDEN, "No such user exists: jane@t.email")))
+          .uponReceiving("request for user Jane")
+          .method("POST")
+          .body("TeMail=jane%40t.email&UNSIGNED_BYTES=abc&SIGNATURE=xyz")
+          .headers(headers)
+          .path("/verify")
+          .willRespondWith()
+          .status(FORBIDDEN.value())
+          .headers(singletonMap(CONTENT_TYPE, APPLICATION_JSON_VALUE))
+          .body(objectMapper.writeValueAsString(Response.failed(FORBIDDEN, "No such user exists: jane@t.email")))
           .given("Verify - Invalid request")
-            .uponReceiving("request without signature")
-            .method("POST")
-            .headers(headers)
-            .path("/verify")
-            .willRespondWith()
-            .status(400)
-            .headers(singletonMap(CONTENT_TYPE, APPLICATION_JSON_VALUE))
-            .body(objectMapper.writeValueAsString(Response.failed(BAD_REQUEST, "TeMail address or public key is invalid")))
+          .uponReceiving("request without signature")
+          .method("POST")
+          .headers(headers)
+          .path("/verify")
+          .willRespondWith()
+          .status(400)
+          .headers(singletonMap(CONTENT_TYPE, APPLICATION_JSON_VALUE))
+          .body(
+              objectMapper.writeValueAsString(Response.failed(BAD_REQUEST, "TeMail address or public key is invalid")))
           .toPact();
     } catch (JsonProcessingException e) {
       throw new IllegalStateException(e);
@@ -103,12 +103,12 @@ public class AuthConsumerVerificationTest extends ConsumerPactTestMk2 {
     return "temail-gateway";
   }
 
-  private MultiValueMap<String, String> httpEntityOf(String email, String unsigned, String signature) {
-    MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
-    map.add("TeMail", email);
-    map.add("UNSIGNED_BYTES", unsigned);
-    map.add("SIGNATURE", signature);
+  private AuthData httpEntityOf(String email, String unsigned, String signature) {
+    AuthData authData = new AuthData();
+    authData.setTemail(email);
+    authData.setUnsignedBytes(unsigned);
+    authData.setSignature(signature);
 
-    return map;
+    return authData;
   }
 }

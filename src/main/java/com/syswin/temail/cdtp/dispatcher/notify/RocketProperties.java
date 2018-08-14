@@ -10,8 +10,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Data
 @ConfigurationProperties(prefix = "temail.cdtp.dispatcher.rocketmq")
 public class RocketProperties {
-    private String namesrvAddr;
-    private String producerGroup = "cdtp-dispatcher-producer";
-    private String consumerGroup = "cdtp-dispatcher-consumer";
-    private String topic = "cdtp-notify";
+
+  private String namesrvAddr;
+  private String producerGroup = "cdtp-dispatcher-producer";
+  private String consumerGroup = "cdtp-dispatcher-consumer";
+  private String topic = "cdtp-notify";
 }

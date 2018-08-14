@@ -11,29 +11,31 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.client.RestTemplate;
 
+//@EnableSwagger2Doc
 @SpringBootApplication
 @EnableConfigurationProperties({DispatcherProperties.class, RocketProperties.class})
 public class DispatcherApplication {
-    public static void main(String[] args) {
-        SpringApplication.run(DispatcherApplication.class, args);
-    }
 
-    @Bean
-    RestTemplate restTemplate() {
-        return new RestTemplateBuilder()
-            .setConnectTimeout(3000)
-            .setReadTimeout(3000)
-            .errorHandler(new SilentResponseErrorHandler())
-            .build();
-    }
+  public static void main(String[] args) {
+    SpringApplication.run(DispatcherApplication.class, args);
+  }
 
-    @Bean
-    PackageDispatcher responseFetcher(DispatcherProperties properties, RestTemplate restTemplate) {
-        return new PackageDispatcher(properties, restTemplate);
-    }
+  @Bean
+  RestTemplate restTemplate() {
+    return new RestTemplateBuilder()
+        .setConnectTimeout(3000)
+        .setReadTimeout(3000)
+        .errorHandler(new SilentResponseErrorHandler())
+        .build();
+  }
 
-    @Bean
-    AuthService authService(DispatcherProperties properties, RestTemplate restTemplate) {
-        return new AuthService(restTemplate, properties.getAuthVerifyUrl());
-    }
+  @Bean
+  PackageDispatcher responseFetcher(DispatcherProperties properties, RestTemplate restTemplate) {
+    return new PackageDispatcher(properties, restTemplate);
+  }
+
+  @Bean
+  AuthService authService(DispatcherProperties properties, RestTemplate restTemplate) {
+    return new AuthService(restTemplate, properties.getAuthVerifyUrl());
+  }
 }

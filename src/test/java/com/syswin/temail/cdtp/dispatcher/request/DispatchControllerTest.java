@@ -37,7 +37,7 @@ public class DispatchControllerTest {
   public void wrapResponse() throws Exception {
     when(packageDispatcher.dispatch(any())).thenReturn(ResponseEntity.ok("hello"));
 
-    CDTPPackage<CDTPBody> cdtpPackage = initCDTPPackage();
+    CDTPPackage cdtpPackage = initCDTPPackage();
     String content = gson.toJson(cdtpPackage);
 
     mvc.perform(post("/dispatch")
@@ -57,8 +57,8 @@ public class DispatchControllerTest {
         .andExpect(jsonPath("$.receiverPK", is("ReceiverPK(")));
   }
 
-  private CDTPPackage<CDTPBody> initCDTPPackage() {
-    CDTPPackage<CDTPBody> cdtpPackage = new CDTPPackage<>();
+  private CDTPPackage initCDTPPackage() {
+    CDTPPackage cdtpPackage = new CDTPPackage();
     cdtpPackage.setCommand(1);
     cdtpPackage.setVersion(1);
     cdtpPackage.setAlgorithm(1);

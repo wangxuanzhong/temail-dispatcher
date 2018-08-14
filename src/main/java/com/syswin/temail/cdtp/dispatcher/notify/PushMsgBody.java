@@ -8,6 +8,7 @@ import lombok.Data;
  */
 @Data
 public class PushMsgBody {
-    private String toTemail;
-    private String data;
+
+  private String toTemail;
+  private String data;
 }
