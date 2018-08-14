@@ -1,4 +1,4 @@
-package com.syswin.temail.cdtp.dispatcher.push;
+package com.syswin.temail.cdtp.dispatcher.notify;
 
 import org.apache.rocketmq.client.consumer.DefaultMQPushConsumer;
 import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyStatus;

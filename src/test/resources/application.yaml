@@ -1,14 +1,5 @@
 server:
   port: 8888
-
-#swagger:
-#  contact:
-#    name: 姚华成
-#    email:  yaohuacheng@syswin.com
-#  title: cdtp-dispatcher
-#  description: CDTP分发服务
-#  basePath: /**
-
 #
 #temail.cdtp.dispatcher:
 #  auth-verify-url: http://192.168.15.186:8081/verify
