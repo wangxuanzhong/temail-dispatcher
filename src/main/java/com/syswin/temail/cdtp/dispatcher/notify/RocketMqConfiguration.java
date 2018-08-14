@@ -1,11 +1,14 @@
 package com.syswin.temail.cdtp.dispatcher.notify;
 
+import com.syswin.temail.cdtp.dispatcher.DispatcherProperties;
+import com.syswin.temail.cdtp.dispatcher.DispatcherProperties.RocketMQ;
 import org.apache.rocketmq.client.consumer.DefaultMQPushConsumer;
 import org.apache.rocketmq.client.consumer.MQConsumer;
 import org.apache.rocketmq.client.producer.DefaultMQProducer;
 import org.apache.rocketmq.client.producer.MQProducer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.client.RestTemplate;
 
 /**
  * @author 姚华成
@@ -15,19 +18,21 @@ import org.springframework.context.annotation.Configuration;
 public class RocketMqConfiguration {
 
   @Bean
-  public MQConsumer consumer(RocketProperties properties, MQProducer producer) throws Exception {
-    DefaultMQPushConsumer consumer = new DefaultMQPushConsumer(properties.getConsumerGroup());
-    consumer.setNamesrvAddr(properties.getNamesrvAddr());
-    consumer.subscribe(properties.getTopic(), "*");
-    consumer.setMessageListener(new DispatchListener(producer));
+  public MQConsumer consumer(DispatcherProperties properties, RestTemplate restTemplate, MQProducer producer)
+      throws Exception {
+    RocketMQ rocketMQ = properties.getRocketmq();
+    DefaultMQPushConsumer consumer = new DefaultMQPushConsumer(rocketMQ.getConsumerGroup());
+    consumer.setNamesrvAddr(rocketMQ.getNamesrvAddr());
+    consumer.subscribe(rocketMQ.getConsumerTopic(), "*");
+    consumer.setMessageListener(new DispatchListener(producer, restTemplate, properties.getCdtpStatusUrl()));
     consumer.start();
     return consumer;
   }
 
   @Bean
-  public MQProducer producer(RocketProperties properties) throws Exception {
-    DefaultMQProducer producer = new DefaultMQProducer(properties.getProducerGroup());
-    producer.setNamesrvAddr(properties.getNamesrvAddr());
+  public MQProducer producer(DispatcherProperties properties) throws Exception {
+    DefaultMQProducer producer = new DefaultMQProducer(properties.getRocketmq().getProducerGroup());
+    producer.setNamesrvAddr(properties.getRocketmq().getNamesrvAddr());
     producer.start();
     return producer;
   }

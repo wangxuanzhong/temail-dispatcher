@@ -16,7 +16,7 @@ import au.com.dius.pact.model.RequestResponsePact;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.syswin.temail.cdtp.dispatcher.request.application.AuthService;
-import com.syswin.temail.cdtp.dispatcher.request.application.Response;
+import com.syswin.temail.cdtp.dispatcher.request.controller.Response;
 import com.syswin.temail.cdtp.dispatcher.request.application.SilentResponseErrorHandler;
 import com.syswin.temail.cdtp.dispatcher.request.entity.AuthData;
 import java.util.HashMap;

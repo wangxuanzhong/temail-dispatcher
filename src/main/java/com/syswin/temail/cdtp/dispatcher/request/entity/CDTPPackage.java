@@ -1,20 +1,18 @@
 package com.syswin.temail.cdtp.dispatcher.request.entity;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
-public class CDTPPackage {
+@EqualsAndHashCode(callSuper = true)
+public class CDTPPackage extends CDTPHeader {
 
-  private int command;
-  private int version;
-  private int algorithm;
-  private String sign;
-  private int dem;
-  private long timestamp;
-  private String pkgId;
-  private String from;
-  private String to;
-  private String senderPK;
-  private String receiverPK;
-  private CDTPBody data;
+  private String data;
+
+  public CDTPPackage() {
+  }
+
+  public CDTPPackage(CDTPHeader header) {
+    super(header);
+  }
 }

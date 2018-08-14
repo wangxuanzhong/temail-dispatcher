@@ -1,22 +1,23 @@
-temail.cdtp.dispatcher:
-  cmd-request-map:
-    testGet:
-      url: http://localhost:8081/testGet
-      method: GET
-    testPost:
-      url: http://localhost:8081/testPost
-      method: POST
-    hello:
-      url: http://localhost:8081/hello
-      method: GET
-
-    usermailGet:
-      url: http://192.168.15.186:8090/usermail
-      method: GET
-    usermailPost:
-      url: http://192.168.15.186:8090/usermail
-      method: POST
-    revertPut:
-      url: http://192.168.15.186:8090/revert
-      method: PUT
-  auth-verify-url: http://localhost:8081/verify
+server:
+  port: 8888
+#
+#temail.cdtp.dispatcher:
+#  auth-verify-url: http://192.168.15.186:8081/verify
+#  cdtp-status-url: http://172.31.244.73:9099/locateStatus/{accountNo}
+#
+#  cmd-request-map:
+#    1001:
+#      url: http://192.168.15.186:8090/usermail
+#      method: GET
+#    1002:
+#      url: http://192.168.15.186:8090/usermail
+#      method: POST
+#    1003:
+#      url: http://192.168.15.186:8090/revert
+#      method: PUT
+#
+#  rocketmq:
+#    namesrv-addr: 172.28.43.18:9876
+#    producer-group: cdtp-dispatcher-producer
+#    consumer-group: cdtp-dispatcher-consumer
+#    consumer-topic: temail-notification

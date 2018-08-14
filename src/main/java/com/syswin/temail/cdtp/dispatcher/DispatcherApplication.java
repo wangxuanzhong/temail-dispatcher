@@ -1,6 +1,5 @@
 package com.syswin.temail.cdtp.dispatcher;
 
-import com.syswin.temail.cdtp.dispatcher.notify.RocketProperties;
 import com.syswin.temail.cdtp.dispatcher.request.application.AuthService;
 import com.syswin.temail.cdtp.dispatcher.request.application.PackageDispatcher;
 import com.syswin.temail.cdtp.dispatcher.request.application.SilentResponseErrorHandler;
@@ -13,7 +12,7 @@ import org.springframework.web.client.RestTemplate;
 
 //@EnableSwagger2Doc
 @SpringBootApplication
-@EnableConfigurationProperties({DispatcherProperties.class, RocketProperties.class})
+@EnableConfigurationProperties({DispatcherProperties.class})
 public class DispatcherApplication {
 
   public static void main(String[] args) {
@@ -21,10 +20,10 @@ public class DispatcherApplication {
   }
 
   @Bean
-  RestTemplate restTemplate() {
+  RestTemplate restTemplate(DispatcherProperties properties) {
     return new RestTemplateBuilder()
-        .setConnectTimeout(3000)
-        .setReadTimeout(3000)
+        .setConnectTimeout(properties.getHttpCliet().getConnectTimeoutInMilli())
+        .setReadTimeout(properties.getHttpCliet().getReadTimeoutInMilli())
         .errorHandler(new SilentResponseErrorHandler())
         .build();
   }

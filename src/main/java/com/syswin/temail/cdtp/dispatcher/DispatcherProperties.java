@@ -10,13 +10,32 @@ import org.springframework.http.HttpMethod;
 @ConfigurationProperties(prefix = "temail.cdtp.dispatcher")
 public class DispatcherProperties {
 
-  private Map<String, Request> cmdRequestMap = new HashMap<>();
   private String authVerifyUrl;
+  private String cdtpStatusUrl;
+  private Map<Integer, Request> cmdRequestMap = new HashMap<>();
+  private RocketMQ rocketmq = new RocketMQ();
+  private HttpCliet httpCliet = new HttpCliet();
+
+  @Data
+  public static class RocketMQ {
+
+    private String namesrvAddr;
+    private String producerGroup = "cdtp-dispatcher-producer";
+    private String consumerGroup = "cdtp-dispatcher-consumer";
+    private String consumerTopic = "temail-notification";
+  }
 
   @Data
   public static class Request {
 
     private String url;
     private HttpMethod method;
+  }
+
+  @Data
+  public static class HttpCliet {
+
+    private int readTimeoutInMilli = 3000;
+    private int connectTimeoutInMilli = 3000;
   }
 }

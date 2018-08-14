@@ -10,7 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.google.gson.Gson;
 import com.syswin.temail.cdtp.dispatcher.request.application.PackageDispatcher;
-import com.syswin.temail.cdtp.dispatcher.request.entity.CDTPBody;
+import com.syswin.temail.cdtp.dispatcher.request.entity.CDTPParams;
 import com.syswin.temail.cdtp.dispatcher.request.entity.CDTPPackage;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -71,14 +71,11 @@ public class DispatchControllerTest {
     cdtpPackage.setSenderPK("SenderPK(");
     cdtpPackage.setReceiverPK("ReceiverPK(");
 
-    CDTPBody cdtpBody = new CDTPBody();
-
-    CDTPBody.CDTPParams params = new CDTPBody.CDTPParams();
-
+    CDTPParams params = new CDTPParams();
     params.setHeader(new LinkedMultiValueMap<>());
     params.setQuery(new LinkedMultiValueMap<>());
-    cdtpBody.setParams(params);
-    cdtpPackage.setData(cdtpBody);
+
+    cdtpPackage.setData(new Gson().toJson(params));
     return cdtpPackage;
   }
 }

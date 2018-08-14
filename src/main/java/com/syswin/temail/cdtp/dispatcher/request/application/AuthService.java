@@ -3,6 +3,7 @@ package com.syswin.temail.cdtp.dispatcher.request.application;
 import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED;
 
+import com.syswin.temail.cdtp.dispatcher.request.controller.Response;
 import com.syswin.temail.cdtp.dispatcher.request.entity.AuthData;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;

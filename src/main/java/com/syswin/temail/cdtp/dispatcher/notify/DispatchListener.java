@@ -1,7 +1,15 @@
 package com.syswin.temail.cdtp.dispatcher.notify;
 
+import static com.syswin.temail.cdtp.dispatcher.Constants.NOTIFY_COMMAND;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
+import com.syswin.temail.cdtp.dispatcher.notify.entity.MessageBody;
+import com.syswin.temail.cdtp.dispatcher.notify.entity.TemailAccountStatusLocateResponse;
+import com.syswin.temail.cdtp.dispatcher.notify.entity.TemailAccountStatusLocateResponse.TemailAccountStatus;
+import com.syswin.temail.cdtp.dispatcher.request.entity.CDTPHeader;
+import com.syswin.temail.cdtp.dispatcher.request.entity.CDTPPackage;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyContext;
@@ -10,7 +18,7 @@ import org.apache.rocketmq.client.consumer.listener.MessageListenerConcurrently;
 import org.apache.rocketmq.client.producer.MQProducer;
 import org.apache.rocketmq.common.message.Message;
 import org.apache.rocketmq.common.message.MessageExt;
-import org.springframework.util.StringUtils;
+import org.springframework.web.client.RestTemplate;
 
 /**
  * @author 姚华成
@@ -21,9 +29,13 @@ public class DispatchListener implements MessageListenerConcurrently {
 
   private Gson gson = new Gson();
   private MQProducer producer;
+  private RestTemplate restTemplate;
+  private String cdtpStatusUrl;
 
-  public DispatchListener(MQProducer producer) {
+  public DispatchListener(MQProducer producer, RestTemplate restTemplate, String cdtpStatusUrl) {
     this.producer = producer;
+    this.restTemplate = restTemplate;
+    this.cdtpStatusUrl = cdtpStatusUrl;
   }
 
   @Override
@@ -32,14 +44,21 @@ public class DispatchListener implements MessageListenerConcurrently {
       for (MessageExt msg : msgs) {
         String msgData = new String(msg.getBody());
         log.debug("接收到的消息是：{}", msgData);
-        PushMsgBody pushMsgBody;
+        MessageBody messageBody;
         try {
-          pushMsgBody = gson.fromJson(msgData, PushMsgBody.class);
-          String topic = getTopicByTemail(pushMsgBody.getToTemail());
-          if (StringUtils.hasText(topic)) {
-            Message sendMsg = new Message(topic, pushMsgBody.getData().getBytes());
-            producer.send(sendMsg);
-          }
+          messageBody = gson.fromJson(msgData, MessageBody.class);
+          CDTPHeader header = gson.fromJson(messageBody.getHeader(), CDTPHeader.class);
+          String toTemail = messageBody.getToTemail();
+          header.setCommand(NOTIFY_COMMAND);
+          header.setTo(toTemail);
+          CDTPPackage cdtpPackage = new CDTPPackage(header);
+          cdtpPackage.setData(gson.toJson(messageBody.getData()));
+          byte[] messageData = gson.toJson(cdtpPackage).getBytes();
+
+          List<String> topics = getTopicsByTemail(toTemail);
+          List<Message> sendMsgList = new ArrayList<>();
+          topics.forEach(topic -> sendMsgList.add(new Message(topic, messageData)));
+          producer.send(sendMsgList);
         } catch (JsonSyntaxException e) {
           // 不处理
         }
@@ -52,8 +71,19 @@ public class DispatchListener implements MessageListenerConcurrently {
     }
   }
 
-  private String getTopicByTemail(String temail) {
+  private List<String> getTopicsByTemail(String temail) {
     // 根据temail地址从状态服务器获取该temail对应的通道所在topic
-    return "defaultChannel";
+    List<String> topicList = new ArrayList<>();
+    TemailAccountStatusLocateResponse response = restTemplate
+        .getForObject(cdtpStatusUrl, TemailAccountStatusLocateResponse.class, temail);
+    if (response != null) {
+      List<TemailAccountStatus> statusList = response.getStatusList();
+      if (statusList != null && !statusList.isEmpty()) {
+        for (TemailAccountStatus temailAccountStatus : statusList) {
+          topicList.add(temailAccountStatus.getMqTopic());
+        }
+      }
+    }
+    return topicList;
   }
 }

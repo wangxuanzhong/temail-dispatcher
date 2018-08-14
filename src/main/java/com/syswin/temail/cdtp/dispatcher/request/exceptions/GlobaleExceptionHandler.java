@@ -1,10 +1,9 @@
-package com.syswin.temail.cdtp.dispatcher.request.controller;
+package com.syswin.temail.cdtp.dispatcher.request.exceptions;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 
-import com.syswin.temail.cdtp.dispatcher.request.exceptions.TeMailUnsupportedCommandException;
-import com.syswin.temail.cdtp.dispatcher.request.application.Response;
+import com.syswin.temail.cdtp.dispatcher.request.controller.Response;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;

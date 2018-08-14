@@ -21,6 +21,7 @@
     <syswin-disconf.version>1.0.0</syswin-disconf.version>
     <ocm-swagger.version>1.7.0.RELEASE</ocm-swagger.version>
     <swagger2.version>2.6.1</swagger2.version>
+    <zookeeper.version>3.4.9</zookeeper.version>
   </properties>
 
   <dependencies>
@@ -30,20 +31,27 @@
       <version>${syswin-disconf.version}</version>
     </dependency>
     <dependency>
+      <!-- disconfig只能使用这个版本，高版本有错误 -->
       <groupId>org.reflections</groupId>
       <artifactId>reflections</artifactId>
       <version>0.9.9-RC1</version>
+      <exclusions>
+        <exclusion>
+          <groupId>com.google.guava</groupId>
+          <artifactId>guava</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
-    <!--<dependency>-->
-    <!--<groupId>com.systoon.ocm.framework</groupId>-->
-    <!--<artifactId>ocm-swagger</artifactId>-->
-    <!--<version>${ocm-swagger.version}</version>-->
-    <!--</dependency>-->
-    <!--<dependency>-->
-    <!--<groupId>io.springfox</groupId>-->
-    <!--<artifactId>springfox-swagger-ui</artifactId>-->
-    <!--<version>${swagger2.version}</version>-->
-    <!--</dependency>-->
+    <dependency>
+      <groupId>com.systoon.ocm.framework</groupId>
+      <artifactId>ocm-swagger</artifactId>
+      <version>${ocm-swagger.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.springfox</groupId>
+      <artifactId>springfox-swagger-ui</artifactId>
+      <version>${swagger2.version}</version>
+    </dependency>
     <dependency>
       <groupId>io.springfox</groupId>
       <artifactId>springfox-swagger2</artifactId>
@@ -69,29 +77,43 @@
       <artifactId>spring-boot-starter-log4j2</artifactId>
     </dependency>
     <dependency>
+      <groupId>com.fasterxml.jackson.dataformat</groupId>
+      <artifactId>jackson-dataformat-yaml</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>log4j-over-slf4j</artifactId>
     </dependency>
 
     <dependency>
-      <groupId>io.netty</groupId>
-      <artifactId>netty-all</artifactId>
-      <scope>compile</scope>
+      <groupId>org.apache.zookeeper</groupId>
+      <artifactId>zookeeper</artifactId>
+      <version>${zookeeper.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>log4j</groupId>
+          <artifactId>log4j</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-log4j12</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>jline</groupId>
+          <artifactId>jline</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.rocketmq</groupId>
+      <artifactId>rocketmq-client</artifactId>
+      <version>${rocketmq-client.version}</version>
     </dependency>
 
     <dependency>
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.google.protobuf</groupId>
-      <artifactId>protobuf-java</artifactId>
-      <version>${protobuf-java.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.rocketmq</groupId>
-      <artifactId>rocketmq-client</artifactId>
-      <version>${rocketmq-client.version}</version>
     </dependency>
 
     <dependency>
@@ -118,7 +140,7 @@
     </dependency>
     <dependency>
       <groupId>au.com.dius</groupId>
-      <artifactId>pact-jvm-consumer_2.11</artifactId>
+      <artifactId>pact-jvm-consumer-junit_2.11</artifactId>
       <version>${pact.version}</version>
       <scope>test</scope>
       <exclusions>
@@ -127,18 +149,6 @@
           <artifactId>groovy-all</artifactId>
         </exclusion>
       </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>au.com.dius</groupId>
-      <artifactId>pact-jvm-consumer-junit_2.11</artifactId>
-      <version>${pact.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>au.com.dius</groupId>
-      <artifactId>pact-jvm-provider_2.11</artifactId>
-      <version>${pact.version}</version>
-      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>au.com.dius</groupId>
@@ -154,6 +164,50 @@
     </dependency>
   </dependencies>
   <build>
+    <resources>
+      <resource>
+        <directory>${basedir}/src/main/resources</directory>
+        <filtering>true</filtering>
+        <includes>
+          <include>**/*.properties</include>
+          <include>**/*.yml</include>
+          <include>**/*.yaml</include>
+          <include>**/*.xml</include>
+        </includes>
+      </resource>
+      <resource>
+        <directory>${basedir}/src/main/resources</directory>
+        <filtering>false</filtering>
+        <excludes>
+          <exclude>**/*.properties</exclude>
+          <exclude>**/*.yml</exclude>
+          <exclude>**/*.yaml</exclude>
+          <exclude>**/*.xml</exclude>
+        </excludes>
+      </resource>
+    </resources>
+    <testResources>
+      <testResource>
+        <directory>${basedir}/src/test/resources</directory>
+        <filtering>true</filtering>
+        <includes>
+          <include>**/*.properties</include>
+          <include>**/*.yml</include>
+          <include>**/*.yaml</include>
+          <include>**/*.xml</include>
+        </includes>
+      </testResource>
+      <testResource>
+        <directory>${basedir}/src/test/resources</directory>
+        <filtering>false</filtering>
+        <excludes>
+          <exclude>**/*.properties</exclude>
+          <exclude>**/*.yml</exclude>
+          <exclude>**/*.yaml</exclude>
+          <exclude>**/*.xml</exclude>
+        </excludes>
+      </testResource>
+    </testResources>
     <plugins>
       <plugin>
         <groupId>org.springframework.boot</groupId>

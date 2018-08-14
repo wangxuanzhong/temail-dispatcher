@@ -1,4 +1,4 @@
-package com.syswin.temail.cdtp.dispatcher.request.application;
+package com.syswin.temail.cdtp.dispatcher.request.controller;
 
 import static org.springframework.http.HttpStatus.OK;
 
