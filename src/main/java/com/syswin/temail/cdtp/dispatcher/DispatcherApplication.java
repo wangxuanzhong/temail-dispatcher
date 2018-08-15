@@ -1,5 +1,6 @@
 package com.syswin.temail.cdtp.dispatcher;
 
+import com.systoon.ocm.framework.swagger.EnableSwagger2Doc;
 import com.syswin.temail.cdtp.dispatcher.request.application.AuthService;
 import com.syswin.temail.cdtp.dispatcher.request.application.PackageDispatcher;
 import com.syswin.temail.cdtp.dispatcher.request.application.SilentResponseErrorHandler;
@@ -10,7 +11,7 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.client.RestTemplate;
 
-//@EnableSwagger2Doc
+@EnableSwagger2Doc
 @SpringBootApplication
 @EnableConfigurationProperties({DispatcherProperties.class})
 public class DispatcherApplication {

@@ -12,7 +12,6 @@ import com.syswin.temail.cdtp.dispatcher.DispatcherProperties.Request;
 import com.syswin.temail.cdtp.dispatcher.request.entity.CDTPHeader;
 import com.syswin.temail.cdtp.dispatcher.request.entity.CDTPPackage;
 import com.syswin.temail.cdtp.dispatcher.request.entity.CDTPParams;
-import com.syswin.temail.cdtp.dispatcher.request.exceptions.TeMailUnsupportedCommandException;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -57,13 +56,13 @@ public class PackageDispatcher {
 
     if (request == null) {
       log.error("不支持的命令类型：{}, 请求参数：{}", command, cdtpPackage);
-      throw new TeMailUnsupportedCommandException("不支持的命令类型：" + command);
+      throw new RuntimeException("不支持的命令类型：" + command);
     }
 
     HttpEntity<?> entity = composeHttpEntity(request, cdtpPackage, params);
     if (entity == null) {
       log.error("请求参数：{}", cdtpPackage);
-      throw new TeMailUnsupportedCommandException("不支持的命令类型：" + request.getMethod());
+      throw new RuntimeException("不支持的命令类型：" + request.getMethod());
     }
 
     String url = composeUrl(request, params.getQuery());

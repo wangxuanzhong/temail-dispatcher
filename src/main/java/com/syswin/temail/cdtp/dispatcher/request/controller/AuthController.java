@@ -2,6 +2,7 @@ package com.syswin.temail.cdtp.dispatcher.request.controller;
 
 import com.syswin.temail.cdtp.dispatcher.request.application.AuthService;
 import com.syswin.temail.cdtp.dispatcher.request.entity.AuthData;
+import com.syswin.temail.cdtp.dispatcher.request.exceptions.AuthException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +27,11 @@ public class AuthController {
   @PostMapping(value = "/verify")
   public ResponseEntity<Response<String>> verify(
       @RequestBody AuthData body) {
-    return authService.verify(body);
+    try {
+      return authService.verify(body);
+    } catch (Exception e) {
+      throw new AuthException(e);
+    }
   }
 
   @GetMapping
