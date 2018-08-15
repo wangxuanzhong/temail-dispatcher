@@ -43,7 +43,7 @@ public class DispatchListener implements MessageListenerConcurrently {
     try {
       for (MessageExt msg : msgs) {
         String msgData = new String(msg.getBody());
-        log.debug("接收到的消息是：{}", msgData);
+        log.info("接收到的消息是：{}", msgData);
         MessageBody messageBody;
         try {
           messageBody = gson.fromJson(msgData, MessageBody.class);
@@ -58,8 +58,11 @@ public class DispatchListener implements MessageListenerConcurrently {
           List<String> topics = getTopicsByTemail(toTemail);
           List<Message> sendMsgList = new ArrayList<>();
           topics.forEach(topic -> sendMsgList.add(new Message(topic, messageData)));
+          log.info("发送给cdtp-server的消息为:{}", sendMsgList);
           producer.send(sendMsgList);
         } catch (JsonSyntaxException e) {
+          log.error("消息内容为：{}", msgData);
+          log.error("解析错误", e);
           // 不处理
         }
       }

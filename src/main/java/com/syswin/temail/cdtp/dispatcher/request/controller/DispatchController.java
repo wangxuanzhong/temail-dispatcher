@@ -1,5 +1,6 @@
 package com.syswin.temail.cdtp.dispatcher.request.controller;
 
+import com.google.gson.Gson;
 import com.syswin.temail.cdtp.dispatcher.request.application.PackageDispatcher;
 import com.syswin.temail.cdtp.dispatcher.request.entity.CDTPPackage;
 import com.syswin.temail.cdtp.dispatcher.request.exceptions.DispatchException;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class DispatchController {
 
   private final PackageDispatcher packageDispatcher;
+  private Gson gson = new Gson();
 
   @Autowired
   public DispatchController(PackageDispatcher packageDispatcher) {
@@ -28,12 +30,16 @@ public class DispatchController {
   @PostMapping(value = "/dispatch")
   public ResponseEntity<Response<CDTPPackage>> dispatch(@RequestBody CDTPPackage reqPackage) {
     try {
+      log.info("dispatch服务接收到的请求信息为：{}", gson.toJson(reqPackage));
       ResponseEntity<String> responseEntity = packageDispatcher.dispatch(reqPackage);
       CDTPPackage respPackage = new CDTPPackage(reqPackage);
       respPackage.setData(responseEntity.getBody());
 
-      return new ResponseEntity<>(Response.ok(responseEntity.getStatusCode(), respPackage),
+      ResponseEntity<Response<CDTPPackage>> result = new ResponseEntity<>(
+          Response.ok(responseEntity.getStatusCode(), respPackage),
           responseEntity.getStatusCode());
+      log.info("dispatch服务返回的结果为：{}", gson.toJson(result));
+      return result;
     } catch (Exception e) {
       throw new DispatchException(e, reqPackage);
     }
