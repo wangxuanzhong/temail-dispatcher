@@ -51,7 +51,7 @@ public class Response<T> {
     return new Response<>(status, message);
   }
 
-  static <T> Response<T> failed(HttpStatus status, String message, T body) {
+  public static <T> Response<T> failed(HttpStatus status, String message, T body) {
     return new Response<>(status, message, body);
   }
 

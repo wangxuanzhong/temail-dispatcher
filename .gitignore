@@ -14,6 +14,8 @@ buildNumber.properties
 .settings/
 .project
 .classpath
+.apt_generated/
+.factorypath
 
 
 # Idea Project file
@@ -67,6 +69,7 @@ gradle-app.setting
 build/
 doc/
 .sonar_lock
+disconf/download*
 
 # 苹果机器的内部管理文件
 *~

@@ -2,6 +2,7 @@ package com.syswin.temail.cdtp.dispatcher.request.controller;
 
 import com.syswin.temail.cdtp.dispatcher.request.application.PackageDispatcher;
 import com.syswin.temail.cdtp.dispatcher.request.entity.CDTPPackage;
+import com.syswin.temail.cdtp.dispatcher.request.exceptions.DispatchException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -26,11 +27,15 @@ public class DispatchController {
   @ApiOperation("请求转发")
   @PostMapping(value = "/dispatch")
   public ResponseEntity<Response<CDTPPackage>> dispatch(@RequestBody CDTPPackage reqPackage) {
-    ResponseEntity<String> responseEntity = packageDispatcher.dispatch(reqPackage);
-    CDTPPackage respPackage = new CDTPPackage(reqPackage);
-    respPackage.setData(responseEntity.getBody());
+    try {
+      ResponseEntity<String> responseEntity = packageDispatcher.dispatch(reqPackage);
+      CDTPPackage respPackage = new CDTPPackage(reqPackage);
+      respPackage.setData(responseEntity.getBody());
 
-    return new ResponseEntity<>(Response.ok(responseEntity.getStatusCode(), respPackage),
-        responseEntity.getStatusCode());
+      return new ResponseEntity<>(Response.ok(responseEntity.getStatusCode(), respPackage),
+          responseEntity.getStatusCode());
+    } catch (Exception e) {
+      throw new DispatchException(e, reqPackage);
+    }
   }
 }
