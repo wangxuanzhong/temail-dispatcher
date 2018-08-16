@@ -10,8 +10,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.google.gson.Gson;
 import com.syswin.temail.cdtp.dispatcher.request.application.PackageDispatcher;
-import com.syswin.temail.cdtp.dispatcher.request.entity.CDTPParams;
 import com.syswin.temail.cdtp.dispatcher.request.entity.CDTPPackage;
+import com.syswin.temail.cdtp.dispatcher.request.entity.CDTPParams;
+import java.util.HashMap;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +21,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.util.LinkedMultiValueMap;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest
@@ -72,8 +72,8 @@ public class DispatchControllerTest {
     cdtpPackage.setReceiverPK("ReceiverPK(");
 
     CDTPParams params = new CDTPParams();
-    params.setHeader(new LinkedMultiValueMap<>());
-    params.setQuery(new LinkedMultiValueMap<>());
+    params.setHeader(new HashMap<>());
+    params.setQuery(new HashMap<>());
 
     cdtpPackage.setData(new Gson().toJson(params));
     return cdtpPackage;

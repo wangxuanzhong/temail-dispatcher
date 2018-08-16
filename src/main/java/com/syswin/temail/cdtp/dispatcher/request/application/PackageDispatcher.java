@@ -7,12 +7,13 @@ import com.google.gson.ExclusionStrategy;
 import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
 import com.syswin.temail.cdtp.dispatcher.DispatcherProperties;
 import com.syswin.temail.cdtp.dispatcher.DispatcherProperties.Request;
 import com.syswin.temail.cdtp.dispatcher.request.entity.CDTPHeader;
 import com.syswin.temail.cdtp.dispatcher.request.entity.CDTPPackage;
 import com.syswin.temail.cdtp.dispatcher.request.entity.CDTPParams;
-import java.util.List;
+import com.syswin.temail.cdtp.dispatcher.request.exceptions.DispatchException;
 import java.util.Map;
 import java.util.Map.Entry;
 import lombok.extern.slf4j.Slf4j;
@@ -49,8 +50,14 @@ public class PackageDispatcher {
   }
 
   public ResponseEntity<String> dispatch(CDTPPackage cdtpPackage) {
-
-    CDTPParams params = new Gson().fromJson(cdtpPackage.getData(), CDTPParams.class);
+    CDTPParams params;
+    Gson gson = new Gson();
+    try {
+      params = gson.fromJson(cdtpPackage.getData(), CDTPParams.class);
+    } catch (JsonSyntaxException e) {
+      log.error("请求参数：{}" + gson.toJson(cdtpPackage));
+      throw new DispatchException(e, cdtpPackage);
+    }
     int command = cdtpPackage.getCommand();
     Request request = properties.getCmdRequestMap().get(command);
 
@@ -91,12 +98,12 @@ public class PackageDispatcher {
     }
   }
 
-  private String composeUrl(Request request, Map<String, List<String>> queries) {
+  private String composeUrl(Request request, Map<String, String> queries) {
     String url = request.getUrl();
     if (queries != null && !queries.isEmpty()) {
       UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(url);
-      for (Entry<String, List<String>> entry : queries.entrySet()) {
-        builder.queryParam(entry.getKey(), entry.getValue().toArray());
+      for (Entry<String, String> entry : queries.entrySet()) {
+        builder.queryParam(entry.getKey(), entry.getValue());
       }
       url = builder.toUriString();
     }
@@ -104,11 +111,11 @@ public class PackageDispatcher {
   }
 
   private MultiValueMap<String, String> addHeaders(CDTPHeader cdtpHeader, CDTPParams params) {
-    Map<String, List<String>> paramsHeaders = params.getHeader();
+    Map<String, String> paramsHeaders = params.getHeader();
     MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
     if (paramsHeaders != null && !paramsHeaders.isEmpty()) {
-      for (Entry<String, List<String>> entry : paramsHeaders.entrySet()) {
-        headers.addAll(entry.getKey(), entry.getValue());
+      for (Entry<String, String> entry : paramsHeaders.entrySet()) {
+        headers.add(entry.getKey(), entry.getValue());
       }
     }
     String CDTP_HEADER = "CDTP-header";

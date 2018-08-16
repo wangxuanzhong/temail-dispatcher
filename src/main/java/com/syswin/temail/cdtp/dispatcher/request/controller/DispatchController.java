@@ -40,6 +40,8 @@ public class DispatchController {
           responseEntity.getStatusCode());
       log.info("dispatch服务返回的结果为：{}", gson.toJson(result));
       return result;
+    } catch (DispatchException e) {
+      throw e;
     } catch (Exception e) {
       throw new DispatchException(e, reqPackage);
     }
