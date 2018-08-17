@@ -4,10 +4,7 @@ import com.google.gson.Gson;
 import com.syswin.temail.cdtp.dispatcher.DispatcherApplication;
 import com.syswin.temail.cdtp.dispatcher.request.entity.CDTPPackage;
 import com.syswin.temail.cdtp.dispatcher.request.entity.CDTPParams;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import javax.annotation.Resource;
 import org.junit.Assert;
@@ -59,9 +56,9 @@ public class DispatchController2Test {
   public void testDispatchGetWithHeader() throws Exception {
     CDTPPackage cdtpPackage = initCDTPPackage();
     cdtpPackage.setCommand(101);
-    Map<String, List<String>> headers = new HashMap<>(2);
-    headers.put("headerName1", Collections.singletonList("headerValue1"));
-    headers.put("headerName2", Arrays.asList("headerValue2", "headerValue3"));
+    Map<String, String> headers = new HashMap<>(2);
+    headers.put("headerName1", "headerValue1");
+    headers.put("headerName2", "headerValue2");
     CDTPParams params = new CDTPParams();
     params.setHeader(headers);
     cdtpPackage.setData(gson.toJson(params));
@@ -73,9 +70,9 @@ public class DispatchController2Test {
   public void testDispatchGetWithQuery() throws Exception {
     CDTPPackage cdtpPackage = initCDTPPackage();
     cdtpPackage.setCommand(101);
-    Map<String, List<String>> query = new HashMap<>(2);
-    query.put("queryName1", Collections.singletonList("queryValue1"));
-    query.put("queryName2", Arrays.asList("queryValue2", "queryValue3"));
+    Map<String, String> query = new HashMap<>(2);
+    query.put("queryName1", "queryValue1");
+    query.put("queryName2", "queryValue2");
     CDTPParams params = new CDTPParams();
     params.setQuery(query);
     cdtpPackage.setData(gson.toJson(params));
@@ -87,12 +84,12 @@ public class DispatchController2Test {
   public void testDispatchGetWithAll() throws Exception {
     CDTPPackage cdtpPackage = initCDTPPackage();
     cdtpPackage.setCommand(101);
-    Map<String, List<String>> headers = new HashMap<>(2);
-    headers.put("headerName1", Collections.singletonList("headerValue1"));
-    headers.put("headerName2", Arrays.asList("headerValue2", "headerValue3"));
-    Map<String, List<String>> query = new HashMap<>(2);
-    query.put("queryName1", Collections.singletonList("queryValue1"));
-    query.put("queryName2", Arrays.asList("queryValue2", "queryValue3"));
+    Map<String, String> headers = new HashMap<>(2);
+    headers.put("headerName1", "headerValue1");
+    headers.put("headerName2", "headerValue2");
+    Map<String, String> query = new HashMap<>(2);
+    query.put("queryName1", "queryValue1");
+    query.put("queryName2", "queryValue2");
     CDTPParams params = new CDTPParams();
     params.setHeader(headers);
     params.setQuery(query);
@@ -105,9 +102,9 @@ public class DispatchController2Test {
   public void testDispatchPostWithHeader() throws Exception {
     CDTPPackage cdtpPackage = initCDTPPackage();
     cdtpPackage.setCommand(102);
-    Map<String, List<String>> headers = new HashMap<>();
-    headers.put("headerName1", Collections.singletonList("headerValue1"));
-    headers.put("headerName2", Arrays.asList("headerValue2", "headerValue3"));
+    Map<String, String> headers = new HashMap<>();
+    headers.put("headerName1", "headerValue1");
+    headers.put("headerName2", "headerValue2");
     CDTPParams params = new CDTPParams();
     params.setHeader(headers);
     cdtpPackage.setData(gson.toJson(params));
@@ -119,9 +116,9 @@ public class DispatchController2Test {
   public void testDispatchPostWithQuery() throws Exception {
     CDTPPackage cdtpPackage = initCDTPPackage();
     cdtpPackage.setCommand(102);
-    Map<String, List<String>> query = new HashMap<>();
-    query.put("queryName1", Collections.singletonList("queryValue1"));
-    query.put("queryName2", Arrays.asList("queryValue2", "queryValue3"));
+    Map<String, String> query = new HashMap<>();
+    query.put("queryName1", "queryValue1");
+    query.put("queryName2", "queryValue2");
     CDTPParams params = new CDTPParams();
     params.setQuery(query);
     cdtpPackage.setData(gson.toJson(params));
@@ -147,12 +144,12 @@ public class DispatchController2Test {
   public void testDispatchPostWithAll() throws Exception {
     CDTPPackage cdtpPackage = initCDTPPackage();
     cdtpPackage.setCommand(102);
-    Map<String, List<String>> headers = new HashMap<>(2);
-    headers.put("headerName1", Collections.singletonList("headerValue1"));
-    headers.put("headerName2", Arrays.asList("headerValue2", "headerValue3"));
-    Map<String, List<String>> query = new HashMap<>(2);
-    query.put("queryName1", Collections.singletonList("queryValue1"));
-    query.put("queryName2", Arrays.asList("queryValue2", "queryValue3"));
+    Map<String, String> headers = new HashMap<>(2);
+    headers.put("headerName1", "headerValue1");
+    headers.put("headerName2", "headerValue2");
+    Map<String, String> query = new HashMap<>(2);
+    query.put("queryName1", "queryValue1");
+    query.put("queryName2", "queryValue2");
     Map<String, Object> body = new HashMap<>(2);
     body.put("f1", "value");
     body.put("f2", 2);
@@ -169,11 +166,11 @@ public class DispatchController2Test {
     CDTPPackage cdtpPackage = initCDTPPackage();
     cdtpPackage.setCommand(1001);
     CDTPParams params = new CDTPParams();
-    Map<String, List<String>> query = new HashMap<>();
-    query.put("from", Collections.singletonList("yaohuacheng@syswin.com"));
-    query.put("to", Collections.singletonList("wangxuanzhong@syswin.com"));
-    query.put("pageSize", Collections.singletonList("10"));
-    query.put("fromSeqId", Collections.singletonList("0"));
+    Map<String, String> query = new HashMap<>();
+    query.put("from", "yaohuacheng@syswin.com");
+    query.put("to", "wangxuanzhong@syswin.com");
+    query.put("pageSize", "10");
+    query.put("fromSeqId", "0");
     params.setQuery(query);
     cdtpPackage.setData(gson.toJson(params));
     execReq(cdtpPackage);

@@ -1,5 +1,6 @@
 package com.syswin.temail.cdtp.dispatcher.request.entity;
 
+import com.google.gson.Gson;
 import lombok.Data;
 
 /**
@@ -41,4 +42,5 @@ public class CDTPHeader {
     this.setSenderPK(header.getSenderPK());
     this.setReceiverPK(header.getReceiverPK());
   }
+
 }
