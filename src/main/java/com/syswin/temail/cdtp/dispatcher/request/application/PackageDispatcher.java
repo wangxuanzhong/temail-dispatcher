@@ -59,7 +59,7 @@ public class PackageDispatcher {
       throw new DispatchException(e, cdtpPackage);
     }
     int command = cdtpPackage.getCommand();
-    Request request = properties.getCmdRequestMap().get(command);
+    Request request = properties.getCmdMap().get(command);
 
     if (request == null) {
       log.error("不支持的命令类型：{}, 请求参数：{}", command, cdtpPackage);
