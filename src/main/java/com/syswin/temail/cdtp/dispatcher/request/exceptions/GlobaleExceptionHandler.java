@@ -29,6 +29,7 @@ public class GlobaleExceptionHandler {
   @ExceptionHandler(DispatchException.class)
   @ResponseStatus(BAD_REQUEST)
   public Response<CDTPPackage> handleException(DispatchException ex) {
+    log.error("无效请求的参数：{}", gson.toJson(ex.getCdtpHeader()));
     log.error("无效的请求", ex);
     CDTPPackage cdtpPackage = new CDTPPackage(ex.getCdtpHeader());
     Map<String, String> map = new HashMap<>(1);
