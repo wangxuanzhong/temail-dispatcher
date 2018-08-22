@@ -7,12 +7,12 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.http.HttpMethod;
 
 @Data
-@ConfigurationProperties(prefix = "temail.cdtp.dispatcher")
+@ConfigurationProperties(prefix = "cdtp")
 public class DispatcherProperties {
 
   private String authVerifyUrl;
   private String cdtpStatusUrl;
-  private Map<Integer, Request> cmdRequestMap = new HashMap<>();
+  private Map<Integer, Request> cmdMap = new HashMap<>();
   private RocketMQ rocketmq = new RocketMQ();
   private HttpCliet httpCliet = new HttpCliet();
 
@@ -20,9 +20,10 @@ public class DispatcherProperties {
   public static class RocketMQ {
 
     private String namesrvAddr;
-    private String producerGroup = "cdtp-dispatcher-producer";
-    private String consumerGroup = "cdtp-dispatcher-consumer";
-    private String consumerTopic = "temail-notification";
+    private String producerGroup;
+    private String producerTopic;
+    private String consumerGroup;
+    private String consumerTopic;
   }
 
   @Data

@@ -4,8 +4,12 @@ import static org.springframework.http.HttpStatus.OK;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import lombok.Getter;
+import lombok.ToString;
 import org.springframework.http.HttpStatus;
 
+@ToString
+@Getter
 @JsonInclude(Include.NON_NULL)
 public class Response<T> {
 
@@ -53,17 +57,5 @@ public class Response<T> {
 
   public static <T> Response<T> failed(HttpStatus status, String message, T body) {
     return new Response<>(status, message, body);
-  }
-
-  public Integer getCode() {
-    return code;
-  }
-
-  public String getMessage() {
-    return message;
-  }
-
-  public T getData() {
-    return data;
   }
 }

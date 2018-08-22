@@ -2,8 +2,10 @@ package com.syswin.temail.cdtp.dispatcher.request.entity;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 @Data
+@ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class CDTPPackage extends CDTPHeader {
 

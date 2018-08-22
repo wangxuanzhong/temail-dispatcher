@@ -1,32 +1,16 @@
 server:
-  port: 8888
+  port: 8081
+cdtp:
+  rocketmq:
+    producer-group: cdtp-dispatcher-producer
+    producer-topic: temail-gateway
+    consumer-group: cdtp-dispatcher-consumer
+    consumer-topic: temail-notification
 
-#swagger:
-#  contact:
-#    name: 姚华成
-#    email:  yaohuacheng@syswin.com
-#  title: cdtp-dispatcher
-#  description: CDTP分发服务
-#  basePath: /**
-
-#
-#temail.cdtp.dispatcher:
-#  auth-verify-url: http://192.168.15.186:8081/verify
-#  cdtp-status-url: http://172.31.244.73:9099/locateStatus/{accountNo}
-#
-#  cmd-request-map:
-#    1001:
-#      url: http://192.168.15.186:8090/usermail
-#      method: GET
-#    1002:
-#      url: http://192.168.15.186:8090/usermail
-#      method: POST
-#    1003:
-#      url: http://192.168.15.186:8090/revert
-#      method: PUT
-#
-#  rocketmq:
-#    namesrv-addr: 172.28.43.18:9876
-#    producer-group: cdtp-dispatcher-producer
-#    consumer-group: cdtp-dispatcher-consumer
-#    consumer-topic: temail-notification
+swagger:
+  contact:
+    name: 姚华成
+    email:  yaohuacheng@syswin.com
+  title: cdtp-dispatcher
+  description: CDTP分发服务
+  basePath: /**
