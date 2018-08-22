@@ -4,7 +4,6 @@ temail:
   dispatcher:
     rocketmq:
       producer-group: temail-dispatcher-producer
-      producer-topic: temail-gateway
       consumer-group: temail-dispatcher-consumer
       consumer-topic: temail-notification
 

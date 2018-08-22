@@ -13,15 +13,4 @@ public class TemailAccountStatusLocateResponse {
 
   private List<TemailAccountStatus> statusList;
 
-  /**
-   * Temail长连接状态信息 Created by juaihua on 2018/8/14.
-   */
-  @Data
-  public static class TemailAccountStatus {
-
-    private String devId;
-    private String hostOf;
-    private String mqTopic;
-  }
-
 }
