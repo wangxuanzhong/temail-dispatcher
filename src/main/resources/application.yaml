@@ -1,16 +1,17 @@
 server:
   port: 8081
-cdtp:
-  rocketmq:
-    producer-group: cdtp-dispatcher-producer
-    producer-topic: temail-gateway
-    consumer-group: cdtp-dispatcher-consumer
-    consumer-topic: temail-notification
+temail:
+  dispatcher:
+    rocketmq:
+      producer-group: temail-dispatcher-producer
+      producer-topic: temail-gateway
+      consumer-group: temail-dispatcher-consumer
+      consumer-topic: temail-notification
 
 swagger:
   contact:
     name: 姚华成
     email:  yaohuacheng@syswin.com
-  title: cdtp-dispatcher
+  title: temail-dispatcher
   description: CDTP分发服务
   basePath: /**
