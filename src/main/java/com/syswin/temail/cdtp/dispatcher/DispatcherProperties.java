@@ -20,9 +20,10 @@ public class DispatcherProperties {
   public static class RocketMQ {
 
     private String namesrvAddr;
-    private String producerGroup = "cdtp-dispatcher-producer";
-    private String consumerGroup = "cdtp-dispatcher-consumer";
-    private String consumerTopic = "temail-notification";
+    private String producerGroup;
+    private String producerTopic;
+    private String consumerGroup;
+    private String consumerTopic;
   }
 
   @Data

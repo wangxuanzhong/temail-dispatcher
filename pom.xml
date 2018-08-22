@@ -212,17 +212,24 @@
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
         <configuration>
-          <archive>
-            <manifest>
-              <mainClass>com.syswin.temail.cdtp.dispatcher.DispatcherApplication</mainClass>
-            </manifest>
-          </archive>
+          <mainClass>com.syswin.temail.cdtp.dispatcher.DispatcherApplication</mainClass>
+          <layout>ZIP</layout>
+          <executable>true</executable>
+          <includes>
+            <include>
+              <groupId>nothing</groupId>
+              <artifactId>nothing</artifactId>
+            </include>
+          </includes>
         </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>repackage</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

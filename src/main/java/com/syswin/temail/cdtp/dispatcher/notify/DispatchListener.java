@@ -10,9 +10,7 @@ import com.syswin.temail.cdtp.dispatcher.notify.entity.TemailAccountStatusLocate
 import com.syswin.temail.cdtp.dispatcher.request.entity.CDTPHeader;
 import com.syswin.temail.cdtp.dispatcher.request.entity.CDTPPackage;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyContext;
 import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyStatus;
@@ -33,11 +31,14 @@ public class DispatchListener implements MessageListenerConcurrently {
   private MQProducer producer;
   private RestTemplate restTemplate;
   private String cdtpStatusUrl;
+  private String producerTopic;
 
-  public DispatchListener(MQProducer producer, RestTemplate restTemplate, String cdtpStatusUrl) {
+  public DispatchListener(MQProducer producer, RestTemplate restTemplate, String cdtpStatusUrl,
+      String producerTopic) {
     this.producer = producer;
     this.restTemplate = restTemplate;
     this.cdtpStatusUrl = cdtpStatusUrl;
+    this.producerTopic = producerTopic;
   }
 
   @Override
@@ -57,16 +58,10 @@ public class DispatchListener implements MessageListenerConcurrently {
           cdtpPackage.setData(gson.toJson(messageBody.getData()));
           byte[] messageData = gson.toJson(cdtpPackage).getBytes();
 
-          List<String> topics = getTopicsByTemail(toTemail);
-          Map<String, List<Message>> map = new HashMap<>();
-          topics.forEach(topic -> {
-            List<Message> msgList = map.computeIfAbsent(topic, k -> new ArrayList<>());
-            msgList.add(new Message(topic, messageData));
-          });
-          log.info("发送给cdtp-server的消息为:{}", map);
-          for (List<Message> msgList : map.values()) {
-            producer.send(msgList);
-          }
+          List<String> topics = getServerTagsByTemail(toTemail);
+          List<Message> msgList = new ArrayList<>();
+          topics.forEach(serverTag -> msgList.add(new Message(producerTopic, serverTag, messageData)));
+          producer.send(msgList);
         } catch (JsonSyntaxException e) {
           log.error("消息内容为：{}", msgData);
           log.error("解析错误", e);
@@ -81,19 +76,19 @@ public class DispatchListener implements MessageListenerConcurrently {
     }
   }
 
-  private List<String> getTopicsByTemail(String temail) {
+  private List<String> getServerTagsByTemail(String temail) {
     // 根据temail地址从状态服务器获取该temail对应的通道所在topic
-    List<String> topicList = new ArrayList<>();
+    List<String> tags = new ArrayList<>();
     TemailAccountStatusLocateResponse response = restTemplate
         .getForObject(cdtpStatusUrl, TemailAccountStatusLocateResponse.class, temail);
     if (response != null) {
       List<TemailAccountStatus> statusList = response.getStatusList();
       if (statusList != null && !statusList.isEmpty()) {
         for (TemailAccountStatus temailAccountStatus : statusList) {
-          topicList.add(temailAccountStatus.getMqTopic());
+          tags.add(temailAccountStatus.getMqTopic());
         }
       }
     }
-    return topicList;
+    return tags;
   }
 }
