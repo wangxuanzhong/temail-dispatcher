@@ -10,7 +10,9 @@ import com.syswin.temail.cdtp.dispatcher.notify.entity.TemailAccountStatusLocate
 import com.syswin.temail.cdtp.dispatcher.request.entity.CDTPHeader;
 import com.syswin.temail.cdtp.dispatcher.request.entity.CDTPPackage;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyContext;
 import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyStatus;
@@ -56,10 +58,15 @@ public class DispatchListener implements MessageListenerConcurrently {
           byte[] messageData = gson.toJson(cdtpPackage).getBytes();
 
           List<String> topics = getTopicsByTemail(toTemail);
-          List<Message> sendMsgList = new ArrayList<>();
-          topics.forEach(topic -> sendMsgList.add(new Message(topic, messageData)));
-          log.info("发送给cdtp-server的消息为:{}", sendMsgList);
-          producer.send(sendMsgList);
+          Map<String, List<Message>> map = new HashMap<>();
+          topics.forEach(topic -> {
+            List<Message> msgList = map.computeIfAbsent(topic, k -> new ArrayList<>());
+            msgList.add(new Message(topic, messageData));
+          });
+          log.info("发送给cdtp-server的消息为:{}", map);
+          for (List<Message> msgList : map.values()) {
+            producer.send(msgList);
+          }
         } catch (JsonSyntaxException e) {
           log.error("消息内容为：{}", msgData);
           log.error("解析错误", e);
