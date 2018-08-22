@@ -55,7 +55,7 @@ public class PackageDispatcher {
     try {
       params = gson.fromJson(cdtpPackage.getData(), CDTPParams.class);
     } catch (JsonSyntaxException e) {
-      log.error("请求参数：{}" + gson.toJson(cdtpPackage));
+      log.error("请求参数：{}" + cdtpPackage);
       throw new DispatchException(e, cdtpPackage);
     }
     int command = cdtpPackage.getCommand();
@@ -73,18 +73,17 @@ public class PackageDispatcher {
     }
 
     String url = composeUrl(request, params.getQuery());
-
+    log.info("转发的请求：URL={}, method={}, entity={}", url, request.getMethod(), entity);
     return restTemplate.exchange(url, request.getMethod(), entity, String.class);
   }
-
 
   private HttpEntity<?> composeHttpEntity(Request request, CDTPHeader cdtpHeader, CDTPParams params) {
     MultiValueMap<String, String> headers = addHeaders(cdtpHeader, params);
 
     switch (request.getMethod()) {
       case GET:
-      case DELETE:
         return new HttpEntity<>(headers);
+      case DELETE:
       case POST:
       case PUT:
         Map<String, Object> body = params.getBody();
