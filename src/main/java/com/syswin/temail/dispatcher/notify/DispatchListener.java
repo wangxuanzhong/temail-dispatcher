@@ -2,12 +2,12 @@ package com.syswin.temail.dispatcher.notify;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
+import com.syswin.temail.dispatcher.Constants;
 import com.syswin.temail.dispatcher.notify.entity.MessageBody;
 import com.syswin.temail.dispatcher.notify.entity.TemailAccountStatusLocateResponse;
 import com.syswin.temail.dispatcher.notify.entity.TemailAccountStatusLocateResponse.TemailAccountStatus;
 import com.syswin.temail.dispatcher.request.entity.CDTPHeader;
 import com.syswin.temail.dispatcher.request.entity.CDTPPackage;
-import com.syswin.temail.dispatcher.Constants;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
@@ -49,18 +49,22 @@ public class DispatchListener implements MessageListenerConcurrently {
         MessageBody messageBody;
         try {
           messageBody = gson.fromJson(msgData, MessageBody.class);
-          CDTPHeader header = gson.fromJson(messageBody.getHeader(), CDTPHeader.class);
-          String toTemail = messageBody.getToTemail();
-          header.setCommand(Constants.NOTIFY_COMMAND);
-          header.setTo(toTemail);
-          CDTPPackage cdtpPackage = new CDTPPackage(header);
-          cdtpPackage.setData(gson.toJson(messageBody.getData()));
-          byte[] messageData = gson.toJson(cdtpPackage).getBytes();
+          if (messageBody != null) {
+            CDTPHeader header = gson.fromJson(messageBody.getHeader(), CDTPHeader.class);
+            if (header != null) {
+              String toTemail = messageBody.getToTemail();
+              header.setCommand(Constants.NOTIFY_COMMAND);
+              header.setTo(toTemail);
+              CDTPPackage cdtpPackage = new CDTPPackage(header);
+              cdtpPackage.setData(gson.toJson(messageBody.getData()));
+              byte[] messageData = gson.toJson(cdtpPackage).getBytes();
 
-          List<String> topics = getServerTagsByTemail(toTemail);
-          List<Message> msgList = new ArrayList<>();
-          topics.forEach(serverTag -> msgList.add(new Message(producerTopic, serverTag, messageData)));
-          producer.send(msgList);
+              List<String> topics = getServerTagsByTemail(toTemail);
+              List<Message> msgList = new ArrayList<>();
+              topics.forEach(serverTag -> msgList.add(new Message(producerTopic, serverTag, messageData)));
+              producer.send(msgList);
+            }
+          }
         } catch (JsonSyntaxException e) {
           log.error("消息内容为：{}", msgData);
           log.error("解析错误", e);
