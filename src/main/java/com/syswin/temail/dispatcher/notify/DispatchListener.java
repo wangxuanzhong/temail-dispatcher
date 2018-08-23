@@ -82,14 +82,19 @@ public class DispatchListener implements MessageListenerConcurrently {
 
   private List<TemailAccountStatus> getServerTagsByTemail(String temail) {
     // 根据temail地址从状态服务器获取该temail对应的通道所在topic
-    log.info("获取请求用户所属通道信息:url={}, temail={}", temailChannelUrl, temail);
-    TemailAccountStatusLocateResponse response = restTemplate
-        .getForObject(temailChannelUrl, TemailAccountStatusLocateResponse.class, temail);
-    if (response != null) {
-      List<TemailAccountStatus> statuses = response.getStatusList();
-      if (statuses != null && !statuses.isEmpty()) {
-        return statuses;
+    try {
+      log.info("获取请求用户所属通道信息:url={}, temail={}", temailChannelUrl, temail);
+      TemailAccountStatusLocateResponse response = restTemplate
+          .getForObject(temailChannelUrl, TemailAccountStatusLocateResponse.class, temail);
+      if (response != null) {
+        List<TemailAccountStatus> statuses = response.getStatusList();
+        if (statuses != null && !statuses.isEmpty()) {
+          return statuses;
+        }
       }
+    } catch (Exception e) {
+      log.error("获取用户所属通道时出错！", e);
+      // 获取用户所属通道时出错时，丢弃推送消息
     }
     return new ArrayList<>();
   }
