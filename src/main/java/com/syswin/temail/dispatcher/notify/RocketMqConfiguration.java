@@ -24,8 +24,7 @@ public class RocketMqConfiguration {
     DefaultMQPushConsumer consumer = new DefaultMQPushConsumer(rocketMQ.getConsumerGroup());
     consumer.setNamesrvAddr(rocketMQ.getNamesrvAddr());
     consumer.subscribe(rocketMQ.getConsumerTopic(), "*");
-    consumer.setMessageListener(new DispatchListener(producer, restTemplate, properties.getTemailChannelUrl(),
-        rocketMQ.getProducerTopic()));
+    consumer.setMessageListener(new DispatchListener(producer, restTemplate, properties.getTemailChannelUrl()));
     consumer.start();
     return consumer;
   }

@@ -21,7 +21,6 @@ public class DispatcherProperties {
 
     private String namesrvAddr;
     private String producerGroup;
-    private String producerTopic;
     private String consumerGroup;
     private String consumerTopic;
   }
