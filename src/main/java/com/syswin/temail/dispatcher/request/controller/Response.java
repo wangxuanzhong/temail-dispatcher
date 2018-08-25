@@ -17,9 +17,6 @@ public class Response<T> {
   private String message;
   private T data;
 
-  private Response() {
-  }
-
   private Response(HttpStatus status) {
     this.code = status.value();
   }
@@ -39,7 +36,7 @@ public class Response<T> {
     return new Response<>(OK);
   }
 
-  static <T> Response<T> ok(T body) {
+  public static <T> Response<T> ok(T body) {
     return ok(OK, body);
   }
 

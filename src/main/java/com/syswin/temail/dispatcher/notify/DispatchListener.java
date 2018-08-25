@@ -1,13 +1,15 @@
 package com.syswin.temail.dispatcher.notify;
 
+import static com.syswin.temail.dispatcher.Constants.CDTP_VERSION;
+import static com.syswin.temail.dispatcher.Constants.NOTIFY_COMMAND;
+import static com.syswin.temail.dispatcher.Constants.NOTIFY_COMMAND_SPACE;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
-import com.syswin.temail.dispatcher.Constants;
 import com.syswin.temail.dispatcher.notify.entity.MessageBody;
 import com.syswin.temail.dispatcher.notify.entity.TemailAccountStatus;
 import com.syswin.temail.dispatcher.notify.entity.TemailAccountStatusLocateResponse;
-import com.syswin.temail.dispatcher.request.entity.CDTPHeader;
-import com.syswin.temail.dispatcher.request.entity.CDTPPackage;
+import com.syswin.temail.dispatcher.request.entity.CDTPPacket;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
@@ -47,18 +49,20 @@ public class DispatchListener implements MessageListenerConcurrently {
         try {
           messageBody = gson.fromJson(msgData, MessageBody.class);
           if (messageBody != null) {
-            CDTPHeader header = gson.fromJson(messageBody.getHeader(), CDTPHeader.class);
+            CDTPPacket.Header header = gson.fromJson(messageBody.getHeader(), CDTPPacket.Header.class);
             if (header != null) {
-              String toTemail = messageBody.getToTemail();
-              header.setCommand(Constants.NOTIFY_COMMAND);
-              header.setTo(toTemail);
-              CDTPPackage cdtpPackage = new CDTPPackage(header);
-              cdtpPackage.setData(gson.toJson(messageBody.getData()));
-              byte[] messageData = gson.toJson(cdtpPackage).getBytes();
-
-              List<TemailAccountStatus> statusList = getServerTagsByTemail(toTemail);
+              String receiver = messageBody.getReceiver();
+              List<TemailAccountStatus> statusList = getServerTagsByTemail(receiver);
               if (!statusList.isEmpty()) {
                 List<Message> msgList = new ArrayList<>();
+                CDTPPacket cdtpPacket = new CDTPPacket();
+                cdtpPacket.setCommandSpace(NOTIFY_COMMAND_SPACE);
+                cdtpPacket.setCommand(NOTIFY_COMMAND);
+                cdtpPacket.setVersion(CDTP_VERSION);
+                cdtpPacket.setHeader(header);
+                cdtpPacket.setData(gson.toJson(messageBody.getData()).getBytes());
+
+                byte[] messageData = gson.toJson(cdtpPacket).getBytes();
                 statusList.forEach(status ->
                     msgList.add(new Message(status.getMqTopic(), status.getMqTag(), messageData))
                 );
@@ -69,10 +73,9 @@ public class DispatchListener implements MessageListenerConcurrently {
         } catch (JsonSyntaxException e) {
           log.error("消息内容为：{}", msgData);
           log.error("解析错误", e);
-          // 不处理
+          // 不处理，不重试
         }
       }
-
       return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;
     } catch (Exception e) {
       log.error("队列传输出错！请求参数：" + msgs, e);

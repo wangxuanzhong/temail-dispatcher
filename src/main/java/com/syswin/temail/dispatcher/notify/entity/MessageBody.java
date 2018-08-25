@@ -10,7 +10,7 @@ import lombok.Data;
 @Data
 public class MessageBody {
 
-  private String toTemail;
+  private String receiver;
   private String header;
   private Map<String,Object> data;
 }

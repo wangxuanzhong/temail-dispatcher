@@ -10,10 +10,10 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 import com.syswin.temail.dispatcher.DispatcherProperties;
 import com.syswin.temail.dispatcher.DispatcherProperties.Request;
-import com.syswin.temail.dispatcher.request.entity.CDTPHeader;
-import com.syswin.temail.dispatcher.request.entity.CDTPPackage;
+import com.syswin.temail.dispatcher.request.entity.CDTPPacket;
 import com.syswin.temail.dispatcher.request.entity.CDTPParams;
 import com.syswin.temail.dispatcher.request.exceptions.DispatchException;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Map.Entry;
 import lombok.extern.slf4j.Slf4j;
@@ -49,26 +49,26 @@ public class PackageDispatcher {
     this.restTemplate = restTemplate;
   }
 
-  public ResponseEntity<String> dispatch(CDTPPackage cdtpPackage) {
+  public ResponseEntity<String> dispatch(CDTPPacket cdtpPacket) {
     CDTPParams params;
     Gson gson = new Gson();
     try {
-      params = gson.fromJson(cdtpPackage.getData(), CDTPParams.class);
+      params = gson.fromJson(new String(cdtpPacket.getData(), StandardCharsets.UTF_8), CDTPParams.class);
     } catch (JsonSyntaxException e) {
-      log.error("请求参数：{}" + cdtpPackage);
-      throw new DispatchException(e, cdtpPackage);
+      log.error("请求参数：{}" + cdtpPacket);
+      throw new DispatchException(e, cdtpPacket);
     }
-    int command = cdtpPackage.getCommand();
+    int command = cdtpPacket.getCommand();
     Request request = properties.getCmdMap().get(command);
 
     if (request == null) {
-      log.error("不支持的命令类型：{}, 请求参数：{}", command, cdtpPackage);
+      log.error("不支持的命令类型：{}, 请求参数：{}", command, cdtpPacket);
       throw new RuntimeException("不支持的命令类型：" + command);
     }
 
-    HttpEntity<?> entity = composeHttpEntity(request, cdtpPackage, params);
+    HttpEntity<?> entity = composeHttpEntity(request, cdtpPacket.getHeader(), params);
     if (entity == null) {
-      log.error("请求参数：{}", cdtpPackage);
+      log.error("请求参数：{}", cdtpPacket);
       throw new RuntimeException("不支持的命令类型：" + request.getMethod());
     }
 
@@ -77,7 +77,7 @@ public class PackageDispatcher {
     return restTemplate.exchange(url, request.getMethod(), entity, String.class);
   }
 
-  private HttpEntity<?> composeHttpEntity(Request request, CDTPHeader cdtpHeader, CDTPParams params) {
+  private HttpEntity<?> composeHttpEntity(Request request, CDTPPacket.Header cdtpHeader, CDTPParams params) {
     MultiValueMap<String, String> headers = addHeaders(cdtpHeader, params);
 
     switch (request.getMethod()) {
@@ -109,7 +109,7 @@ public class PackageDispatcher {
     return url;
   }
 
-  private MultiValueMap<String, String> addHeaders(CDTPHeader cdtpHeader, CDTPParams params) {
+  private MultiValueMap<String, String> addHeaders(CDTPPacket.Header cdtpHeader, CDTPParams params) {
     Map<String, String> paramsHeaders = params.getHeader();
     MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
     if (paramsHeaders != null && !paramsHeaders.isEmpty()) {
