@@ -19,6 +19,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.web.client.RestClientException;
 
 @RunWith(SpringRestPactRunner.class)
 @PactBroker(host = "172.28.50.206", port = "88")
@@ -46,6 +47,6 @@ public class LoginProviderTest {
 
   @State("User mike is registered, but server is out of work")
   public void serverOutOfWork() {
-    when(authService.verify("mike@t.email", unsignedBytes, signature)).thenReturn(new ResponseEntity<>(Response.failed(INTERNAL_SERVER_ERROR), INTERNAL_SERVER_ERROR));
+    when(authService.verify("mike@t.email", unsignedBytes, signature)).thenThrow(RestClientException.class);
   }
 }
