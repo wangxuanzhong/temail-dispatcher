@@ -8,12 +8,16 @@ import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
+import com.google.gson.reflect.TypeToken;
 import com.syswin.temail.dispatcher.DispatcherProperties;
 import com.syswin.temail.dispatcher.DispatcherProperties.Request;
 import com.syswin.temail.dispatcher.request.entity.CDTPPacket;
+import com.syswin.temail.dispatcher.request.entity.CDTPPacket.Header;
 import com.syswin.temail.dispatcher.request.entity.CDTPParams;
 import com.syswin.temail.dispatcher.request.exceptions.DispatchException;
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import lombok.extern.slf4j.Slf4j;
@@ -53,12 +57,16 @@ public class PackageDispatcher {
     CDTPParams params;
     Gson gson = new Gson();
     try {
-      params = gson.fromJson(new String(cdtpPacket.getData(), StandardCharsets.UTF_8), CDTPParams.class);
+      if (isSendSingleMsg(cdtpPacket)) {
+        params = buildSendSingleMsgParams(cdtpPacket);
+      } else {
+        params = gson.fromJson(new String(cdtpPacket.getData(), StandardCharsets.UTF_8), CDTPParams.class);
+      }
     } catch (JsonSyntaxException e) {
       log.error("请求参数：{}" + cdtpPacket);
       throw new DispatchException(e, cdtpPacket);
     }
-    int command = cdtpPacket.getCommand();
+    int command = (cdtpPacket.getCommandSpace() << 16) + cdtpPacket.getCommand();
     Request request = properties.getCmdMap().get(command);
 
     if (request == null) {
@@ -120,6 +128,27 @@ public class PackageDispatcher {
     String CDTP_HEADER = "CDTP-header";
     headers.add(CDTP_HEADER, gson.toJson(cdtpHeader));
     return headers;
+  }
+
+  private boolean isSendSingleMsg(CDTPPacket packet) {
+    // TODO(姚华成): 根据业务定义，可能会改变
+    short commandSpace = packet.getCommandSpace();
+    short command = packet.getCommand();
+    return commandSpace == 1 && command == 1;
+  }
+
+  private CDTPParams buildSendSingleMsgParams(CDTPPacket cdtpPacket) {
+    // TODO(姚华成):具体格式需要业务定义
+    Header header = cdtpPacket.getHeader();
+    Map<String, Object> extraData = gson
+        .fromJson(header.getExtraData(), new TypeToken<Map<String, Object>>() {
+        }.getType());
+    Map<String, Object> body = new HashMap<>(extraData);
+    body.put("sender", header.getSender());
+    body.put("receiver", header.getReceiver());
+    body.put("msgData", Base64.getEncoder().encodeToString(cdtpPacket.getData()));
+
+    return new CDTPParams(body);
   }
 
 }
