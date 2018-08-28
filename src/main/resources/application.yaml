@@ -14,3 +14,12 @@ swagger:
   title: temail-dispatcher
   description: CDTP分发服务
   basePath: /**
+
+---
+
+spring:
+  profiles: dev
+  autoconfigure.exclude:
+  - com.systoon.integration.spring.boot.disconf.DisconfAutoConfiguration
+  - com.systoon.integration.spring.boot.disconf.context.config.ConfigurationPropertiesRebinderAutoConfiguration
+  - com.systoon.integration.spring.boot.disconf.context.config.RefreshAutoConfiguration

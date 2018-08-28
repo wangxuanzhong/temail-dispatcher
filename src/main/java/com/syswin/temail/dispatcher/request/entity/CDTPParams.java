@@ -5,7 +5,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
 public class CDTPParams {
 
   private Map<String, String> header;
@@ -13,7 +12,6 @@ public class CDTPParams {
   private Map<String, Object> body;
 
   public CDTPParams(Map<String, Object> body) {
-    this();
     this.body = body;
   }
 }

@@ -17,6 +17,9 @@ public class Response<T> {
   private String message;
   private T data;
 
+  Response() {
+  }
+
   private Response(HttpStatus status) {
     this.code = status.value();
   }
