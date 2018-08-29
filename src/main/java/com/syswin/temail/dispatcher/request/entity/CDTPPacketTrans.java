@@ -7,13 +7,13 @@ import lombok.Data;
  * @date 2018-8-24
  */
 @Data
-public final class CDTPPacket {
+public final class CDTPPacketTrans {
 
   private short commandSpace;
   private short command;
   private short version;
   private Header header;
-  private byte[] data;
+  private String data;
 
   @Data
   public static final class Header {

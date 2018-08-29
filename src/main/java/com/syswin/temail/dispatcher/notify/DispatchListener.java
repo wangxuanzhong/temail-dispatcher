@@ -9,7 +9,7 @@ import com.google.gson.JsonSyntaxException;
 import com.syswin.temail.dispatcher.notify.entity.MessageBody;
 import com.syswin.temail.dispatcher.notify.entity.TemailAccountStatus;
 import com.syswin.temail.dispatcher.notify.entity.TemailAccountStatusLocateResponse;
-import com.syswin.temail.dispatcher.request.entity.CDTPPacket;
+import com.syswin.temail.dispatcher.request.entity.CDTPPacketTrans;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
@@ -49,20 +49,20 @@ public class DispatchListener implements MessageListenerConcurrently {
         try {
           messageBody = gson.fromJson(msgData, MessageBody.class);
           if (messageBody != null) {
-            CDTPPacket.Header header = gson.fromJson(messageBody.getHeader(), CDTPPacket.Header.class);
+            CDTPPacketTrans.Header header = gson.fromJson(messageBody.getHeader(), CDTPPacketTrans.Header.class);
             if (header != null) {
               String receiver = messageBody.getReceiver();
               List<TemailAccountStatus> statusList = getServerTagsByTemail(receiver);
               if (!statusList.isEmpty()) {
                 List<Message> msgList = new ArrayList<>();
-                CDTPPacket cdtpPacket = new CDTPPacket();
-                cdtpPacket.setCommandSpace(NOTIFY_COMMAND_SPACE);
-                cdtpPacket.setCommand(NOTIFY_COMMAND);
-                cdtpPacket.setVersion(CDTP_VERSION);
-                cdtpPacket.setHeader(header);
-                cdtpPacket.setData(gson.toJson(messageBody.getData()).getBytes());
+                CDTPPacketTrans packet = new CDTPPacketTrans();
+                packet.setCommandSpace(NOTIFY_COMMAND_SPACE);
+                packet.setCommand(NOTIFY_COMMAND);
+                packet.setVersion(CDTP_VERSION);
+                packet.setHeader(header);
+                packet.setData(gson.toJson(messageBody.getData()));
 
-                byte[] messageData = gson.toJson(cdtpPacket).getBytes();
+                byte[] messageData = gson.toJson(packet).getBytes();
                 statusList.forEach(status ->
                     msgList.add(new Message(status.getMqTopic(), status.getMqTag(), messageData))
                 );

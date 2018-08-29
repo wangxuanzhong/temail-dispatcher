@@ -1,6 +1,6 @@
 package com.syswin.temail.dispatcher.request.exceptions;
 
-import com.syswin.temail.dispatcher.request.entity.CDTPPacket;
+import com.syswin.temail.dispatcher.request.entity.CDTPPacketTrans;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,29 +12,29 @@ public class DispatchException extends RuntimeException {
 
   @Getter
   @Setter
-  private CDTPPacket packet;
+  private CDTPPacketTrans packet;
 
-  public DispatchException(CDTPPacket packet) {
+  public DispatchException(CDTPPacketTrans packet) {
     setPacket(packet);
   }
 
-  public DispatchException(String message, CDTPPacket packet) {
+  public DispatchException(String message, CDTPPacketTrans packet) {
     super(message);
     setPacket(packet);
   }
 
-  public DispatchException(String message, Throwable cause, CDTPPacket packet) {
+  public DispatchException(String message, Throwable cause, CDTPPacketTrans packet) {
     super(message, cause);
     setPacket(packet);
   }
 
-  public DispatchException(Throwable cause, CDTPPacket packet) {
+  public DispatchException(Throwable cause, CDTPPacketTrans packet) {
     super(cause);
     setPacket(packet);
   }
 
   public DispatchException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace,
-      CDTPPacket packet) {
+      CDTPPacketTrans packet) {
     super(message, cause, enableSuppression, writableStackTrace);
     setPacket(packet);
   }

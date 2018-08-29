@@ -7,7 +7,7 @@ import com.google.gson.Gson;
 import com.syswin.temail.dispatcher.request.application.AuthService;
 import com.syswin.temail.dispatcher.request.application.PackageDispatcher;
 import com.syswin.temail.dispatcher.request.entity.AuthData;
-import com.syswin.temail.dispatcher.request.entity.CDTPPacket;
+import com.syswin.temail.dispatcher.request.entity.CDTPPacketTrans;
 import com.syswin.temail.dispatcher.request.exceptions.AuthException;
 import com.syswin.temail.dispatcher.request.exceptions.DispatchException;
 import io.swagger.annotations.Api;
@@ -40,7 +40,8 @@ public class DispatchController {
   public ResponseEntity<Response<String>> verify(@RequestBody AuthData body) {
     try {
       log.info("verify服务接收到的请求信息为：{}", gson.toJson(body));
-      ResponseEntity<Response<String>> result = authService.verify(body.getTemail(), body.getUnsignedBytes(), body.getSignature());
+      ResponseEntity<Response<String>> result = authService
+          .verify(body.getTemail(), body.getUnsignedBytes(), body.getSignature());
       log.info("verify服务返回的结果为：{}", gson.toJson(result));
       return result;
     } catch (Exception e) {
@@ -50,28 +51,19 @@ public class DispatchController {
 
   @ApiOperation("CDTP请求转发")
   @PostMapping(value = "/dispatch")
-  public ResponseEntity<Response<CDTPPacket>> dispatch(@RequestBody CDTPPacket cdtpPacket) {
+  public ResponseEntity<String> dispatch(@RequestBody CDTPPacketTrans packet) {
     try {
-      log.info("dispatch服务接收到的请求信息为：{}", cdtpPacket);
-      ResponseEntity<String> responseEntity = packageDispatcher.dispatch(cdtpPacket);
-      String entityBody = responseEntity.getBody();
-      byte[] packetData;
-      if (entityBody == null) {
-        packetData = new byte[0];
-      } else {
-        packetData = entityBody.getBytes();
-      }
-      cdtpPacket.setData(packetData);
-
-      ResponseEntity<Response<CDTPPacket>> result = new ResponseEntity<>(
-          Response.ok(responseEntity.getStatusCode(), cdtpPacket),
+      log.info("dispatch服务接收到的请求信息为：{}", packet);
+      ResponseEntity<String> responseEntity = packageDispatcher.dispatch(packet);
+      ResponseEntity<String> result = new ResponseEntity<>(responseEntity.getBody(),
           responseEntity.getStatusCode());
+
       log.info("dispatch服务返回的结果为：{}", result);
       return result;
     } catch (DispatchException e) {
       throw e;
     } catch (Exception e) {
-      throw new DispatchException(e, cdtpPacket);
+      throw new DispatchException(e, packet);
     }
   }
 }
