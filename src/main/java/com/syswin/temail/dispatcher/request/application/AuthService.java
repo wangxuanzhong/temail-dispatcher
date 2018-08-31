@@ -4,7 +4,6 @@ import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED;
 
 import com.syswin.temail.dispatcher.request.controller.Response;
-import com.syswin.temail.dispatcher.request.entity.AuthData;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -30,11 +29,11 @@ public class AuthService {
     this.headers.setContentType(APPLICATION_FORM_URLENCODED);
   }
 
-  public ResponseEntity<Response<String>> verify(AuthData body) {
+  public ResponseEntity<Response<String>> verify(String temail, String unsignedBytes, String signature) {
     MultiValueMap<String, String> entityBody = new LinkedMultiValueMap<>();
-    entityBody.add(TE_MAIL, body.getTemail());
-    entityBody.add(UNSIGNED_BYTES, body.getUnsignedBytes());
-    entityBody.add(SIGNATURE, body.getSignature());
+    entityBody.add(TE_MAIL, temail);
+    entityBody.add(UNSIGNED_BYTES, unsignedBytes);
+    entityBody.add(SIGNATURE, signature);
 
     HttpEntity<?> requestEntity = new HttpEntity<>(entityBody, headers);
 

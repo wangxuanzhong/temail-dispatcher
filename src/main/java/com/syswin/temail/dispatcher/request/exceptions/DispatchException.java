@@ -1,6 +1,6 @@
 package com.syswin.temail.dispatcher.request.exceptions;
 
-import com.syswin.temail.dispatcher.request.entity.CDTPHeader;
+import com.syswin.temail.dispatcher.request.entity.CDTPPacketTrans;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,30 +12,30 @@ public class DispatchException extends RuntimeException {
 
   @Getter
   @Setter
-  private CDTPHeader cdtpHeader;
+  private CDTPPacketTrans packet;
 
-  public DispatchException(CDTPHeader cdtpHeader) {
-    setCdtpHeader(cdtpHeader);
+  public DispatchException(CDTPPacketTrans packet) {
+    setPacket(packet);
   }
 
-  public DispatchException(String message, CDTPHeader cdtpHeader) {
+  public DispatchException(String message, CDTPPacketTrans packet) {
     super(message);
-    setCdtpHeader(cdtpHeader);
+    setPacket(packet);
   }
 
-  public DispatchException(String message, Throwable cause, CDTPHeader cdtpHeader) {
+  public DispatchException(String message, Throwable cause, CDTPPacketTrans packet) {
     super(message, cause);
-    setCdtpHeader(cdtpHeader);
+    setPacket(packet);
   }
 
-  public DispatchException(Throwable cause, CDTPHeader cdtpHeader) {
+  public DispatchException(Throwable cause, CDTPPacketTrans packet) {
     super(cause);
-    setCdtpHeader(cdtpHeader);
+    setPacket(packet);
   }
 
   public DispatchException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace,
-      CDTPHeader cdtpHeader) {
+      CDTPPacketTrans packet) {
     super(message, cause, enableSuppression, writableStackTrace);
-    setCdtpHeader(cdtpHeader);
+    setPacket(packet);
   }
 }

@@ -14,14 +14,13 @@ public class DispatcherProperties {
   private String temailChannelUrl;
   private RocketMQ rocketmq = new RocketMQ();
   private HttpCliet httpCliet = new HttpCliet();
-  private Map<Integer, Request> cmdMap = new HashMap<>();
+  private Map<String, Request> cmdMap = new HashMap<>();
 
   @Data
   public static class RocketMQ {
 
     private String namesrvAddr;
     private String producerGroup;
-    private String producerTopic;
     private String consumerGroup;
     private String consumerTopic;
   }

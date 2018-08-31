@@ -8,12 +8,14 @@ import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
+import com.google.gson.reflect.TypeToken;
 import com.syswin.temail.dispatcher.DispatcherProperties;
 import com.syswin.temail.dispatcher.DispatcherProperties.Request;
-import com.syswin.temail.dispatcher.request.entity.CDTPHeader;
-import com.syswin.temail.dispatcher.request.entity.CDTPPackage;
+import com.syswin.temail.dispatcher.request.entity.CDTPPacketTrans;
+import com.syswin.temail.dispatcher.request.entity.CDTPPacketTrans.Header;
 import com.syswin.temail.dispatcher.request.entity.CDTPParams;
 import com.syswin.temail.dispatcher.request.exceptions.DispatchException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import lombok.extern.slf4j.Slf4j;
@@ -49,26 +51,30 @@ public class PackageDispatcher {
     this.restTemplate = restTemplate;
   }
 
-  public ResponseEntity<String> dispatch(CDTPPackage cdtpPackage) {
+  public ResponseEntity<String> dispatch(CDTPPacketTrans packet) {
     CDTPParams params;
     Gson gson = new Gson();
     try {
-      params = gson.fromJson(cdtpPackage.getData(), CDTPParams.class);
+      if (isSendSingleMsg(packet)) {
+        params = buildSendSingleMsgParams(packet);
+      } else {
+        params = gson.fromJson(packet.getData(), CDTPParams.class);
+      }
     } catch (JsonSyntaxException e) {
-      log.error("请求参数：{}" + cdtpPackage);
-      throw new DispatchException(e, cdtpPackage);
+      log.error("请求参数：{}" + packet);
+      throw new DispatchException(e, packet);
     }
-    int command = cdtpPackage.getCommand();
-    Request request = properties.getCmdMap().get(command);
+    int command = (packet.getCommandSpace() << 16) + packet.getCommand();
+    Request request = properties.getCmdMap().get(Integer.toHexString(command));
 
     if (request == null) {
-      log.error("不支持的命令类型：{}, 请求参数：{}", command, cdtpPackage);
+      log.error("不支持的命令类型：{}, 请求参数：{}", command, packet);
       throw new RuntimeException("不支持的命令类型：" + command);
     }
 
-    HttpEntity<?> entity = composeHttpEntity(request, cdtpPackage, params);
+    HttpEntity<?> entity = composeHttpEntity(request, packet.getHeader(), params);
     if (entity == null) {
-      log.error("请求参数：{}", cdtpPackage);
+      log.error("请求参数：{}", packet);
       throw new RuntimeException("不支持的命令类型：" + request.getMethod());
     }
 
@@ -77,7 +83,7 @@ public class PackageDispatcher {
     return restTemplate.exchange(url, request.getMethod(), entity, String.class);
   }
 
-  private HttpEntity<?> composeHttpEntity(Request request, CDTPHeader cdtpHeader, CDTPParams params) {
+  private HttpEntity<?> composeHttpEntity(Request request, CDTPPacketTrans.Header cdtpHeader, CDTPParams params) {
     MultiValueMap<String, String> headers = addHeaders(cdtpHeader, params);
 
     switch (request.getMethod()) {
@@ -109,7 +115,7 @@ public class PackageDispatcher {
     return url;
   }
 
-  private MultiValueMap<String, String> addHeaders(CDTPHeader cdtpHeader, CDTPParams params) {
+  private MultiValueMap<String, String> addHeaders(CDTPPacketTrans.Header cdtpHeader, CDTPParams params) {
     Map<String, String> paramsHeaders = params.getHeader();
     MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
     if (paramsHeaders != null && !paramsHeaders.isEmpty()) {
@@ -120,6 +126,26 @@ public class PackageDispatcher {
     String CDTP_HEADER = "CDTP-header";
     headers.add(CDTP_HEADER, gson.toJson(cdtpHeader));
     return headers;
+  }
+
+  private boolean isSendSingleMsg(CDTPPacketTrans packet) {
+    // TODO(姚华成): 根据业务定义，可能会改变
+    short commandSpace = packet.getCommandSpace();
+    short command = packet.getCommand();
+    return commandSpace == 1 && command == 1;
+  }
+
+  private CDTPParams buildSendSingleMsgParams(CDTPPacketTrans packet) {
+    Header header = packet.getHeader();
+    Map<String, Object> extraData = gson
+        .fromJson(header.getExtraData(), new TypeToken<Map<String, Object>>() {
+        }.getType());
+    Map<String, Object> body = new HashMap<>(extraData);
+    body.put("sender", header.getSender());
+    body.put("receiver", header.getReceiver());
+    body.put("msgData", packet.getData());
+
+    return new CDTPParams(body);
   }
 
 }

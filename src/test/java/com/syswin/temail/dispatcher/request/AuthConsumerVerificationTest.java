@@ -83,13 +83,13 @@ public class AuthConsumerVerificationTest extends ConsumerPactTestMk2 {
     String url = mockServer.getUrl() + "/verify";
     AuthService authService = new AuthService(restTemplate, url);
 
-    ResponseEntity<Response<String>> response = authService.verify(httpEntityOf("mike@t.email", "abc", "xyz"));
+    ResponseEntity<Response<String>> response = authService.verify("mike@t.email", "abc", "xyz");
     assertThat(response.getStatusCode()).isEqualTo(OK);
 
-    response = authService.verify(httpEntityOf("jane@t.email", "abc", "xyz"));
+    response = authService.verify("jane@t.email", "abc", "xyz");
     assertThat(response.getStatusCode()).isEqualTo(FORBIDDEN);
 
-    response = authService.verify(null);
+    response = authService.verify(null, null, null);
     assertThat(response.getStatusCode()).isEqualTo(BAD_REQUEST);
   }
 
@@ -101,14 +101,5 @@ public class AuthConsumerVerificationTest extends ConsumerPactTestMk2 {
   @Override
   protected String consumerName() {
     return "temail-gateway";
-  }
-
-  private AuthData httpEntityOf(String email, String unsigned, String signature) {
-    AuthData authData = new AuthData();
-    authData.setTemail(email);
-    authData.setUnsignedBytes(unsigned);
-    authData.setSignature(signature);
-
-    return authData;
   }
 }

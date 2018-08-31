@@ -157,6 +157,12 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>au.com.dius</groupId>
+      <artifactId>pact-jvm-provider-spring_2.11</artifactId>
+      <version>${pact.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>com.github.seanyinx</groupId>
       <artifactId>unit-scaffolding</artifactId>
       <version>1.0.0</version>
@@ -224,6 +230,14 @@
             <!--</include>-->
           <!--</includes>-->
         <!--</configuration>-->
+        <dependencies>
+          <!-- spring热部署 -->
+          <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>springloaded</artifactId>
+            <version>1.2.8.RELEASE</version>
+          </dependency>
+        </dependencies>
         <executions>
           <execution>
             <goals>

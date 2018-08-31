@@ -6,6 +6,8 @@ package com.syswin.temail.dispatcher;
  */
 public class Constants {
 
-  public static final int NOTIFY_COMMAND = 104;
+  public static final short NOTIFY_COMMAND_SPACE = 3;
+  public static final short NOTIFY_COMMAND = 2;
+  public static final short CDTP_VERSION = 1;
 
 }

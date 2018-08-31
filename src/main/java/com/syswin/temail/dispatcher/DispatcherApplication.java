@@ -21,7 +21,7 @@ public class DispatcherApplication {
   }
 
   @Bean
-  RestTemplate restTemplate(DispatcherProperties properties) {
+  public RestTemplate restTemplate(DispatcherProperties properties) {
     return new RestTemplateBuilder()
         .setConnectTimeout(properties.getHttpCliet().getConnectTimeoutInMilli())
         .setReadTimeout(properties.getHttpCliet().getReadTimeoutInMilli())
@@ -30,12 +30,12 @@ public class DispatcherApplication {
   }
 
   @Bean
-  PackageDispatcher responseFetcher(DispatcherProperties properties, RestTemplate restTemplate) {
+  public PackageDispatcher packageDispatcher(DispatcherProperties properties, RestTemplate restTemplate) {
     return new PackageDispatcher(properties, restTemplate);
   }
 
   @Bean
-  AuthService authService(DispatcherProperties properties, RestTemplate restTemplate) {
+  public AuthService authService(DispatcherProperties properties, RestTemplate restTemplate) {
     return new AuthService(restTemplate, properties.getAuthVerifyUrl());
   }
 }

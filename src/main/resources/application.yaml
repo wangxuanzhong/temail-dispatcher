@@ -4,7 +4,6 @@ temail:
   dispatcher:
     rocketmq:
       producer-group: temail-dispatcher-producer
-      producer-topic: temail-gateway
       consumer-group: temail-dispatcher-consumer
       consumer-topic: temail-notification
 
@@ -15,3 +14,12 @@ swagger:
   title: temail-dispatcher
   description: CDTP分发服务
   basePath: /**
+
+---
+
+spring:
+  profiles: dev
+  autoconfigure.exclude:
+  - com.systoon.integration.spring.boot.disconf.DisconfAutoConfiguration
+  - com.systoon.integration.spring.boot.disconf.context.config.ConfigurationPropertiesRebinderAutoConfiguration
+  - com.systoon.integration.spring.boot.disconf.context.config.RefreshAutoConfiguration
