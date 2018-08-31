@@ -7,8 +7,9 @@ import static com.syswin.temail.dispatcher.Constants.NOTIFY_COMMAND_SPACE;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.syswin.temail.dispatcher.notify.entity.MessageBody;
-import com.syswin.temail.dispatcher.notify.entity.TemailAccountStatus;
-import com.syswin.temail.dispatcher.notify.entity.TemailAccountStatusLocateResponse;
+import com.syswin.temail.dispatcher.notify.entity.TemailAccountLocation;
+import com.syswin.temail.dispatcher.notify.entity.TemailAccountLocations;
+import com.syswin.temail.dispatcher.request.controller.Response;
 import com.syswin.temail.dispatcher.request.entity.CDTPPacketTrans;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +20,9 @@ import org.apache.rocketmq.client.consumer.listener.MessageListenerConcurrently;
 import org.apache.rocketmq.client.producer.MQProducer;
 import org.apache.rocketmq.common.message.Message;
 import org.apache.rocketmq.common.message.MessageExt;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
 /**
@@ -52,7 +56,7 @@ public class DispatchListener implements MessageListenerConcurrently {
             CDTPPacketTrans.Header header = gson.fromJson(messageBody.getHeader(), CDTPPacketTrans.Header.class);
             if (header != null) {
               String receiver = messageBody.getReceiver();
-              List<TemailAccountStatus> statusList = getServerTagsByTemail(receiver);
+              List<TemailAccountLocation> statusList = getServerTagsByTemail(receiver);
               if (!statusList.isEmpty()) {
                 List<Message> msgList = new ArrayList<>();
                 CDTPPacketTrans packet = new CDTPPacketTrans();
@@ -83,14 +87,18 @@ public class DispatchListener implements MessageListenerConcurrently {
     }
   }
 
-  private List<TemailAccountStatus> getServerTagsByTemail(String temail) {
+  private List<TemailAccountLocation> getServerTagsByTemail(String temail) {
     // 根据temail地址从状态服务器获取该temail对应的通道所在topic
     try {
       log.info("获取请求用户所属通道信息:url={}, temail={}", temailChannelUrl, temail);
-      TemailAccountStatusLocateResponse response = restTemplate
-          .getForObject(temailChannelUrl, TemailAccountStatusLocateResponse.class, temail);
+
+      ResponseEntity<Response<TemailAccountLocations>> responseEntity = restTemplate
+          .exchange(temailChannelUrl, HttpMethod.GET, null,
+              new ParameterizedTypeReference<Response<TemailAccountLocations>>() {
+              }, temail);
+      Response<TemailAccountLocations> response = responseEntity.getBody();
       if (response != null) {
-        List<TemailAccountStatus> statuses = response.getStatusList();
+        List<TemailAccountLocation> statuses = response.getData().getStatuses();
         if (statuses != null && !statuses.isEmpty()) {
           return statuses;
         }
