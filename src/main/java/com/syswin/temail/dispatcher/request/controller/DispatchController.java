@@ -25,7 +25,7 @@ public class DispatchController {
 
   private final PackageDispatcher packageDispatcher;
   private final AuthService authService;
-  private Gson gson = new Gson();
+  private final Gson gson = new Gson();
 
   @Autowired
   public DispatchController(PackageDispatcher packageDispatcher,
