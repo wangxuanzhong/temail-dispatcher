@@ -14,6 +14,7 @@ import au.com.dius.pact.consumer.dsl.PactDslWithProvider;
 import au.com.dius.pact.model.RequestResponsePact;
 import com.google.gson.Gson;
 import com.syswin.temail.dispatcher.notify.entity.TemailAccountLocation;
+import com.syswin.temail.dispatcher.notify.entity.TemailAccountLocations;
 import com.syswin.temail.dispatcher.request.application.SilentResponseErrorHandler;
 import com.syswin.temail.dispatcher.request.controller.Response;
 import java.util.List;
@@ -34,7 +35,7 @@ public class DiscoveryConsumerTest extends ConsumerPactTestMk2 {
   private static final String mqTag = "gateway-localhost";
   private static final String gatewayHost = "localhost";
   private static final String processId = "12345";
-  private final List<TemailAccountLocation> location = location();
+  private final TemailAccountLocations locations = new TemailAccountLocations(location());
 
   private final RestTemplate restTemplate = new RestTemplateBuilder()
       .errorHandler(new SilentResponseErrorHandler())
@@ -50,7 +51,7 @@ public class DiscoveryConsumerTest extends ConsumerPactTestMk2 {
           .willRespondWith()
           .status(200)
           .headers(singletonMap(CONTENT_TYPE, APPLICATION_JSON_VALUE))
-          .body(gson.toJson(Response.ok(OK, location)))
+          .body(gson.toJson(Response.ok(OK, locations)))
         .given("Remote discovery service error")
           .uponReceiving("request to unavailable discovery service")
           .method("GET")
@@ -71,7 +72,7 @@ public class DiscoveryConsumerTest extends ConsumerPactTestMk2 {
     List<TemailAccountLocation> locations = gatewayLocator.locate(sean);
 
     assertThat(locations).hasSize(1);
-    assertThat(locations.get(0)).isEqualToComparingFieldByField(location.get(0));
+    assertThat(locations.get(0)).isEqualToComparingFieldByField(this.locations.getStatuses().get(0));
 
 
     locations = gatewayLocator.locate(jack);

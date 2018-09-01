@@ -4,6 +4,7 @@ import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 import com.syswin.temail.dispatcher.notify.entity.TemailAccountLocation;
+import com.syswin.temail.dispatcher.notify.entity.TemailAccountLocations;
 import com.syswin.temail.dispatcher.request.controller.Response;
 import java.util.Collections;
 import java.util.List;
@@ -17,7 +18,7 @@ import org.springframework.web.client.RestTemplate;
 @Slf4j
 class GatewayLocator {
 
-  private final ParameterizedTypeReference<Response<List<TemailAccountLocation>>> responseType = new ParameterizedTypeReference<Response<List<TemailAccountLocation>>>() {
+  private final ParameterizedTypeReference<Response<TemailAccountLocations>> responseType = new ParameterizedTypeReference<Response<TemailAccountLocations>>() {
   };
 
   private final HttpEntity<Void> httpEntity;
@@ -37,17 +38,17 @@ class GatewayLocator {
     try {
       log.info("获取请求用户所属通道信息:url={}, temail={}", discoveryUrl, temail);
 
-      ResponseEntity<Response<List<TemailAccountLocation>>> responseEntity = restTemplate.exchange(
+      ResponseEntity<Response<TemailAccountLocations>> responseEntity = restTemplate.exchange(
           discoveryUrl,
           GET,
           httpEntity,
           responseType,
           temail);
 
-      Response<List<TemailAccountLocation>> response = responseEntity.getBody();
+      Response<TemailAccountLocations> response = responseEntity.getBody();
       if (responseEntity.getStatusCode().is2xxSuccessful()) {
         if (response != null) {
-          List<TemailAccountLocation> statuses = response.getData();
+          List<TemailAccountLocation> statuses = response.getData().getStatuses();
           if (statuses != null) {
             return statuses;
           }
