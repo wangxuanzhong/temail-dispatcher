@@ -50,6 +50,7 @@ class GatewayLocator {
         if (response != null) {
           List<TemailAccountLocation> statuses = response.getData().getStatuses();
           if (statuses != null) {
+            log.info("成功获取用户所属通道信息: url = {}, temail = {}, response = {}", discoveryUrl, temail, response);
             return statuses;
           }
         }

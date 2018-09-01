@@ -58,6 +58,7 @@ class DispatchListener implements MessageListenerConcurrently {
                 statusList.forEach(status ->
                     msgList.add(new Message(status.getMqTopic(), status.getMqTag(), messageData))
                 );
+                log.info("发送消息到gateway {}", statusList);
                 producer.send(msgList);
               }
             }
