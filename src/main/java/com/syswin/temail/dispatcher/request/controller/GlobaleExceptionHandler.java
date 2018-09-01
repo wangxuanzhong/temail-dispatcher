@@ -1,20 +1,21 @@
-package com.syswin.temail.dispatcher.request.exceptions;
+package com.syswin.temail.dispatcher.request.controller;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 
 import com.google.gson.Gson;
-import com.syswin.temail.dispatcher.request.controller.Response;
 import com.syswin.temail.dispatcher.request.entity.CDTPPacketTrans;
+import com.syswin.temail.dispatcher.request.exceptions.AuthException;
+import com.syswin.temail.dispatcher.request.exceptions.DispatchException;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @Slf4j
-@ControllerAdvice
+@RestControllerAdvice
 public class GlobaleExceptionHandler {
 
   private Gson gson = new Gson();
