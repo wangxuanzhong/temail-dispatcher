@@ -8,8 +8,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.syswin.temail.dispatcher.notify.entity.MessageBody;
 import com.syswin.temail.dispatcher.notify.entity.TemailAccountLocation;
-import com.syswin.temail.dispatcher.notify.entity.TemailAccountLocations;
-import com.syswin.temail.dispatcher.request.controller.Response;
 import com.syswin.temail.dispatcher.request.entity.CDTPPacketTrans;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,27 +18,17 @@ import org.apache.rocketmq.client.consumer.listener.MessageListenerConcurrently;
 import org.apache.rocketmq.client.producer.MQProducer;
 import org.apache.rocketmq.common.message.Message;
 import org.apache.rocketmq.common.message.MessageExt;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.RestTemplate;
 
-/**
- * @author 姚华成
- * @date 2018/8/7
- */
 @Slf4j
-public class DispatchListener implements MessageListenerConcurrently {
+class DispatchListener implements MessageListenerConcurrently {
 
-  private Gson gson = new Gson();
-  private MQProducer producer;
-  private RestTemplate restTemplate;
-  private String temailChannelUrl;
+  private final Gson gson = new Gson();
+  private final MQProducer producer;
+  private final GatewayLocator gatewayLocator;
 
-  public DispatchListener(MQProducer producer, RestTemplate restTemplate, String temailChannelUrl) {
+  DispatchListener(MQProducer producer, GatewayLocator gatewayLocator) {
     this.producer = producer;
-    this.restTemplate = restTemplate;
-    this.temailChannelUrl = temailChannelUrl;
+    this.gatewayLocator = gatewayLocator;
   }
 
   @Override
@@ -56,7 +44,7 @@ public class DispatchListener implements MessageListenerConcurrently {
             CDTPPacketTrans.Header header = gson.fromJson(messageBody.getHeader(), CDTPPacketTrans.Header.class);
             if (header != null) {
               String receiver = messageBody.getReceiver();
-              List<TemailAccountLocation> statusList = getServerTagsByTemail(receiver);
+              List<TemailAccountLocation> statusList = gatewayLocator.locate(receiver);
               if (!statusList.isEmpty()) {
                 List<Message> msgList = new ArrayList<>();
                 CDTPPacketTrans packet = new CDTPPacketTrans();
@@ -85,28 +73,5 @@ public class DispatchListener implements MessageListenerConcurrently {
       log.error("队列传输出错！请求参数：" + msgs, e);
       return ConsumeConcurrentlyStatus.RECONSUME_LATER;
     }
-  }
-
-  private List<TemailAccountLocation> getServerTagsByTemail(String temail) {
-    // 根据temail地址从状态服务器获取该temail对应的通道所在topic
-    try {
-      log.info("获取请求用户所属通道信息:url={}, temail={}", temailChannelUrl, temail);
-
-      ResponseEntity<Response<TemailAccountLocations>> responseEntity = restTemplate
-          .exchange(temailChannelUrl, HttpMethod.GET, null,
-              new ParameterizedTypeReference<Response<TemailAccountLocations>>() {
-              }, temail);
-      Response<TemailAccountLocations> response = responseEntity.getBody();
-      if (response != null) {
-        List<TemailAccountLocation> statuses = response.getData().getStatuses();
-        if (statuses != null && !statuses.isEmpty()) {
-          return statuses;
-        }
-      }
-    } catch (Exception e) {
-      log.error("获取用户所属通道时出错！", e);
-      // 获取用户所属通道时出错时，丢弃推送消息
-    }
-    return new ArrayList<>();
   }
 }
