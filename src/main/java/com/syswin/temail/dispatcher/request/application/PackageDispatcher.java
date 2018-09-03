@@ -68,7 +68,7 @@ public class PackageDispatcher {
     Request request = properties.getCmdMap().get(Integer.toHexString(command));
 
     if (request == null) {
-      log.error("不支持的命令类型：{}, 请求参数：{}", command, packet);
+      log.error("不支持的命令类型：{}, 请求参数：{}", Integer.toHexString(command), packet);
       throw new RuntimeException("不支持的命令类型：" + command);
     }
 
