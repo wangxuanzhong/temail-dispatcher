@@ -40,13 +40,13 @@ Configuration:
         level: info
         additivity: false
         AppenderRef:
-          ref: ASYNC_LOGFILE
+          ref: CONSOLE
       -
         name: com.syswin
         level: info
         additivity: false
         AppenderRef:
-          ref: ASYNC_LOGFILE
+          ref: CONSOLE
     root:
       level: info
       AppenderRef:
