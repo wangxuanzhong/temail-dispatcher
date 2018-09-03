@@ -45,7 +45,7 @@ public class DispatchController {
   }
 
   @ApiOperation("CDTP请求转发")
-  @PostMapping(value = "/dispatch")
+  @PostMapping(value = "/dispatch", consumes = APPLICATION_JSON_UTF8_VALUE, produces = APPLICATION_JSON_VALUE)
   public ResponseEntity<String> dispatch(@RequestBody CDTPPacketTrans packet) {
     try {
       log.info("dispatch服务接收到的请求信息为：{}", packet);
