@@ -4,10 +4,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-/**
- * @author 姚华成
- * @date 2018-8-24
- */
 @Data
 @EqualsAndHashCode
 @ToString
@@ -38,5 +34,4 @@ public final class CDTPPacketTrans {
     private String topic;
     private String extraData;
   }
-
 }

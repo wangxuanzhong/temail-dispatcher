@@ -1,9 +1,5 @@
 package com.syswin.temail.dispatcher.notify;
 
-import static com.syswin.temail.dispatcher.Constants.CDTP_VERSION;
-import static com.syswin.temail.dispatcher.Constants.NOTIFY_COMMAND;
-import static com.syswin.temail.dispatcher.Constants.NOTIFY_COMMAND_SPACE;
-
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.syswin.temail.dispatcher.notify.entity.MessageBody;
@@ -25,6 +21,7 @@ class DispatchListener implements MessageListenerConcurrently {
   private final Gson gson = new Gson();
   private final MQProducer producer;
   private final GatewayLocator gatewayLocator;
+  private final NotificationMessageFactory notificationMsgFactory = new NotificationMessageFactory();
 
   DispatchListener(MQProducer producer, GatewayLocator gatewayLocator) {
     this.producer = producer;
@@ -37,25 +34,17 @@ class DispatchListener implements MessageListenerConcurrently {
       for (MessageExt msg : msgs) {
         String msgData = new String(msg.getBody());
         log.info("接收到的消息是：{}", msgData);
-        MessageBody messageBody;
         try {
-          messageBody = gson.fromJson(msgData, MessageBody.class);
+          MessageBody messageBody = gson.fromJson(msgData, MessageBody.class);
           if (messageBody != null) {
             CDTPPacketTrans.Header header = gson.fromJson(messageBody.getHeader(), CDTPPacketTrans.Header.class);
             if (header != null) {
               String receiver = messageBody.getReceiver();
               List<TemailAccountLocation> statusList = gatewayLocator.locate(receiver);
               if (!statusList.isEmpty()) {
+                String payload = notificationMsgFactory.notificationOf(receiver, header, messageBody.getData());
+                byte[] messageData = payload.getBytes();
                 List<Message> msgList = new ArrayList<>();
-                CDTPPacketTrans packet = new CDTPPacketTrans();
-                packet.setCommandSpace(NOTIFY_COMMAND_SPACE);
-                packet.setCommand(NOTIFY_COMMAND);
-                packet.setVersion(CDTP_VERSION);
-                header.setReceiver(receiver);
-                packet.setHeader(header);
-                packet.setData(gson.toJson(messageBody.getData()));
-
-                byte[] messageData = gson.toJson(packet).getBytes();
                 statusList.forEach(status ->
                     msgList.add(new Message(status.getMqTopic(), status.getMqTag(), messageData))
                 );
