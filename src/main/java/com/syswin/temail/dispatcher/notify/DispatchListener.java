@@ -6,7 +6,9 @@ import com.syswin.temail.dispatcher.notify.entity.MessageBody;
 import com.syswin.temail.dispatcher.notify.entity.TemailAccountLocation;
 import com.syswin.temail.dispatcher.request.entity.CDTPPacketTrans;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyContext;
 import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyStatus;
@@ -41,14 +43,21 @@ class DispatchListener implements MessageListenerConcurrently {
             if (header != null) {
               String receiver = messageBody.getReceiver();
               List<TemailAccountLocation> statusList = gatewayLocator.locate(receiver);
+
               if (!statusList.isEmpty()) {
                 String payload = notificationMsgFactory.notificationOf(receiver, header, messageBody.getData());
                 byte[] messageData = payload.getBytes();
                 List<Message> msgList = new ArrayList<>();
-                statusList.forEach(status ->
-                    msgList.add(new Message(status.getMqTopic(), status.getMqTag(), messageData))
+                Set<String> mqTags = new HashSet<>();
+                statusList.forEach(status -> {
+                      String mqTag = status.getMqTag();
+                      if (!mqTags.contains(mqTag)) {
+                        mqTags.add(mqTag);
+                        msgList.add(new Message(status.getMqTopic(), mqTag, messageData));
+                      }
+                    }
                 );
-                log.info("发送消息到gateway {}", statusList);
+                log.info("发送消息到gateway {}", msgList);
                 producer.send(msgList);
               }
             }
