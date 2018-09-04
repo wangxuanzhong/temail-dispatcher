@@ -51,6 +51,7 @@ class DispatchListener implements MessageListenerConcurrently {
                 packet.setCommandSpace(NOTIFY_COMMAND_SPACE);
                 packet.setCommand(NOTIFY_COMMAND);
                 packet.setVersion(CDTP_VERSION);
+                header.setReceiver(receiver);
                 packet.setHeader(header);
                 packet.setData(gson.toJson(messageBody.getData()));
 
