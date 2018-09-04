@@ -65,7 +65,7 @@ public class PackageDispatcher {
       throw new DispatchException(e, packet);
     }
     int command = (packet.getCommandSpace() << 16) + packet.getCommand();
-    Request request = properties.getCmdMap().get(Integer.toHexString(command));
+    Request request = properties.getCmdMap().get(Integer.toHexString(command).toUpperCase());
 
     if (request == null) {
       log.error("不支持的命令类型：{}, 请求参数：{}", Integer.toHexString(command), packet);
