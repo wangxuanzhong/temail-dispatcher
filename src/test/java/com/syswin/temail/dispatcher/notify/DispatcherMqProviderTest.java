@@ -20,9 +20,6 @@ import org.junit.runner.RunWith;
 @PactBroker(host = "172.28.50.206", port = "88")
 public class DispatcherMqProviderTest {
 
-  @TestTarget
-  public final Target target = new AmqpTarget(singletonList("com.syswin.temail.dispatcher.notify.*"));
-
   private static final String headerJson = "{\n"
       + "  \"header\": {\n"
       + "    \"dataEncryptionMethod\": 0,\n"
@@ -31,7 +28,8 @@ public class DispatcherMqProviderTest {
       + "    \"timestamp\": 0\n"
       + "  }\n"
       + "}";
-
+  @TestTarget
+  public final Target target = new AmqpTarget(singletonList("com.syswin.temail.dispatcher.notify.*"));
   private final Gson gson = new Gson();
 
   @State("Notification service is available")
@@ -45,6 +43,6 @@ public class DispatcherMqProviderTest {
 
     NotificationMessageFactory factory = new NotificationMessageFactory();
 
-    return factory.notificationOf("sean@t.email", header, ImmutableMap.of("code", 200, "data", "bonjour"));
+    return factory.notificationOf("sean@t.email", header, gson.toJson(ImmutableMap.of("code", 200, "data", "bonjour")));
   }
 }

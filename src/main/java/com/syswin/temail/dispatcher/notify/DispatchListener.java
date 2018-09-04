@@ -1,9 +1,5 @@
 package com.syswin.temail.dispatcher.notify;
 
-import static com.syswin.temail.dispatcher.Constants.CDTP_VERSION;
-import static com.syswin.temail.dispatcher.Constants.NOTIFY_COMMAND;
-import static com.syswin.temail.dispatcher.Constants.NOTIFY_COMMAND_SPACE;
-
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.syswin.temail.dispatcher.notify.entity.MessageBody;
@@ -25,6 +21,7 @@ class DispatchListener implements MessageListenerConcurrently {
   private final Gson gson = new Gson();
   private final MQProducer producer;
   private final GatewayLocator gatewayLocator;
+  private final NotificationMessageFactory notificationMsgFactory = new NotificationMessageFactory();
 
   DispatchListener(MQProducer producer, GatewayLocator gatewayLocator) {
     this.producer = producer;
