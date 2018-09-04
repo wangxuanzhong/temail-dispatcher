@@ -21,7 +21,7 @@ public class ProducerTest {
     MessageBody messageBody = new MessageBody();
     Map<String, Object> data = new HashMap<>();
     data.put("key", "这是测试的消息2!");
-    messageBody.setData(data);
+    messageBody.setData(new Gson().toJson(data));
     messageBody.setReceiver("yaohuacheng@syswin.com");
     Gson gson = new Gson();
     for (int i = 0; i < 10; i++) {

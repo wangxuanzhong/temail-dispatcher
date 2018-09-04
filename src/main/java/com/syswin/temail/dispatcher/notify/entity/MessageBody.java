@@ -1,6 +1,5 @@
 package com.syswin.temail.dispatcher.notify.entity;
 
-import java.util.Map;
 import lombok.Data;
 
 /**
@@ -12,5 +11,5 @@ public class MessageBody {
 
   private String receiver;
   private String header;
-  private Map<String,Object> data;
+  private String data;
 }
