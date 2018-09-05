@@ -61,7 +61,7 @@ public class PackageDispatcher {
         params = gson.fromJson(packet.getData(), CDTPParams.class);
       }
     } catch (JsonSyntaxException e) {
-      log.error("请求参数：{}" + packet);
+      log.error("请求参数：{}", packet);
       throw new DispatchException(e, packet);
     }
     int command = (packet.getCommandSpace() << 16) + packet.getCommand();

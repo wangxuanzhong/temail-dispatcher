@@ -5,7 +5,6 @@ import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 
 import com.google.gson.Gson;
 import com.syswin.temail.dispatcher.request.entity.CDTPPacketTrans;
-import com.syswin.temail.dispatcher.request.exceptions.AuthException;
 import com.syswin.temail.dispatcher.request.exceptions.DispatchException;
 import java.util.HashMap;
 import java.util.Map;
@@ -19,13 +18,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GlobaleExceptionHandler {
 
   private Gson gson = new Gson();
-
-  @ExceptionHandler(AuthException.class)
-  @ResponseStatus(BAD_REQUEST)
-  public Response<String> handleException(AuthException ex) {
-    log.error("无效的请求", ex);
-    return Response.failed(BAD_REQUEST, ex.getMessage());
-  }
 
   @ExceptionHandler(DispatchException.class)
   @ResponseStatus(BAD_REQUEST)

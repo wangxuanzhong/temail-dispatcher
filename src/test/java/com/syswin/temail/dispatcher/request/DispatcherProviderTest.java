@@ -1,6 +1,5 @@
 package com.syswin.temail.dispatcher.request;
 
-import static com.seanyinx.github.unit.scaffolding.Randomness.uniquify;
 import static org.mockito.Mockito.when;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.DEFINED_PORT;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
@@ -33,7 +32,7 @@ import org.springframework.web.client.RestClientException;
 @Provider("temail-dispatcher")
 @SpringBootTest(webEnvironment = DEFINED_PORT, properties = "server.port=8081")
 @ActiveProfiles("dev")
-public class LoginProviderTest {
+public class DispatcherProviderTest {
 
   private static final String ackMessage = "Sent ackMessage";
   @TestTarget
@@ -42,11 +41,9 @@ public class LoginProviderTest {
   private final String signature = "signed-abc";
   private final String sender = "jack@t.email";
   private final String receiver = "sean@t.email";
-  private final String message = "hello world";
-  private final String deviceId = uniquify("deviceId");
   private final Gson gson = new Gson();
 
-  private final CDTPPacketTrans cdtpPacketTrans = singleChatPacket(sender, receiver, message, deviceId);
+  private final CDTPPacketTrans cdtpPacketTrans = singleChatPacket(sender, receiver);
 
 
   @MockBean
@@ -76,12 +73,12 @@ public class LoginProviderTest {
   @State("dispatch user request")
   public void dispatchUserRequest() {
     when(packageDispatcher.dispatch(cdtpPacketTrans))
-        .thenReturn((ResponseEntity<String>) ResponseEntity.ok(gson.toJson(Response.ok(OK, ackPayload()))));
+        .thenReturn(ResponseEntity.ok(gson.toJson(Response.ok(OK, ackPayload()))));
 
   }
 
   // 创建单聊消息体
-  public CDTPPacketTrans singleChatPacket(String sender, String recipient, String message, String deviceId) {
+  public CDTPPacketTrans singleChatPacket(String sender, String recipient) {
 
     CDTPPacketTrans cdtpPacketTrans = new CDTPPacketTrans();
     short CDTP_VERSION = 1;
@@ -108,12 +105,9 @@ public class LoginProviderTest {
     extraData.put("msgId", "4298F38F87DC4775B264A3753E77B443");
     cdtpPacketTransHeader.setExtraData(gson.toJson(extraData));
     cdtpPacketTrans.setHeader(cdtpPacketTransHeader);
-//    String  messageStr = Base64.getEncoder().encodeToString(message.getBytes());
     cdtpPacketTrans.setData("aGVsbG8gd29ybGQ=");
-    System.err.println(cdtpPacketTrans);
     return cdtpPacketTrans;
   }
-
 
   @NotNull
   private CDTPPacketTrans ackPayload() {
