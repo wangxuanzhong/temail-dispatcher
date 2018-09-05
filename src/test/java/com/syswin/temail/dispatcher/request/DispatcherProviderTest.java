@@ -37,7 +37,7 @@ public class DispatcherProviderTest {
   private static final String ackMessage = "Sent ackMessage";
   @TestTarget
   public final Target target = new HttpTarget(8081);
-  private final String unsignedBytes = "abc";
+  private final String unsignedBytes = "abcPackageDispatcher";
   private final String signature = "signed-abc";
   private final String sender = "jack@t.email";
   private final String receiver = "sean@t.email";
