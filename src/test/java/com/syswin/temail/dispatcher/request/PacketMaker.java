@@ -5,13 +5,10 @@ import com.syswin.temail.dispatcher.request.entity.CDTPPacketTrans.Header;
 
 public class PacketMaker {
 
-  public PacketMaker() {
-  }
-
   public static CDTPPacketTrans initCDTPPackage() {
     CDTPPacketTrans packet = new CDTPPacketTrans();
-    packet.setCommand((short) 0);
-    packet.setCommand((short) 1);
+    packet.setCommandSpace((short) 0xF);
+    packet.setCommand((short) 0xF0F);
     packet.setVersion((short) 1);
 
     Header header = new Header();

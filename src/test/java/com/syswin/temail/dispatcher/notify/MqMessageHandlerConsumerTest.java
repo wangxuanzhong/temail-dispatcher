@@ -1,7 +1,7 @@
 package com.syswin.temail.dispatcher.notify;
 
-import static com.syswin.temail.dispatcher.Constants.CDTP_VERSION;
-import static com.syswin.temail.dispatcher.Constants.NOTIFY_COMMAND;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import au.com.dius.pact.consumer.MessagePactBuilder;
@@ -11,10 +11,11 @@ import au.com.dius.pact.consumer.PactVerification;
 import au.com.dius.pact.consumer.dsl.PactDslJsonBody;
 import au.com.dius.pact.model.v3.messaging.MessagePact;
 import com.google.gson.Gson;
-import com.syswin.temail.dispatcher.DispatcherProperties;
+import com.syswin.temail.dispatcher.notify.entity.MessageBody;
+import com.syswin.temail.dispatcher.notify.entity.MqMessage;
 import com.syswin.temail.dispatcher.notify.entity.TemailAccountLocation;
 import com.syswin.temail.dispatcher.request.controller.Response;
-import com.syswin.temail.dispatcher.request.entity.CDTPPacketTrans;
+import com.syswin.temail.dispatcher.request.entity.CDTPPacketTrans.Header;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,21 +32,22 @@ public class MqMessageHandlerConsumerTest {
   @Rule
   public final MessagePactProviderRule mockProvider = new MessagePactProviderRule(this);
   private final MQProducer producer = Mockito.mock(MQProducer.class);
-  private final String recipient = "sean@t.email";
-  private final CDTPPacketTrans payload = mqMsgPayload(recipient, "bonjour");
   private final GatewayLocator gatewayLocator = Mockito.mock(GatewayLocator.class);
-  private byte[] currentMessage;
-  private DispatcherProperties properties;
 
-  public static CDTPPacketTrans mqMsgPayload(String recipient, String message) {
-    Response<String> body = Response.ok(message);
-    CDTPPacketTrans payload = new CDTPPacketTrans();
-    payload.setCommandSpace((short) 3);
-    payload.setCommand(NOTIFY_COMMAND);
-    payload.setVersion(CDTP_VERSION);
-    CDTPPacketTrans.Header header = new CDTPPacketTrans.Header();
+  private final String recipient = "sean@t.email";
+  private final MessageBody payload = mqMsgPayload(recipient, "bonjour");
+
+  private byte[] currentMessage;
+
+  static MessageBody mqMsgPayload(String recipient, String message) {
+    MessageBody payload = new MessageBody();
+    payload.setReceiver(recipient);
+
+    Header header = new Header();
     header.setReceiver(recipient);
-    payload.setHeader(header);
+    payload.setHeader(gson.toJson(header));
+
+    Response<String> body = Response.ok(message);
     payload.setData(gson.toJson(body));
     return payload;
   }
@@ -67,53 +69,46 @@ public class MqMessageHandlerConsumerTest {
   @Test
   @PactVerification({"Able to process online notification message"})
   public void test() throws Exception {
+    // 1. 请求参数的准备：
+    // 2. 外部环境的模拟：
+    //    2.1 gatewayLocator获取gateway信息；
+    //    2.2 producer发送消息内容
+    //          发送的消息内容的构建
+    // 3. 执行需要验证的方法
+    // 4. 检查结果
+
+    String mqTopic = "mqTopic";
+    String mqTag = "mqTag";
+
     List<TemailAccountLocation> locations = new ArrayList<>();
+    locations.add(new TemailAccountLocation(recipient, "", "", "", mqTopic, mqTag));
     when(gatewayLocator.locate(recipient)).thenReturn(locations);
+
+    List<MqMessage> msgList = new ArrayList<>();
+    NotificationMessageFactory notificationMsgFactory = new NotificationMessageFactory();
+    String body = notificationMsgFactory
+        .notificationOf(payload.getReceiver(), gson.fromJson(payload.getHeader(), Header.class), payload.getData());
+    msgList.add(new MqMessage(mqTopic, mqTag, body));
+
     MessageHandler messageHandler = new MessageHandler(producer, gatewayLocator);
-
-    String msg = new String(currentMessage);
-    messageHandler.onMessageReceived(msg);
-
-//    verify(producer).send(argThat(matchesPayload(payload)));
+    messageHandler.onMessageReceived(new String(currentMessage));
+    verify(producer).send(argThat(matchesPayload(msgList)));
   }
 
   public void setMessage(byte[] messageContents) {
     currentMessage = messageContents;
   }
 
-  private ArgumentMatcher<CDTPPacketTrans> matchesPayload(CDTPPacketTrans payload) {
-    return packet -> gson.toJson(payload)
-        .equals(gson.toJson(packet));
+  private ArgumentMatcher<List<MqMessage>> matchesPayload(List<MqMessage> messageList) {
+    return params -> gson.toJson(messageList)
+        .equals(gson.toJson(params));
   }
 
-  private void setStringIfNotNull(PactDslJsonBody header, String key, String value) {
-    if (value != null) {
-      header.stringValue(key, value);
-    }
-  }
-
-  private PactDslJsonBody packetJson(CDTPPacketTrans cdtpPacketTrans) {
+  private PactDslJsonBody packetJson(MessageBody messageBody) {
     PactDslJsonBody body = new PactDslJsonBody();
-    body.numberValue("commandSpace", cdtpPacketTrans.getCommandSpace());
-    body.numberValue("command", cdtpPacketTrans.getCommand());
-    body.numberValue("version", cdtpPacketTrans.getVersion());
-    body.stringValue("data", cdtpPacketTrans.getData());
-
-    PactDslJsonBody header = new PactDslJsonBody();
-    setStringIfNotNull(header, "deviceId", cdtpPacketTrans.getHeader().getDeviceId());
-    header.numberValue("signatureAlgorithm", cdtpPacketTrans.getHeader().getSignatureAlgorithm());
-    setStringIfNotNull(header, "signature", cdtpPacketTrans.getHeader().getSignature());
-    header.numberValue("dataEncryptionMethod", cdtpPacketTrans.getHeader().getDataEncryptionMethod());
-    header.numberValue("timestamp", cdtpPacketTrans.getHeader().getTimestamp());
-    setStringIfNotNull(header, "packetId", cdtpPacketTrans.getHeader().getPacketId());
-    setStringIfNotNull(header, "sender", cdtpPacketTrans.getHeader().getSender());
-    setStringIfNotNull(header, "senderPK", cdtpPacketTrans.getHeader().getSenderPK());
-    setStringIfNotNull(header, "receiver", cdtpPacketTrans.getHeader().getReceiver());
-    setStringIfNotNull(header, "receiverPK", cdtpPacketTrans.getHeader().getReceiverPK());
-    setStringIfNotNull(header, "at", cdtpPacketTrans.getHeader().getAt());
-    setStringIfNotNull(header, "topic", cdtpPacketTrans.getHeader().getTopic());
-    setStringIfNotNull(header, "extraData", cdtpPacketTrans.getHeader().getExtraData());
-    body.object("header", header);
+    body.stringValue("receiver", messageBody.getReceiver());
+    body.stringValue("header", messageBody.getHeader());
+    body.stringValue("data", messageBody.getData());
     return body;
   }
 

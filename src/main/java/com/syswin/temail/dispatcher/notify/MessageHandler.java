@@ -18,8 +18,7 @@ class MessageHandler {
   final Gson gson = new Gson();
   final GatewayLocator gatewayLocator;
   final NotificationMessageFactory notificationMsgFactory = new NotificationMessageFactory();
-  //  final MQProducer producer;
-  MQProducer producer;
+  final MQProducer producer;
 
   public MessageHandler(MQProducer producer, GatewayLocator gatewayLocator) {
     this.producer = producer;

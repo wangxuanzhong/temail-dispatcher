@@ -8,7 +8,6 @@ import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.seanyinx.github.unit.scaffolding.Randomness.uniquify;
-import static com.syswin.temail.dispatcher.request.PacketMaker.initCDTPPackage;
 import static org.apache.http.HttpHeaders.CONTENT_TYPE;
 import static org.apache.http.HttpStatus.SC_OK;
 import static org.apache.http.entity.ContentType.APPLICATION_JSON;
@@ -26,6 +25,7 @@ import com.syswin.temail.dispatcher.DispatcherProperties;
 import com.syswin.temail.dispatcher.DispatcherProperties.Request;
 import com.syswin.temail.dispatcher.request.application.PackageDispatcher;
 import com.syswin.temail.dispatcher.request.entity.CDTPPacketTrans;
+import com.syswin.temail.dispatcher.request.entity.CDTPPacketTrans.Header;
 import com.syswin.temail.dispatcher.request.entity.CDTPParams;
 import java.util.Map;
 import org.junit.Before;
@@ -85,6 +85,27 @@ public class PackageDispatcherTest {
                 .withHeader(CONTENT_TYPE, APPLICATION_JSON.getMimeType())
                 .withStatus(SC_OK)
                 .withBody(responseBody2)));
+  }
+
+  static CDTPPacketTrans initCDTPPackage() {
+    CDTPPacketTrans packet = new CDTPPacketTrans();
+    packet.setCommandSpace((short) 0xF);
+    packet.setCommand((short) 0xF0F);
+    packet.setVersion((short) 1);
+
+    Header header = new Header();
+    header.setSignatureAlgorithm(1);
+    header.setSignature("sign");
+    header.setDataEncryptionMethod(1);
+    header.setTimestamp(System.currentTimeMillis());
+    header.setPacketId("pkgId");
+    header.setSender("yaohuacheng@syswin.com");
+    header.setSenderPK("SenderPK(");
+    header.setReceiver("yaohuacheng@syswin.com");
+    header.setReceiverPK("ReceiverPK(");
+    packet.setHeader(header);
+
+    return packet;
   }
 
   @Before

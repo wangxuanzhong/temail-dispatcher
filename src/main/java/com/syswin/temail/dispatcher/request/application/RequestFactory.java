@@ -42,21 +42,22 @@ class RequestFactory {
         params = gson.fromJson(packet.getData(), CDTPParams.class);
       }
     } catch (JsonSyntaxException e) {
-      log.error("请求参数：{}" + packet);
+      log.error("Body的Json格式解析错误，请求参数：{}" + packet);
       throw new DispatchException(e, packet);
     }
     int command = (packet.getCommandSpace() << 16) + packet.getCommand();
-    Request request = properties.getCmdMap().get(Integer.toHexString(command).toUpperCase());
+    String cmdHex = Integer.toHexString(command).toUpperCase();
+    Request request = properties.getCmdMap().get(cmdHex);
 
     if (request == null) {
-      log.error("不支持的命令类型：{}, 请求参数：{}", Integer.toHexString(command), packet);
-      throw new RuntimeException("不支持的命令类型：" + command);
+      log.error("不支持的命令类型：{}, 请求参数：{}", cmdHex, packet);
+      throw new DispatchException("不支持的命令类型：" + command, packet);
     }
 
     HttpEntity<?> entity = composeHttpEntity(request, packet.getHeader(), params);
     if (entity == null) {
-      log.error("请求参数：{}", packet);
-      throw new RuntimeException("不支持的命令类型：" + request.getMethod());
+      log.error("不支持的请求类型：{}，请求参数：{}", request.getMethod(), packet);
+      throw new DispatchException("不支持的请求类型：" + request.getMethod(), packet);
     }
 
     String url = composeUrl(request, params.getQuery());
@@ -65,7 +66,7 @@ class RequestFactory {
   }
 
 
-  private HttpEntity<?> composeHttpEntity(Request request, CDTPPacketTrans.Header cdtpHeader, CDTPParams params) {
+  private HttpEntity<?> composeHttpEntity(Request request, Header cdtpHeader, CDTPParams params) {
     MultiValueMap<String, String> headers = addHeaders(cdtpHeader, params);
 
     switch (request.getMethod()) {
