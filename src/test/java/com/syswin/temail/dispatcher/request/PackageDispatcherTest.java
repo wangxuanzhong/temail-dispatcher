@@ -40,8 +40,8 @@ public class PackageDispatcherTest {
 
   @ClassRule
   public static final WireMockRule wireMockRule = new WireMockRule(8081);
-  private static final String COMMAND1 = uniquify("command1");
-  private static final String COMMAND2 = uniquify("command2");
+  private static final String COMMAND1 = "command1";
+  private static final String COMMAND2 = "command2";
 
 
   private static final String responseBody1 = uniquify("response1");
@@ -62,14 +62,12 @@ public class PackageDispatcherTest {
       "q1", "v1",
       "q2", "v22");
   private final PackageDispatcher packageDispatcher = new PackageDispatcher(properties, restTemplate);
-  private final CDTPPacketTrans packet = initCDTPPackage();
 
   @BeforeClass
   public static void beforeClass() {
-    stubFor(any(urlEqualTo("/" + COMMAND1 + "?q1=v1&q2=v21&q2=v22"))
+    stubFor(any(urlEqualTo("/" + COMMAND1 + "?q1=v1&q2=v22"))
         .withHeader("h1", equalTo("v1"))
         .withHeader("h2", containing("v21"))
-        .withHeader("h2", containing("v22"))
         .willReturn(
             aResponse()
                 .withHeader(CONTENT_TYPE, APPLICATION_JSON.getMimeType())
@@ -89,8 +87,8 @@ public class PackageDispatcherTest {
 
   static CDTPPacketTrans initCDTPPackage() {
     CDTPPacketTrans packet = new CDTPPacketTrans();
-    packet.setCommandSpace((short) 0xF);
-    packet.setCommand((short) 0xF0F);
+    packet.setCommandSpace((short) 0x0A);
+    packet.setCommand((short) 0x0F01);
     packet.setVersion((short) 1);
 
     Header header = new Header();
@@ -110,20 +108,23 @@ public class PackageDispatcherTest {
 
   @Before
   public void setUp() {
-    properties.setCmdMap(ImmutableMap.of(COMMAND1, request, COMMAND2, request));
+    properties.setCmdMap(ImmutableMap.of("A0F01", request, "A0F02", request));
   }
 
   @Test
   public void requestWithoutBody() {
-//    packet.setCommand(COMMAND1);
+    CDTPPacketTrans packet = initCDTPPackage();
+    packet.setCommandSpace((short) 0x0A);
+    packet.setCommand((short) 0x0F01);
     request.setUrl(baseUrl + "/" + COMMAND1);
 
     CDTPParams params = new CDTPParams();
+    params.setHeader(headers);
+    params.setQuery(queries);
+    packet.setData(gson.toJson(params));
+
     for (HttpMethod method : methods) {
       request.setMethod(method);
-
-      params.setHeader(headers);
-      params.setQuery(queries);
 
       ResponseEntity<String> responseEntity = packageDispatcher.dispatch(packet);
 
@@ -134,16 +135,18 @@ public class PackageDispatcherTest {
 
   @Test
   public void requestWithBody() {
-//    packet.getData().setCommand(COMMAND2);
+    CDTPPacketTrans packet = initCDTPPackage();
+    packet.setCommandSpace((short) 0x0A);
+    packet.setCommand((short) 0x0F02);
     request.setUrl(baseUrl + "/" + COMMAND2);
 
     CDTPParams params = new CDTPParams();
+    params.setHeader(headers);
+    params.setQuery(queries);
+    params.setBody(body);
+    packet.setData(gson.toJson(params));
     for (HttpMethod method : new HttpMethod[]{POST, PUT}) {
       request.setMethod(method);
-
-      params.setHeader(headers);
-      params.setQuery(queries);
-      params.setBody(body);
 
       ResponseEntity<String> responseEntity = packageDispatcher.dispatch(packet);
 
