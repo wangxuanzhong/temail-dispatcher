@@ -12,5 +12,6 @@ public class AuthData {
   private String temail;
   private String unsignedBytes;
   private String signature;
+  private String algorithm;
 
 }
