@@ -1,10 +1,5 @@
 package com.syswin.temail.dispatcher.request;
 
-import static org.mockito.Mockito.when;
-import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.DEFINED_PORT;
-import static org.springframework.http.HttpStatus.FORBIDDEN;
-import static org.springframework.http.HttpStatus.OK;
-
 import au.com.dius.pact.provider.junit.Provider;
 import au.com.dius.pact.provider.junit.State;
 import au.com.dius.pact.provider.junit.loader.PactBroker;
@@ -27,6 +22,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.client.RestClientException;
 
+import static org.mockito.Mockito.when;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.DEFINED_PORT;
+import static org.springframework.http.HttpStatus.FORBIDDEN;
+import static org.springframework.http.HttpStatus.OK;
+
 @RunWith(SpringRestPactRunner.class)
 @PactBroker(host = "172.28.50.206", port = "88")
 @Provider("temail-dispatcher")
@@ -41,6 +41,7 @@ public class DispatcherProviderTest {
   private final String signature = "signed-abc";
   private final String sender = "jack@t.email";
   private final String receiver = "sean@t.email";
+  private final String algorithm = "1";
   private final Gson gson = new Gson();
 
   private final CDTPPacketTrans cdtpPacketTrans = singleChatPacket(sender, receiver);
@@ -55,19 +56,19 @@ public class DispatcherProviderTest {
 
   @State("User sean is registered")
   public void userIsRegistered() {
-    when(authService.verify("sean@t.email", unsignedBytes, signature))
+    when(authService.verify("sean@t.email", unsignedBytes, signature,algorithm))
         .thenReturn(ResponseEntity.ok(Response.ok("Success")));
   }
 
   @State("User jack is not registered")
   public void userNotRegistered() {
-    when(authService.verify("jack@t.email", unsignedBytes, signature))
+    when(authService.verify("jack@t.email", unsignedBytes, signature,algorithm))
         .thenReturn(new ResponseEntity<>(Response.failed(FORBIDDEN), FORBIDDEN));
   }
 
   @State("User mike is registered, but server is out of work")
   public void serverOutOfWork() {
-    when(authService.verify("mike@t.email", unsignedBytes, signature)).thenThrow(RestClientException.class);
+    when(authService.verify("mike@t.email", unsignedBytes, signature, algorithm)).thenThrow(RestClientException.class);
   }
 
   @State("dispatch user request")

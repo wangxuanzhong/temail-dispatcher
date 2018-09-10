@@ -1,5 +1,20 @@
 package com.syswin.temail.dispatcher.request;
 
+import au.com.dius.pact.consumer.ConsumerPactTestMk2;
+import au.com.dius.pact.consumer.MockServer;
+import au.com.dius.pact.consumer.dsl.PactDslWithProvider;
+import au.com.dius.pact.model.RequestResponsePact;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.syswin.temail.dispatcher.request.application.AuthService;
+import com.syswin.temail.dispatcher.request.application.SilentResponseErrorHandler;
+import com.syswin.temail.dispatcher.request.controller.Response;
+import java.util.HashMap;
+import java.util.Map;
+import org.junit.Before;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestTemplate;
+
 import static java.util.Collections.singletonMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
@@ -8,22 +23,6 @@ import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-
-import au.com.dius.pact.consumer.ConsumerPactTestMk2;
-import au.com.dius.pact.consumer.MockServer;
-import au.com.dius.pact.consumer.dsl.PactDslWithProvider;
-import au.com.dius.pact.model.RequestResponsePact;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.syswin.temail.dispatcher.request.application.AuthService;
-import com.syswin.temail.dispatcher.request.controller.Response;
-import com.syswin.temail.dispatcher.request.application.SilentResponseErrorHandler;
-import com.syswin.temail.dispatcher.request.entity.AuthData;
-import java.util.HashMap;
-import java.util.Map;
-import org.junit.Before;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.RestTemplate;
 
 public class AuthConsumerVerificationTest extends ConsumerPactTestMk2 {
 
@@ -83,13 +82,13 @@ public class AuthConsumerVerificationTest extends ConsumerPactTestMk2 {
     String url = mockServer.getUrl() + "/verify";
     AuthService authService = new AuthService(restTemplate, url);
 
-    ResponseEntity<Response<String>> response = authService.verify("mike@t.email", "abc", "xyz");
+    ResponseEntity<Response<String>> response = authService.verify("mike@t.email", "abc", "xyz","1");
     assertThat(response.getStatusCode()).isEqualTo(OK);
 
-    response = authService.verify("jane@t.email", "abc", "xyz");
+    response = authService.verify("jane@t.email", "abc", "xyz", "1");
     assertThat(response.getStatusCode()).isEqualTo(FORBIDDEN);
 
-    response = authService.verify(null, null, null);
+    response = authService.verify(null, null, null, null);
     assertThat(response.getStatusCode()).isEqualTo(BAD_REQUEST);
   }
 
