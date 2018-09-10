@@ -25,6 +25,11 @@ public class AuthService {
   private final HttpHeaders headers = new HttpHeaders();
   private final ParameterizedTypeReference<Response<String>> responseType = responseType();
 
+  static final String TE_MAIL = "TeMail";
+  static final String UNSIGNED_BYTES = "UNSIGNED_BYTES";
+  static final String SIGNATURE = "SIGNATURE";
+  static final String ALGORITHM = "ALGORITHM";
+
   public AuthService(RestTemplate restTemplate, String authUrl) {
     this.authUrl = authUrl;
     this.restTemplate = restTemplate;
@@ -39,10 +44,10 @@ public class AuthService {
   public ResponseEntity<Response<String>> verify(String temail, String unsignedBytes,
       String signature, String algorithm) {
     MultiValueMap<String, String> entityBody = new LinkedMultiValueMap<>();
-    entityBody.add("temail", temail);
-    entityBody.add("unsignedBytes", unsignedBytes);
-    entityBody.add("signature", signature);
-    entityBody.add("algorithm", algorithm);
+    entityBody.add(TE_MAIL, temail);
+    entityBody.add(UNSIGNED_BYTES, unsignedBytes);
+    entityBody.add(SIGNATURE, signature);
+    entityBody.add(ALGORITHM, algorithm);
     HttpEntity<?> requestEntity = new HttpEntity<>(entityBody, headers);
     ResponseEntity<Response<String>> result =  restTemplate.exchange(authUrl, POST, requestEntity, responseType);
     log.info("{}, {}, {}, {} 验签结果： {} ", temail, unsignedBytes, signature, algorithm, result.getStatusCode());
