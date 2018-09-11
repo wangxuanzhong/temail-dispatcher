@@ -17,14 +17,4 @@ public class Base64Coder {
     return DECODER.decode(base64Str);
   }
 
-  public static String hexString(byte[] data){
-    StringBuilder sbd = new StringBuilder();
-    for(int i = 0; i < data.length; i++){
-      String hexStr = Integer.toHexString((0xFF & data[i]));
-      if(hexStr.length() == 1){hexStr = "0"+hexStr;}
-      sbd.append(hexStr);
-    }
-    return sbd.toString();
-  }
-
 }

@@ -38,4 +38,6 @@ public class DispatcherApplication {
   public AuthService authService(DispatcherProperties properties, RestTemplate restTemplate) {
     return new AuthService(restTemplate, properties.getAuthVerifyUrl());
   }
+
+
 }

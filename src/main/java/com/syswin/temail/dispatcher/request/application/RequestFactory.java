@@ -1,8 +1,5 @@
 package com.syswin.temail.dispatcher.request.application;
 
-import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
-import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
-
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
@@ -12,6 +9,8 @@ import com.syswin.temail.dispatcher.request.entity.CDTPPacketTrans;
 import com.syswin.temail.dispatcher.request.entity.CDTPPacketTrans.Header;
 import com.syswin.temail.dispatcher.request.entity.CDTPParams;
 import com.syswin.temail.dispatcher.request.exceptions.DispatchException;
+import com.syswin.temail.dispatcher.request.utils.CommonPacketDecode;
+import com.syswin.temail.dispatcher.request.utils.PacketDecode;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -21,12 +20,16 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
+import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
+
 @Slf4j
 class RequestFactory {
 
   static final String CDTP_HEADER = "CDTP-header";
   private Gson gson = new Gson();
   private DispatcherProperties properties;
+  private PacketDecode packetDecode = new CommonPacketDecode();
 
   RequestFactory(DispatcherProperties properties) {
     this.properties = properties;
@@ -36,7 +39,7 @@ class RequestFactory {
     CDTPParams params;
     Gson gson = new Gson();
     try {
-      if (isSendSingleMsg(packet)) {
+      if (packetDecode.isSendSingleMsg(packet)) {
         params = buildSendSingleMsgParams(packet);
       } else {
         params = gson.fromJson(packet.getData(), CDTPParams.class);
@@ -108,13 +111,6 @@ class RequestFactory {
     }
     headers.add(CDTP_HEADER, gson.toJson(cdtpHeader));
     return headers;
-  }
-
-  private boolean isSendSingleMsg(CDTPPacketTrans packet) {
-    // TODO(姚华成): 根据业务定义，可能会改变
-    short commandSpace = packet.getCommandSpace();
-    short command = packet.getCommand();
-    return commandSpace == 1 && command == 1;
   }
 
   private CDTPParams buildSendSingleMsgParams(CDTPPacketTrans packet) {

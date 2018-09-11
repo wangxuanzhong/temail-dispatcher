@@ -53,16 +53,16 @@ public class DispatchController {
   public ResponseEntity<String> dispatch(@RequestBody CDTPPacketTrans packet) {
     try {
       ResponseEntity<Response<String>> verify = authService.verify(packet);
-      if(verify.getStatusCode().is2xxSuccessful()){
+      if (verify.getStatusCode().is2xxSuccessful()) {
         log.info("dispatch服务接收到的请求信息为：{}", packet);
         ResponseEntity<String> responseEntity = packageDispatcher.dispatch(packet);
         ResponseEntity<String> result = new ResponseEntity<>(responseEntity.getBody(),
             responseEntity.getStatusCode());
         log.info("dispatch服务返回的结果为：{}", result);
         return result;
-      }else {
-         log.error("签名数据验证失败! ");
-        return new ResponseEntity<>("数据包签名验证未通过!", HttpStatus.OK);
+      } else {
+        log.error("签名数据验证失败! ");
+        return new ResponseEntity(Response.failed(HttpStatus.FORBIDDEN, "数据包签名验证未通过!"), HttpStatus.FORBIDDEN);
       }
     } catch (DispatchException e) {
       throw e;

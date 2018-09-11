@@ -56,13 +56,13 @@ public class DispatcherProviderTest {
 
   @State("User sean is registered")
   public void userIsRegistered() {
-    when(authService.verify("sean@t.email", unsignedBytes, signature,algorithm))
+    when(authService.verify("sean@t.email", unsignedBytes, signature, algorithm))
         .thenReturn(ResponseEntity.ok(Response.ok("Success")));
   }
 
   @State("User jack is not registered")
   public void userNotRegistered() {
-    when(authService.verify("jack@t.email", unsignedBytes, signature,algorithm))
+    when(authService.verify("jack@t.email", unsignedBytes, signature, algorithm))
         .thenReturn(new ResponseEntity<>(Response.failed(FORBIDDEN), FORBIDDEN));
   }
 

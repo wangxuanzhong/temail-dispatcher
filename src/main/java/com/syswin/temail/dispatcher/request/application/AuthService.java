@@ -2,7 +2,8 @@ package com.syswin.temail.dispatcher.request.application;
 
 import com.syswin.temail.dispatcher.request.controller.Response;
 import com.syswin.temail.dispatcher.request.entity.CDTPPacketTrans;
-import com.syswin.temail.dispatcher.request.utils.CommonBizUtils;
+import com.syswin.temail.dispatcher.request.utils.CommonPacketDecode;
+import com.syswin.temail.dispatcher.request.utils.PacketDecode;
 import com.syswin.temail.dispatcher.request.utils.encrypts.SHA256Coder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
@@ -20,7 +21,8 @@ import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED;
 public class AuthService {
 
   private final RestTemplate restTemplate;
-  private SHA256Coder sha256Coder = new SHA256Coder();
+  private final PacketDecode packetDecode;
+  private final SHA256Coder sha256Coder ;
   private final String authUrl;
   private final HttpHeaders headers = new HttpHeaders();
   private final ParameterizedTypeReference<Response<String>> responseType = responseType();
@@ -34,6 +36,8 @@ public class AuthService {
     this.authUrl = authUrl;
     this.restTemplate = restTemplate;
     this.headers.setContentType(APPLICATION_FORM_URLENCODED);
+    this.sha256Coder = new SHA256Coder();
+    this.packetDecode = new CommonPacketDecode();
   }
 
   public ResponseEntity<Response<String>> verify(CDTPPacketTrans packetTrans) {
@@ -59,7 +63,7 @@ public class AuthService {
     unSignedData.append((cdtpPacketTrans.getCommandSpace() + cdtpPacketTrans.getCommand()))
         .append(cdtpPacketTrans.getHeader().getReceiver())
         .append(cdtpPacketTrans.getHeader().getTimestamp())
-        .append(sha256Coder.encryptAndSwitch2Base64(CommonBizUtils.decodeData(cdtpPacketTrans)));
+        .append(sha256Coder.digestWithBase64(packetDecode.decodeData(cdtpPacketTrans)));
     return unSignedData.toString();
   }
 
