@@ -61,7 +61,7 @@ public class AuthService {
   public String extractUnsignedData(CDTPPacketTrans cdtpPacketTrans) {
     StringBuilder unSignedData = new StringBuilder();
     unSignedData.append((cdtpPacketTrans.getCommandSpace() + cdtpPacketTrans.getCommand()))
-        .append(cdtpPacketTrans.getHeader().getReceiver())
+        .append(cdtpPacketTrans.getHeader().getTargetAddress())
         .append(cdtpPacketTrans.getHeader().getTimestamp())
         .append(sha256Coder.digestWithBase64(packetDecode.decodeData(cdtpPacketTrans)));
     return unSignedData.toString();
