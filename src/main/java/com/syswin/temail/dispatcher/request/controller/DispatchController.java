@@ -62,7 +62,7 @@ public class DispatchController {
         return result;
       } else {
         log.error("签名数据验证失败! ");
-        return new ResponseEntity(Response.failed(HttpStatus.FORBIDDEN, "数据包签名验证未通过!"), HttpStatus.FORBIDDEN);
+        return new ResponseEntity<String>(gson.toJson(Response.failed(HttpStatus.FORBIDDEN, "数据包签名验证未通过!")), HttpStatus.FORBIDDEN);
       }
     } catch (DispatchException e) {
       throw e;
