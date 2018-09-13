@@ -8,6 +8,7 @@ public class CDTPParams {
 
   private Map<String, String> header;
   private Map<String, String> query;
+  private Map<String, Object> path;
   private Map<String, Object> body;
 
   public CDTPParams() {

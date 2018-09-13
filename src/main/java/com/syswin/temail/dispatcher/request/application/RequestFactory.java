@@ -63,7 +63,7 @@ class RequestFactory {
       throw new DispatchException("不支持的请求类型：" + request.getMethod(), packet);
     }
 
-    String url = composeUrl(request, params.getQuery());
+    String url = composeUrl(request, params.getPath(), params.getQuery());
     log.info("转发的请求：URL={}, method={}, entity={}", url, request.getMethod(), entity);
     return new TemailRequest(url, request.getMethod(), entity);
   }
@@ -89,15 +89,19 @@ class RequestFactory {
     }
   }
 
-  private String composeUrl(Request request, Map<String, String> queries) {
+  private String composeUrl(Request request, Map<String, Object> path, Map<String, String> queries) {
     String url = request.getUrl();
+    UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(url);
     if (queries != null && !queries.isEmpty()) {
-      UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(url);
       for (Entry<String, String> entry : queries.entrySet()) {
         builder.queryParam(entry.getKey(), entry.getValue());
       }
-      url = builder.toUriString();
     }
+
+    if (path != null) {
+      builder.uriVariables(path);
+    }
+    url = builder.toUriString();
     return url;
   }
 

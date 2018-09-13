@@ -41,7 +41,7 @@ public class RequestFactoryTest {
   private final HttpMethod[] methods = {GET, POST, PUT, DELETE};
   private final RequestFactory requestFactory = new RequestFactory(properties);
 
-  static CDTPPacketTrans initCDTPPackage() {
+  private static CDTPPacketTrans initCDTPPackage() {
     CDTPPacketTrans packet = new CDTPPacketTrans();
     packet.setCommandSpace((short) 0xA);
     packet.setCommand((short) 0xF0F);
@@ -114,6 +114,33 @@ public class RequestFactoryTest {
       String[] headerNames = new String[headers.keySet().size()];
       assertThat(temailRequest.entity().getHeaders())
           .containsKeys(headers.keySet().toArray(headerNames));
+
+      assertThat(temailRequest.entity().getBody()).isNull();
+    }
+  }
+
+  @Test
+  public void requestWithPathVariable() {
+    request.setUrl(baseUrl + "/{Name1}/{Name2}");
+
+    CDTPPacketTrans packet = initCDTPPackage();
+    Map<String, Object> pathVariables = ImmutableMap.of(
+        "Name1", "Value1",
+        "Name2", "Value2");
+
+    CDTPParams cdtpParams = new CDTPParams();
+    cdtpParams.setPath(pathVariables);
+    packet.setData(gson.toJson(cdtpParams));
+
+    for (HttpMethod method : methods) {
+      request.setMethod(method);
+
+      TemailRequest temailRequest = requestFactory.toRequest(packet);
+
+      assertThat(temailRequest.url()).isEqualTo(baseUrl + "/Value1/Value2");
+      assertThat(temailRequest.method()).isEqualTo(request.getMethod());
+      assertThat(temailRequest.entity().getHeaders())
+          .contains(new SimpleEntry<>(CDTP_HEADER, singletonList(gson.toJson(packet.getHeader()))));
 
       assertThat(temailRequest.entity().getBody()).isNull();
     }
