@@ -1,5 +1,8 @@
 package com.syswin.temail.dispatcher.request.application;
 
+import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
+import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
@@ -19,9 +22,6 @@ import org.springframework.http.HttpEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.util.UriComponentsBuilder;
-
-import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
-import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 
 @Slf4j
 class RequestFactory {
@@ -80,7 +80,9 @@ class RequestFactory {
       case PUT:
         Map<String, Object> body = params.getBody();
         if (body != null) {
-          headers.add(CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE);
+          if (!headers.containsKey(CONTENT_TYPE)) {
+            headers.add(CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE);
+          }
           return new HttpEntity<>(body, headers);
         }
         return new HttpEntity<>(headers);
