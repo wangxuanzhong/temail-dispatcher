@@ -53,9 +53,8 @@ class MessageHandler {
         }
       }
     } catch (JsonSyntaxException e) {
-      log.error("消息内容为：{}", msg);
-      log.error("解析错误", e);
-      // 不处理，不重试
+      // 数据格式错误，记录错误，直接跳过
+      log.error("消息内容为：" + msg, e);
     }
   }
 }
