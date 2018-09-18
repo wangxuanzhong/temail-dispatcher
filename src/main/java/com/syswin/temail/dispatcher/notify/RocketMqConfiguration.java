@@ -25,7 +25,7 @@ class RocketMqConfiguration {
     consumer.setNamesrvAddr(rocketMQ.getNamesrvAddr());
     consumer.subscribe(rocketMQ.getConsumerTopic(), MQ_TOPIC_TAG);
     consumer.setMessageListener(new RocketDispatchListener(new RocketMQProducer(producer),
-        new GatewayLocator(restTemplate, properties.getTemailChannelUrl())));
+        new GatewayLocator(restTemplate, properties.getTemailChannelUrl()), properties));
     consumer.start();
     log.info("Started listening to MQ topic {}, tag {}", rocketMQ.getConsumerTopic(), MQ_TOPIC_TAG);
     return consumer;

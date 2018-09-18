@@ -14,6 +14,7 @@ import com.google.gson.Gson;
 import com.syswin.temail.dispatcher.DispatcherProperties;
 import com.syswin.temail.dispatcher.notify.entity.MessageBody;
 import com.syswin.temail.dispatcher.notify.entity.MqMessage;
+import com.syswin.temail.dispatcher.notify.entity.PushData;
 import com.syswin.temail.dispatcher.notify.entity.TemailAccountLocation;
 import com.syswin.temail.dispatcher.request.controller.Response;
 import com.syswin.temail.dispatcher.request.entity.CDTPPacketTrans.Header;
@@ -21,13 +22,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.ArgumentMatcher;
 import org.mockito.Mockito;
 
-
-public class MqMessageHandlerConsumerTest {
+public class MqOffLineMessageHandlerConsummerTest {
 
   private final static Gson gson = new Gson();
   @Rule
@@ -36,13 +37,16 @@ public class MqMessageHandlerConsumerTest {
   private final GatewayLocator gatewayLocator = Mockito.mock(GatewayLocator.class);
 
   private final String recipient = "sean@t.email";
-  private final MessageBody payload = mqMsgPayload(recipient, "bonjour");
+
+  private final MessageBody pushDatapayload = mqPushMsgPayload(recipient, "bonjour");
 
   private final DispatcherProperties properties = new DispatcherProperties();
 
+
   private byte[] currentMessage;
 
-  static MessageBody mqMsgPayload(String recipient, String message) {
+
+  static MessageBody mqPushMsgPayload(String recipient, String message) {
     MessageBody payload = new MessageBody();
     payload.setReceiver(recipient);
 
@@ -50,28 +54,34 @@ public class MqMessageHandlerConsumerTest {
     header.setReceiver(recipient);
     payload.setHeader(gson.toJson(header));
 
-    Response<String> body = Response.ok(message);
-    payload.setData(gson.toJson(body));
+    PushData pushData = new PushData();
+    pushData.setMsgId("pushMsgId1");
+    pushData.setFrom("jack@t.email");
+    pushData.setTo(recipient);
+    pushData.setMessage(message);
+    pushData.setEventType(0);
+    payload.setData(gson.toJson(pushData));
     return payload;
   }
 
+
   @Pact(provider = "temail-notificaiton-mq", consumer = "temail-dispatcher-mq")
   public MessagePact createPact(MessagePactBuilder builder) {
-    PactDslJsonBody jsonBody = packetJson(payload);
+    PactDslJsonBody pushJsonBody = packetJson(pushDatapayload);
 
     Map<String, String> metadata = new HashMap<>();
     metadata.put("Content-Type", "application/json; charset=UTF-8");
-
-    return builder.given("Notification service is available")
-        .expectsToReceive("online notification")
+    return builder.given("Notification service is unavailable")
+        .expectsToReceive("offline notification")
         .withMetadata(metadata)
-        .withContent(jsonBody)
+        .withContent(pushJsonBody)
         .toPact();
   }
 
+
   @Test
-  @PactVerification({"Able to process online notification message"})
-  public void test() throws Exception {
+  @PactVerification({"Able to process offline notification message"})
+  public void testPush() throws Exception {
     // 1. 请求参数的准备：
     // 2. 外部环境的模拟：
     //    2.1 gatewayLocator获取gateway信息；
@@ -84,19 +94,23 @@ public class MqMessageHandlerConsumerTest {
     String mqTag = "mqTag";
 
     List<TemailAccountLocation> locations = new ArrayList<>();
-    locations.add(new TemailAccountLocation(recipient, "", "", "", mqTopic, mqTag));
+    //locations.add(new TemailAccountLocation(recipient, "", "", "", mqTopic, mqTag));
     when(gatewayLocator.locate(recipient)).thenReturn(locations);
 
-    List<MqMessage> msgList = new ArrayList<>();
     NotificationMessageFactory notificationMsgFactory = new NotificationMessageFactory();
-    String body = notificationMsgFactory
-        .notificationOf(payload.getReceiver(), gson.fromJson(payload.getHeader(), Header.class), payload.getData());
-    msgList.add(new MqMessage(mqTopic, mqTag, body));
+    Optional<String> body = notificationMsgFactory
+        .getPushMessage(pushDatapayload.getReceiver(), gson.fromJson(pushDatapayload.getHeader(), Header.class),
+            pushDatapayload.getData());
+
+    List<MqMessage> msgList = new ArrayList<>();
+    msgList
+        .add(new MqMessage(properties.getRocketmq().getPushTopic(), properties.getRocketmq().getPushTag(), body.get()));
 
     MessageHandler messageHandler = new MessageHandler(producer, gatewayLocator, properties);
     messageHandler.onMessageReceived(new String(currentMessage));
     verify(producer).send(argThat(matchesPayload(msgList)));
   }
+
 
   public void setMessage(byte[] messageContents) {
     currentMessage = messageContents;

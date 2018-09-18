@@ -2,6 +2,7 @@ package com.syswin.temail.dispatcher.notify;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
+import com.syswin.temail.dispatcher.DispatcherProperties;
 import com.syswin.temail.dispatcher.notify.entity.MessageBody;
 import com.syswin.temail.dispatcher.notify.entity.MqMessage;
 import com.syswin.temail.dispatcher.notify.entity.TemailAccountLocation;
@@ -9,6 +10,7 @@ import com.syswin.temail.dispatcher.request.entity.CDTPPacketTrans.Header;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 
@@ -19,10 +21,12 @@ class MessageHandler {
   final GatewayLocator gatewayLocator;
   final NotificationMessageFactory notificationMsgFactory = new NotificationMessageFactory();
   final MQProducer producer;
+  final DispatcherProperties properties;
 
-  public MessageHandler(MQProducer producer, GatewayLocator gatewayLocator) {
+  public MessageHandler(MQProducer producer, GatewayLocator gatewayLocator, DispatcherProperties properties) {
     this.producer = producer;
     this.gatewayLocator = gatewayLocator;
+    this.properties = properties;
   }
 
   void onMessageReceived(String msg) throws Exception {
@@ -49,6 +53,16 @@ class MessageHandler {
             );
             log.info("发送消息到gateway {}", msgList);
             producer.send(msgList);
+          } else {
+            Optional<String> pushMessage = notificationMsgFactory
+                .getPushMessage(receiver, header, messageBody.getData());
+            if (pushMessage.isPresent()) {
+              List<MqMessage> msgList = new ArrayList<>();
+              MqMessage mqMessage = new MqMessage(properties.getRocketmq().getPushTopic(), properties.getRocketmq().getPushTag(), pushMessage.get());
+              msgList.add(mqMessage);
+              producer.send(msgList);
+              log.info("离线push信息:{}", pushMessage.get());
+            }
           }
         }
       }
