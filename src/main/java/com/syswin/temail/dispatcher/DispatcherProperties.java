@@ -23,7 +23,7 @@ public class DispatcherProperties {
     private String producerGroup;
     private String consumerGroup;
     private String consumerTopic;
-    private String pushTopic = "pushTopic";
+    private String pushTopic = "temail-message";
     private String pushTag = "*";
   }
 
