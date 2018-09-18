@@ -71,7 +71,7 @@ public class MqOffLineMessageHandlerConsummerTest {
 
     Map<String, String> metadata = new HashMap<>();
     metadata.put("Content-Type", "application/json; charset=UTF-8");
-    return builder.given("Notification service is unavailable")
+    return builder.given("Notification service is available")
         .expectsToReceive("offline notification")
         .withMetadata(metadata)
         .withContent(pushJsonBody)

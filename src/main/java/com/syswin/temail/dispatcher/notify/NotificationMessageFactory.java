@@ -5,6 +5,7 @@ import static com.syswin.temail.dispatcher.Constants.NOTIFY_COMMAND;
 import static com.syswin.temail.dispatcher.Constants.NOTIFY_COMMAND_SPACE;
 
 import com.google.gson.Gson;
+import com.syswin.temail.dispatcher.Constants;
 import com.syswin.temail.dispatcher.notify.entity.PushData;
 import com.syswin.temail.dispatcher.notify.entity.PushMessage;
 import com.syswin.temail.dispatcher.request.entity.CDTPPacketTrans;
@@ -34,11 +35,12 @@ class NotificationMessageFactory {
   Optional<String> getPushMessage(String receiver, Header header, String body) {
 
     PushData pushData = gson.fromJson(body, PushData.class);
-    if (pushData.getEventType().equals(0)) {
+    if (pushData.getEventType().equals(Constants.COMMON_MSG_EVENT_TYPE)) {
       PushMessage pushMsg = new PushMessage();
       BeanUtils.copyProperties(pushData, pushMsg);
       return Optional.ofNullable(gson.toJson(pushMsg));
     }
+    
     return Optional.empty();
   }
 }
