@@ -93,7 +93,7 @@ public class MqMessageHandlerConsumerTest {
         .notificationOf(payload.getReceiver(), gson.fromJson(payload.getHeader(), Header.class), payload.getData());
     msgList.add(new MqMessage(mqTopic, mqTag, body));
 
-    MessageHandler messageHandler = new MessageHandler(producer, gatewayLocator, properties);
+    MessageHandler messageHandler = new MessageHandler(producer, gatewayLocator, properties.getRocketmq().getPushTopic(), properties.getRocketmq().getPushTag());
     messageHandler.onMessageReceived(new String(currentMessage));
     verify(producer).send(argThat(matchesPayload(msgList)));
   }

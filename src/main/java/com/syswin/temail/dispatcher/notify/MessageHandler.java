@@ -21,12 +21,16 @@ class MessageHandler {
   final GatewayLocator gatewayLocator;
   final NotificationMessageFactory notificationMsgFactory = new NotificationMessageFactory();
   final MQProducer producer;
-  final DispatcherProperties properties;
+  final String pushTopic;
+  final String pushTag;
 
-  public MessageHandler(MQProducer producer, GatewayLocator gatewayLocator, DispatcherProperties properties) {
+
+  public MessageHandler(MQProducer producer, GatewayLocator gatewayLocator,
+      String pushTopic, String pushTag) {
     this.producer = producer;
     this.gatewayLocator = gatewayLocator;
-    this.properties = properties;
+    this.pushTopic = pushTopic;
+    this.pushTag = pushTag;
   }
 
   void onMessageReceived(String msg) throws Exception {
@@ -56,13 +60,19 @@ class MessageHandler {
           } else {
             Optional<String> pushMessage = notificationMsgFactory
                 .getPushMessage(receiver, header, messageBody.getData());
-            if (pushMessage.isPresent()) {
+
+            pushMessage.ifPresent(message -> {
               List<MqMessage> msgList = new ArrayList<>();
-              MqMessage mqMessage = new MqMessage(properties.getRocketmq().getPushTopic(), properties.getRocketmq().getPushTag(), pushMessage.get());
+              MqMessage mqMessage = new MqMessage(pushTopic, pushTag, pushMessage.get());
               msgList.add(mqMessage);
-              producer.send(msgList);
+              try {
+                producer.send(msgList);
+              } catch (Exception ex) {
+                log.error("离线push信息{},  失败:{}", mqMessage.toString(), ex);
+              }
               log.info("离线push信息:{}", pushMessage.get());
-            }
+            });
+
           }
         }
       }
