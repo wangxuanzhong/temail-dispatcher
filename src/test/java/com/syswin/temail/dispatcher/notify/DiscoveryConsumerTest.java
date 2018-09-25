@@ -19,10 +19,12 @@ import com.syswin.temail.dispatcher.request.application.SilentResponseErrorHandl
 import com.syswin.temail.dispatcher.request.controller.Response;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
+import org.junit.Ignore;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.web.client.RestTemplate;
 
 
+@Ignore
 public class DiscoveryConsumerTest extends ConsumerPactTestMk2 {
 
   private static final Gson gson = new Gson();

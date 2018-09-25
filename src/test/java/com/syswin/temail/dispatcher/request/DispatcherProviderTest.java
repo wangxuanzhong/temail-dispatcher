@@ -1,5 +1,10 @@
 package com.syswin.temail.dispatcher.request;
 
+import static org.mockito.Mockito.when;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.DEFINED_PORT;
+import static org.springframework.http.HttpStatus.FORBIDDEN;
+import static org.springframework.http.HttpStatus.OK;
+
 import au.com.dius.pact.provider.junit.Provider;
 import au.com.dius.pact.provider.junit.State;
 import au.com.dius.pact.provider.junit.loader.PactBroker;
@@ -15,6 +20,7 @@ import com.syswin.temail.dispatcher.request.entity.CDTPPacketTrans;
 import java.util.HashMap;
 import java.util.Map;
 import org.jetbrains.annotations.NotNull;
+import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -22,16 +28,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.client.RestClientException;
 
-import static org.mockito.Mockito.when;
-import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.DEFINED_PORT;
-import static org.springframework.http.HttpStatus.FORBIDDEN;
-import static org.springframework.http.HttpStatus.OK;
-
 @RunWith(SpringRestPactRunner.class)
 @PactBroker(host = "172.28.50.206", port = "88")
 @Provider("temail-dispatcher")
 @SpringBootTest(webEnvironment = DEFINED_PORT, properties = "server.port=8081")
 @ActiveProfiles("dev")
+@Ignore
 public class DispatcherProviderTest {
 
   private static final String ackMessage = "Sent ackMessage";
@@ -77,6 +79,12 @@ public class DispatcherProviderTest {
         .thenReturn(ResponseEntity.ok(gson.toJson(Response.ok(OK, ackPayload()))));
 
   }
+//
+//  @State("online notification")
+//  public void dispatchUserRequest0() {
+//    when(packageDispatcher.dispatch(cdtpPacketTrans))
+//        .thenReturn(ResponseEntity.ok(gson.toJson(Response.ok(OK, ackPayload()))));
+//  }
 
   // 创建单聊消息体
   public CDTPPacketTrans singleChatPacket(String sender, String recipient) {
