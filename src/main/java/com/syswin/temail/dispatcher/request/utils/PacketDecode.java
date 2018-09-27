@@ -4,8 +4,8 @@ import com.syswin.temail.dispatcher.request.entity.CDTPPacketTrans;
 
 public interface PacketDecode {
 
-  public byte[] decodeData(CDTPPacketTrans packet) ;
+  byte[] decodeData(CDTPPacketTrans packet);
 
-  public boolean isSendSingleMsg(CDTPPacketTrans packet);
+  boolean isSendSingleMsg(CDTPPacketTrans packet);
 
 }

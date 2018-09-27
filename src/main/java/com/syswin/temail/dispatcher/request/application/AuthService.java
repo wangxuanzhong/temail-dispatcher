@@ -1,10 +1,16 @@
 package com.syswin.temail.dispatcher.request.application;
 
+import static org.apache.commons.lang3.StringUtils.defaultString;
+import static org.springframework.http.HttpMethod.POST;
+import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED;
+
 import com.syswin.temail.dispatcher.request.controller.Response;
 import com.syswin.temail.dispatcher.request.entity.CDTPPacketTrans;
+import com.syswin.temail.dispatcher.request.entity.CDTPPacketTrans.Header;
 import com.syswin.temail.dispatcher.request.utils.CommonPacketDecode;
+import com.syswin.temail.dispatcher.request.utils.DigestUtil;
+import com.syswin.temail.dispatcher.request.utils.HexUtil;
 import com.syswin.temail.dispatcher.request.utils.PacketDecode;
-import com.syswin.temail.dispatcher.request.utils.encrypts.SHA256Coder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -14,35 +20,30 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import static org.springframework.http.HttpMethod.POST;
-import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED;
-
 @Slf4j
 public class AuthService {
-
-  private final RestTemplate restTemplate;
-  private final PacketDecode packetDecode;
-  private final SHA256Coder sha256Coder ;
-  private final String authUrl;
-  private final HttpHeaders headers = new HttpHeaders();
-  private final ParameterizedTypeReference<Response<String>> responseType = responseType();
 
   static final String TE_MAIL = "TeMail";
   static final String UNSIGNED_BYTES = "UNSIGNED_BYTES";
   static final String SIGNATURE = "SIGNATURE";
   static final String ALGORITHM = "ALGORITHM";
+  private final RestTemplate restTemplate;
+  private final PacketDecode packetDecode;
+  private final String authUrl;
+  private final HttpHeaders headers = new HttpHeaders();
+  private final ParameterizedTypeReference<Response<String>> responseType = responseType();
 
   public AuthService(RestTemplate restTemplate, String authUrl) {
     this.authUrl = authUrl;
     this.restTemplate = restTemplate;
     this.headers.setContentType(APPLICATION_FORM_URLENCODED);
-    this.sha256Coder = new SHA256Coder();
     this.packetDecode = new CommonPacketDecode();
   }
 
   public ResponseEntity<Response<String>> verify(CDTPPacketTrans packetTrans) {
-    return verify(packetTrans.getHeader().getSender(), extractUnsignedData(packetTrans),
-        packetTrans.getHeader().getSignature(), String.valueOf(packetTrans.getHeader().getSignatureAlgorithm()));
+    Header header = packetTrans.getHeader();
+    return verify(header.getSender(), extractUnsignedData(packetTrans),
+        header.getSignature(), String.valueOf(header.getSignatureAlgorithm()));
   }
 
   public ResponseEntity<Response<String>> verify(String temail, String unsignedBytes,
@@ -53,22 +54,29 @@ public class AuthService {
     entityBody.add(SIGNATURE, signature);
     entityBody.add(ALGORITHM, algorithm);
     HttpEntity<?> requestEntity = new HttpEntity<>(entityBody, headers);
-    ResponseEntity<Response<String>> result =  restTemplate.exchange(authUrl, POST, requestEntity, responseType);
+    ResponseEntity<Response<String>> result = restTemplate.exchange(authUrl, POST, requestEntity, responseType);
     log.info("{}, {}, {}, {} 验签结果： {} ", temail, unsignedBytes, signature, algorithm, result.getStatusCode());
     return result;
   }
 
-  public String extractUnsignedData(CDTPPacketTrans cdtpPacketTrans) {
-    StringBuilder unSignedData = new StringBuilder();
-    unSignedData.append((cdtpPacketTrans.getCommandSpace() + cdtpPacketTrans.getCommand()))
-        .append(cdtpPacketTrans.getHeader().getTargetAddress())
-        .append(cdtpPacketTrans.getHeader().getTimestamp())
-        .append(sha256Coder.digestWithBase64(packetDecode.decodeData(cdtpPacketTrans)));
-    return unSignedData.toString();
+  private String extractUnsignedData(CDTPPacketTrans packet) {
+    Header header = packet.getHeader();
+    String targetAddress = defaultString(header.getTargetAddress());
+    String data = packet.getData();
+    String dataSha256 = data == null ? "" :
+        HexUtil.encodeHex(
+            DigestUtil.sha256(
+                packetDecode.decodeData(packet)));
+
+    return String.valueOf(packet.getCommandSpace() + packet.getCommand())
+        + targetAddress
+        + String.valueOf(header.getTimestamp())
+        + dataSha256;
   }
 
   private ParameterizedTypeReference<Response<String>> responseType() {
-    return new ParameterizedTypeReference<Response<String>>() {};
+    return new ParameterizedTypeReference<Response<String>>() {
+    };
   }
 
 }

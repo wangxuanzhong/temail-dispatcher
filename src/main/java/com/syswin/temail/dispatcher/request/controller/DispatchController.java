@@ -1,5 +1,8 @@
 package com.syswin.temail.dispatcher.request.controller;
 
+import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+
 import com.google.gson.Gson;
 import com.syswin.temail.dispatcher.request.application.AuthService;
 import com.syswin.temail.dispatcher.request.application.PackageDispatcher;
@@ -15,9 +18,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-
-import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Api("CDTP分发服务")
 @Slf4j
@@ -62,7 +62,8 @@ public class DispatchController {
         return result;
       } else {
         log.error("签名数据验证失败! ");
-        return new ResponseEntity<String>(gson.toJson(Response.failed(HttpStatus.FORBIDDEN, "数据包签名验证未通过!")), HttpStatus.FORBIDDEN);
+        return new ResponseEntity<>(gson.toJson(Response.failed(HttpStatus.FORBIDDEN, "数据包签名验证未通过!")),
+            HttpStatus.FORBIDDEN);
       }
     } catch (DispatchException e) {
       throw e;
