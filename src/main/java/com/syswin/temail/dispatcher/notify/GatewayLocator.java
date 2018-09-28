@@ -36,7 +36,7 @@ class GatewayLocator {
 
   List<TemailAccountLocation> locate(String temail) {
     try {
-      log.info("获取请求用户所属通道信息:url={}, temail={}", discoveryUrl, temail);
+      log.debug("获取请求用户所属通道信息:url={}, temail={}", discoveryUrl, temail);
 
       ResponseEntity<Response<TemailAccountLocations>> responseEntity = restTemplate.exchange(
           discoveryUrl,
@@ -50,7 +50,7 @@ class GatewayLocator {
         if (response != null) {
           List<TemailAccountLocation> statuses = response.getData().getStatuses();
           if (statuses != null) {
-            log.info("成功获取用户所属通道信息: url = {}, temail = {}, response = {}", discoveryUrl, temail, response);
+            log.debug("成功获取用户所属通道信息: url = {}, temail = {}, response = {}", discoveryUrl, temail, response);
             return statuses;
           }
         }

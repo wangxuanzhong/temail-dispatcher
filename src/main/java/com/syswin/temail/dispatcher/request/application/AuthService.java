@@ -55,7 +55,7 @@ public class AuthService {
     entityBody.add(ALGORITHM, algorithm);
     HttpEntity<?> requestEntity = new HttpEntity<>(entityBody, headers);
     ResponseEntity<Response<String>> result = restTemplate.exchange(authUrl, POST, requestEntity, responseType);
-    log.info("{}, {}, {}, {} 验签结果： {} ", temail, unsignedBytes, signature, algorithm, result.getStatusCode());
+    log.debug("{}, {}, {}, {} 验签结果： {} ", temail, unsignedBytes, signature, algorithm, result.getStatusCode());
     return result;
   }
 

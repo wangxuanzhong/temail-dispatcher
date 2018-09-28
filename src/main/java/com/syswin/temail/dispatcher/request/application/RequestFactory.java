@@ -64,7 +64,7 @@ class RequestFactory {
     }
 
     String url = composeUrl(request, params.getPath(), params.getQuery());
-    log.info("转发的请求：URL={}, method={}, entity={}", url, request.getMethod(), entity);
+    log.debug("转发的请求：URL={}, method={}, entity={}", url, request.getMethod(), entity);
     return new TemailRequest(url, request.getMethod(), entity);
   }
 

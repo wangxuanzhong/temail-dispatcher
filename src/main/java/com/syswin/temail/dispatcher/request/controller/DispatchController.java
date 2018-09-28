@@ -38,13 +38,13 @@ public class DispatchController {
   @ApiOperation("CDTP认证服务")
   @PostMapping(value = "/verify", consumes = APPLICATION_JSON_UTF8_VALUE, produces = APPLICATION_JSON_VALUE)
   public ResponseEntity<Response<String>> verify(@RequestBody AuthData body) {
-    log.info("verify服务接收到的请求信息为：{}", gson.toJson(body));
+    log.debug("verify服务接收到的请求信息为：{}", gson.toJson(body));
     ResponseEntity<Response<String>> result = authService.verify(
         body.getTemail(),
         body.getUnsignedBytes(),
         body.getSignature(),
         body.getAlgorithm());
-    log.info("verify服务返回的结果为：{}", gson.toJson(result));
+    log.debug("verify服务返回的结果为：{}", gson.toJson(result));
     return result;
   }
 
@@ -54,11 +54,11 @@ public class DispatchController {
     try {
       ResponseEntity<Response<String>> verify = authService.verify(packet);
       if (verify.getStatusCode().is2xxSuccessful()) {
-        log.info("dispatch服务接收到的请求信息为：{}", packet);
+        log.debug("dispatch服务接收到的请求信息为：{}", packet);
         ResponseEntity<String> responseEntity = packageDispatcher.dispatch(packet);
         ResponseEntity<String> result = new ResponseEntity<>(responseEntity.getBody(),
             responseEntity.getStatusCode());
-        log.info("dispatch服务返回的结果为：{}", result);
+        log.debug("dispatch服务返回的结果为：{}", result);
         return result;
       } else {
         log.error("签名数据验证失败! ");

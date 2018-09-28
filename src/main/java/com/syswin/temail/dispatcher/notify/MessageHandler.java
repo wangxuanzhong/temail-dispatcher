@@ -2,7 +2,6 @@ package com.syswin.temail.dispatcher.notify;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
-import com.syswin.temail.dispatcher.DispatcherProperties;
 import com.syswin.temail.dispatcher.notify.entity.MessageBody;
 import com.syswin.temail.dispatcher.notify.entity.MqMessage;
 import com.syswin.temail.dispatcher.notify.entity.TemailAccountLocation;
@@ -34,7 +33,7 @@ class MessageHandler {
   }
 
   void onMessageReceived(String msg) throws Exception {
-    log.info("接收到的消息是：{}", msg);
+    log.debug("接收到的消息是：{}", msg);
     try {
       MessageBody messageBody = gson.fromJson(msg, MessageBody.class);
       if (messageBody != null) {
@@ -55,7 +54,7 @@ class MessageHandler {
                   }
                 }
             );
-            log.info("发送消息到gateway {}", msgList);
+            log.debug("发送消息到gateway {}", msgList);
             producer.send(msgList);
           } else {
             Optional<String> pushMessage = notificationMsgFactory
@@ -70,7 +69,7 @@ class MessageHandler {
               } catch (Exception ex) {
                 log.error("离线push信息{},  失败:{}", mqMessage.toString(), ex);
               }
-              log.info("离线push信息:{}", pushMessage.get());
+              log.debug("离线push信息:{}", pushMessage.get());
             });
 
           }
