@@ -12,7 +12,7 @@ public class CommonPacketDecode implements PacketDecode{
       return new byte[0];
     }
     if (isSendSingleMsg(packet)) {
-      return Base64.getDecoder().decode(data);
+      return Base64.getUrlDecoder().decode(data);
     } else {
       return data.getBytes(StandardCharsets.UTF_8);
     }
