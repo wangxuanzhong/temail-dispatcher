@@ -9,8 +9,8 @@ import com.syswin.temail.dispatcher.request.entity.CDTPPacketTrans;
 import com.syswin.temail.dispatcher.request.entity.CDTPPacketTrans.Header;
 import com.syswin.temail.dispatcher.request.utils.CommonPacketDecode;
 import com.syswin.temail.dispatcher.request.utils.DigestUtil;
-import com.syswin.temail.dispatcher.request.utils.HexUtil;
 import com.syswin.temail.dispatcher.request.utils.PacketDecode;
+import java.util.Base64;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -64,7 +64,7 @@ public class AuthService {
     String targetAddress = defaultString(header.getTargetAddress());
     String data = packet.getData();
     String dataSha256 = data == null ? "" :
-        HexUtil.encodeHex(
+        Base64.getUrlEncoder().encodeToString(
             DigestUtil.sha256(
                 packetDecode.decodeData(packet)));
 
