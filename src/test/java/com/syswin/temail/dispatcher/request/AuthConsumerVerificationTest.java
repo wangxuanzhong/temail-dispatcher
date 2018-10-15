@@ -44,35 +44,35 @@ public class AuthConsumerVerificationTest extends ConsumerPactTestMk2 {
     try {
       return pactDslWithProvider
           .given("Verify - User Mike exists")
-            .uponReceiving("request for user Mike")
-            .method("POST")
-            .body("TeMail=mike%40t.email&UNSIGNED_BYTES=abc&SIGNATURE=xyz")
-            .headers(headers)
-            .path("/verify")
-            .willRespondWith()
-            .status(200)
-            .headers(singletonMap(CONTENT_TYPE, APPLICATION_JSON_VALUE))
-            .body(objectMapper.writeValueAsString(Response.ok(OK, "Success")))
+          .uponReceiving("request for user Mike")
+          .method("POST")
+          .body("TeMail=mike%40t.email&UNSIGNED_BYTES=abc&SIGNATURE=xyz")
+          .headers(headers)
+          .path("/verify")
+          .willRespondWith()
+          .status(200)
+          .headers(singletonMap(CONTENT_TYPE, APPLICATION_JSON_VALUE))
+          .body(objectMapper.writeValueAsString(Response.ok(OK, "Success")))
           .given("Verify - User Jane does not exist")
-            .uponReceiving("request for user Jane")
-            .method("POST")
-            .body("TeMail=jane%40t.email&UNSIGNED_BYTES=abc&SIGNATURE=xyz")
-            .headers(headers)
-            .path("/verify")
-            .willRespondWith()
-            .status(FORBIDDEN.value())
-            .headers(singletonMap(CONTENT_TYPE, APPLICATION_JSON_VALUE))
-            .body(objectMapper.writeValueAsString(Response.failed(FORBIDDEN, "No such user exists: jane@t.email")))
+          .uponReceiving("request for user Jane")
+          .method("POST")
+          .body("TeMail=jane%40t.email&UNSIGNED_BYTES=abc&SIGNATURE=xyz")
+          .headers(headers)
+          .path("/verify")
+          .willRespondWith()
+          .status(FORBIDDEN.value())
+          .headers(singletonMap(CONTENT_TYPE, APPLICATION_JSON_VALUE))
+          .body(objectMapper.writeValueAsString(Response.failed(FORBIDDEN, "No such user exists: jane@t.email")))
           .given("Verify - Invalid request")
-            .uponReceiving("request without signature")
-            .method("POST")
-            .headers(headers)
-            .path("/verify")
-            .willRespondWith()
-            .status(400)
-            .headers(singletonMap(CONTENT_TYPE, APPLICATION_JSON_VALUE))
-            .body(
-                objectMapper.writeValueAsString(Response.failed(BAD_REQUEST, "TeMail address or public key is invalid")))
+          .uponReceiving("request without signature")
+          .method("POST")
+          .headers(headers)
+          .path("/verify")
+          .willRespondWith()
+          .status(400)
+          .headers(singletonMap(CONTENT_TYPE, APPLICATION_JSON_VALUE))
+          .body(
+              objectMapper.writeValueAsString(Response.failed(BAD_REQUEST, "TeMail address or public key is invalid")))
           .toPact();
     } catch (JsonProcessingException e) {
       throw new IllegalStateException(e);
@@ -82,9 +82,9 @@ public class AuthConsumerVerificationTest extends ConsumerPactTestMk2 {
   @Override
   public void runTest(MockServer mockServer) {
     String url = mockServer.getUrl() + "/verify";
-    AuthService authService = new AuthService(restTemplate, url);
+    AuthService authService = new AuthService(restTemplate, url, null);
 
-    ResponseEntity<Response<String>> response = authService.verify("mike@t.email", "abc", "xyz","1");
+    ResponseEntity<Response<String>> response = authService.verify("mike@t.email", "abc", "xyz", "1");
     assertThat(response.getStatusCode()).isEqualTo(OK);
 
     response = authService.verify("jane@t.email", "abc", "xyz", "1");

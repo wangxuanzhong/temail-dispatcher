@@ -30,23 +30,31 @@ public class AuthService {
   private final RestTemplate restTemplate;
   private final PacketDecode packetDecode;
   private final String authUrl;
+  private final String specialAuthUrl;
   private final HttpHeaders headers = new HttpHeaders();
   private final ParameterizedTypeReference<Response<String>> responseType = responseType();
 
-  public AuthService(RestTemplate restTemplate, String authUrl) {
-    this.authUrl = authUrl;
+  public AuthService(RestTemplate restTemplate, String authUrl, String specialAuthUrl) {
     this.restTemplate = restTemplate;
+    this.authUrl = authUrl;
+    this.specialAuthUrl = specialAuthUrl;
     this.headers.setContentType(APPLICATION_FORM_URLENCODED);
     this.packetDecode = new CommonPacketDecode();
   }
 
-  public ResponseEntity<Response<String>> verify(CDTPPacketTrans packetTrans) {
-    Header header = packetTrans.getHeader();
-    return verify(header.getSender(), extractUnsignedData(packetTrans),
+  public ResponseEntity<Response<String>> verify(CDTPPacketTrans packet) {
+    Header header = packet.getHeader();
+    String authUrl;
+    if (packetDecode.isSendSingleMsg(packet) || packetDecode.isGroupJoin(packet)) {
+      authUrl = this.specialAuthUrl;
+    } else {
+      authUrl = this.authUrl;
+    }
+    return verify(authUrl, header.getSender(), extractUnsignedData(packet),
         header.getSignature(), String.valueOf(header.getSignatureAlgorithm()));
   }
 
-  public ResponseEntity<Response<String>> verify(String temail, String unsignedBytes,
+  public ResponseEntity<Response<String>> verify(String authUrl, String temail, String unsignedBytes,
       String signature, String algorithm) {
     MultiValueMap<String, String> entityBody = new LinkedMultiValueMap<>();
     entityBody.add(TE_MAIL, temail);
@@ -79,4 +87,8 @@ public class AuthService {
     };
   }
 
+  public ResponseEntity<Response<String>> verify(String temail, String unsignedBytes, String signature,
+      String algorithm) {
+    return verify(authUrl, temail, unsignedBytes, signature, algorithm);
+  }
 }
