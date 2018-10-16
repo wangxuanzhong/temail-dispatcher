@@ -20,11 +20,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.syswin.temail.dispatcher.request.controller.Response;
 import java.util.Map;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
-@Ignore
 public class AuthVerificationConsumerTest extends ConsumerPactTestMk2 {
 
   private final ObjectMapper objectMapper = new ObjectMapper();
@@ -48,27 +46,25 @@ public class AuthVerificationConsumerTest extends ConsumerPactTestMk2 {
           .given("Verify - User Mike exists")
           .uponReceiving("request for user Mike")
           .method("POST")
-          .body("TeMail=mike%40t.email&UNSIGNED_BYTES=abc&SIGNATURE=xyz&ALGORITHM=2")
           .headers(reqHeaders)
+          .body("TeMail=mike%40t.email&UNSIGNED_BYTES=abc&SIGNATURE=xyz&ALGORITHM=2")
           .path("/verify")
           .willRespondWith()
           .status(OK.value())
           .headers(respHeaders)
-          .body(objectMapper.writeValueAsString(Response.ok(OK, "Success")));
+          .body(objectMapper.writeValueAsString(Response.ok(OK, "Success")))
 
-      response
           .given("Verify - User Jane does not exist")
           .uponReceiving("request for user Jane")
           .method("POST")
-          .body("TeMail=jane%40t.email&UNSIGNED_BYTES=abc&SIGNATURE=xyz&ALGORITHM=2")
           .headers(reqHeaders)
+          .body("TeMail=jane%40t.email&UNSIGNED_BYTES=abc&SIGNATURE=xyz&ALGORITHM=2")
           .path("/verify")
           .willRespondWith()
           .status(NOT_FOUND.value())
           .headers(respHeaders)
-          .body(objectMapper.writeValueAsString(Response.failed(NOT_FOUND, "No such user exists: jane@t.email")));
+          .body(objectMapper.writeValueAsString(Response.failed(NOT_FOUND, "No such user exists: jane@t.email")))
 
-      response
           .given("Verify - User Mike exists and signature is error")
           .uponReceiving("User Mike exists and signature is error")
           .method("POST")
@@ -78,9 +74,8 @@ public class AuthVerificationConsumerTest extends ConsumerPactTestMk2 {
           .willRespondWith()
           .status(FORBIDDEN.value())
           .headers(respHeaders)
-          .body(objectMapper.writeValueAsString(Response.ok(FORBIDDEN, "Signature is error")));
+          .body(objectMapper.writeValueAsString(Response.ok(FORBIDDEN, "Signature is error")))
 
-      response
           .given("Verify - UnsupportedAlgorithm")
           .uponReceiving("UnsupportedAlgorithm")
           .method("POST")
@@ -90,9 +85,8 @@ public class AuthVerificationConsumerTest extends ConsumerPactTestMk2 {
           .willRespondWith()
           .status(BAD_REQUEST.value())
           .headers(respHeaders)
-          .body(objectMapper.writeValueAsString(Response.failed(BAD_REQUEST, "Unsupported Algorithm: 5")));
+          .body(objectMapper.writeValueAsString(Response.failed(BAD_REQUEST, "Unsupported Algorithm: 5")))
 
-      response
           .given("Verify - Invalid request")
           .uponReceiving("request without signature")
           .method("POST")
@@ -102,10 +96,9 @@ public class AuthVerificationConsumerTest extends ConsumerPactTestMk2 {
           .status(BAD_REQUEST.value())
           .headers(respHeaders)
           .body(objectMapper.writeValueAsString(Response.failed(BAD_REQUEST,
-              "temail or signature or UNSIGNED_BYTES is null")));
+              "temail or signature or UNSIGNED_BYTES is null")))
 
-      // verifyRecieverTemail
-      response
+          // verifyRecieverTemail
           .given("VerifyRecieverTemail - User Mike exists")
           .uponReceiving("request for user Mike")
           .method("POST")
@@ -115,9 +108,8 @@ public class AuthVerificationConsumerTest extends ConsumerPactTestMk2 {
           .willRespondWith()
           .status(OK.value())
           .headers(respHeaders)
-          .body(objectMapper.writeValueAsString(Response.ok(OK, "Success")));
+          .body(objectMapper.writeValueAsString(Response.ok(OK, "Success")))
 
-      response
           .given("VerifyRecieverTemail - User Jane does not exist")
           .uponReceiving("request for user Jane")
           .method("POST")
@@ -127,9 +119,8 @@ public class AuthVerificationConsumerTest extends ConsumerPactTestMk2 {
           .willRespondWith()
           .status(NOT_FOUND.value())
           .headers(respHeaders)
-          .body(objectMapper.writeValueAsString(Response.failed(NOT_FOUND, "No such user exists: jane@t.email")));
+          .body(objectMapper.writeValueAsString(Response.failed(NOT_FOUND, "No such user exists: jane@t.email")))
 
-      response
           .given("VerifyRecieverTemail - User Mike exists and signature is error")
           .uponReceiving("User Mike exists and signature is error")
           .method("POST")
@@ -139,31 +130,31 @@ public class AuthVerificationConsumerTest extends ConsumerPactTestMk2 {
           .willRespondWith()
           .status(FORBIDDEN.value())
           .headers(respHeaders)
-          .body(objectMapper.writeValueAsString(Response.ok(FORBIDDEN, "Signature is error")));
+          .body(objectMapper.writeValueAsString(Response.ok(FORBIDDEN, "Signature is error")))
 
-      response
           .given("VerifyRecieverTemail - UnsupportedAlgorithm")
           .uponReceiving("Unsupported Algorithm")
           .method("POST")
-          .body("TeMail=jane%40t.email&publicKey=pk&UNSIGNED_BYTES=abc&SIGNATURE=xyz&ALGORITHM=5")
+          .body("TeMail=mike%40t.email&publicKey=pk&UNSIGNED_BYTES=abc&SIGNATURE=xyz&ALGORITHM=5")
           .headers(reqHeaders)
           .path("/verifyRecieverTemail")
           .willRespondWith()
           .status(BAD_REQUEST.value())
           .headers(respHeaders)
-          .body(objectMapper.writeValueAsString(Response.failed(BAD_REQUEST, "Unsupported Algorithm: 5")));
+          .body(objectMapper.writeValueAsString(Response.failed(BAD_REQUEST, "Unsupported Algorithm: 5")))
 
-      response
           .given("VerifyRecieverTemail - Invalid request")
           .uponReceiving("request without signature")
           .method("POST")
+          .body("TeMail=&publicKey=&UNSIGNED_BYTES=&SIGNATURE=&ALGORITHM=")
           .headers(reqHeaders)
           .path("/verifyRecieverTemail")
           .willRespondWith()
           .status(BAD_REQUEST.value())
           .headers(respHeaders)
           .body(objectMapper.writeValueAsString(Response.failed(BAD_REQUEST,
-              "temail or publicKey or signature or UNSIGNED_BYTES is null")));
+              "temail or publicKey or signature or UNSIGNED_BYTES is null")))
+          ;
 
       return response.toPact();
     } catch (JsonProcessingException e) {
@@ -206,7 +197,7 @@ public class AuthVerificationConsumerTest extends ConsumerPactTestMk2 {
     response = authService.verifyRecieverTemail("mike@t.email", "pk", "abc", "xyz", "5");
     assertThat(response.getStatusCode()).isEqualTo(BAD_REQUEST);
 
-    response = authService.verifyRecieverTemail(null, null, null, null, null);
+    response = authService.verifyRecieverTemail("", "", "", "", "");
     assertThat(response.getStatusCode()).isEqualTo(BAD_REQUEST);
   }
 
