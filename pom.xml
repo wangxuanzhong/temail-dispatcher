@@ -179,6 +179,11 @@
       <version>2.6.0</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.module</groupId>
+      <artifactId>jackson-module-kotlin</artifactId>
+      <version>RELEASE</version>
+    </dependency>
 
   </dependencies>
   <build>

@@ -17,7 +17,7 @@ public class CommonPacketDecode implements PacketDecode {
   public boolean isGroupJoin(CDTPPacketTrans packet) {
     short commandSpace = packet.getCommandSpace();
     short command = packet.getCommand();
-    return commandSpace == 2 && command == 0x0102;
+    return commandSpace == 2 && command == 0x0107;
   }
 
   public byte[] decodeData(CDTPPacketTrans packet) {

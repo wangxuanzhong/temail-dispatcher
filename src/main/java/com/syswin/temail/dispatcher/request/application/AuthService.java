@@ -24,6 +24,7 @@ import org.springframework.web.client.RestTemplate;
 public class AuthService {
 
   static final String TE_MAIL = "TeMail";
+  static final String PUBLIC_KEY = "publicKey";
   static final String UNSIGNED_BYTES = "UNSIGNED_BYTES";
   static final String SIGNATURE = "SIGNATURE";
   static final String ALGORITHM = "ALGORITHM";
@@ -34,30 +35,51 @@ public class AuthService {
   private final HttpHeaders headers = new HttpHeaders();
   private final ParameterizedTypeReference<Response<String>> responseType = responseType();
 
-  public AuthService(RestTemplate restTemplate, String authUrl, String specialAuthUrl) {
+  public AuthService(RestTemplate restTemplate, String authUrl) {
     this.restTemplate = restTemplate;
-    this.authUrl = authUrl;
-    this.specialAuthUrl = specialAuthUrl;
+    if (authUrl.endsWith("verify")) {
+      // 对老配置做一个兼容
+      this.authUrl = authUrl;
+      this.specialAuthUrl = authUrl + "RecieverTemail";
+    } else {
+      if (!authUrl.endsWith("/")) {
+        authUrl += "/";
+      }
+      this.authUrl = authUrl + "verify";
+      this.specialAuthUrl = authUrl + "verifyRecieverTemail";
+    }
     this.headers.setContentType(APPLICATION_FORM_URLENCODED);
     this.packetDecode = new CommonPacketDecode();
   }
 
   public ResponseEntity<Response<String>> verify(CDTPPacketTrans packet) {
     Header header = packet.getHeader();
-    String authUrl;
     if (packetDecode.isSendSingleMsg(packet) || packetDecode.isGroupJoin(packet)) {
-      authUrl = this.specialAuthUrl;
+      return verifyRecieverTemail(header.getSender(), header.getSenderPK(), extractUnsignedData(packet),
+          header.getSignature(), String.valueOf(header.getSignatureAlgorithm()));
     } else {
-      authUrl = this.authUrl;
+      return verify(header.getSender(), extractUnsignedData(packet),
+          header.getSignature(), String.valueOf(header.getSignatureAlgorithm()));
     }
-    return verify(authUrl, header.getSender(), extractUnsignedData(packet),
-        header.getSignature(), String.valueOf(header.getSignatureAlgorithm()));
   }
 
-  public ResponseEntity<Response<String>> verify(String authUrl, String temail, String unsignedBytes,
+  public ResponseEntity<Response<String>> verifyRecieverTemail(String temail, String publicKey, String unsignedBytes,
+      String signature, String algorithm) {
+    return verify(specialAuthUrl, temail, publicKey, unsignedBytes, signature, algorithm);
+  }
+
+  public ResponseEntity<Response<String>> verify(String temail, String unsignedBytes,
+      String signature, String algorithm) {
+    return verify(authUrl, temail, null, unsignedBytes, signature, algorithm);
+  }
+
+  private ResponseEntity<Response<String>> verify(String authUrl, String temail, String publicKey, String unsignedBytes,
       String signature, String algorithm) {
     MultiValueMap<String, String> entityBody = new LinkedMultiValueMap<>();
     entityBody.add(TE_MAIL, temail);
+    if (publicKey != null) {
+      entityBody.add(PUBLIC_KEY, publicKey);
+    }
     entityBody.add(UNSIGNED_BYTES, unsignedBytes);
     entityBody.add(SIGNATURE, signature);
     entityBody.add(ALGORITHM, algorithm);
@@ -85,10 +107,5 @@ public class AuthService {
   private ParameterizedTypeReference<Response<String>> responseType() {
     return new ParameterizedTypeReference<Response<String>>() {
     };
-  }
-
-  public ResponseEntity<Response<String>> verify(String temail, String unsignedBytes, String signature,
-      String algorithm) {
-    return verify(authUrl, temail, unsignedBytes, signature, algorithm);
   }
 }

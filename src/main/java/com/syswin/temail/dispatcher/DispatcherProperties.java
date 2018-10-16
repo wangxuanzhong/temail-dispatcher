@@ -13,7 +13,6 @@ import org.springframework.stereotype.Component;
 public class DispatcherProperties {
 
   private String authVerifyUrl;
-  private String specialAuthVerifyUrl;
   private String temailChannelUrl;
   @Autowired
   private RocketMQ rocketmq;

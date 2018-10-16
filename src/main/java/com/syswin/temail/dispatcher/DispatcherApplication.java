@@ -36,7 +36,7 @@ public class DispatcherApplication {
 
   @Bean
   public AuthService authService(DispatcherProperties properties, RestTemplate restTemplate) {
-    return new AuthService(restTemplate, properties.getAuthVerifyUrl(), properties.getSpecialAuthVerifyUrl());
+    return new AuthService(restTemplate, properties.getAuthVerifyUrl());
   }
 
 
