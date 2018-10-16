@@ -52,8 +52,9 @@ public class DispatchController {
   @PostMapping(value = "/dispatch", consumes = APPLICATION_JSON_UTF8_VALUE, produces = APPLICATION_JSON_VALUE)
   public ResponseEntity<String> dispatch(@RequestBody CDTPPacketTrans packet) {
     try {
-      ResponseEntity<Response<String>> verify = authService.verify(packet);
-      if (verify.getStatusCode().is2xxSuccessful()) {
+      ResponseEntity<Response<String>> verifyResult = authService.verify(packet);
+
+      if (verifyResult.getStatusCode().is2xxSuccessful()) {
         log.debug("dispatch服务接收到的请求信息为：{}", packet);
         ResponseEntity<String> responseEntity = packageDispatcher.dispatch(packet);
         ResponseEntity<String> result = new ResponseEntity<>(responseEntity.getBody(),
@@ -61,8 +62,15 @@ public class DispatchController {
         log.debug("dispatch服务返回的结果为：{}", result);
         return result;
       } else {
-        log.error("签名数据验证失败! ");
-        return new ResponseEntity<>(gson.toJson(Response.failed(HttpStatus.FORBIDDEN, "数据包签名验证未通过!")),
+        log.error("签名数据验证失败! 请求参数：{}", packet);
+        Response<String> resultBody = verifyResult.getBody();
+        String errorMesage;
+        if (resultBody != null) {
+          errorMesage = resultBody.getMessage();
+        } else {
+          errorMesage = "数据包签名验证未通过!";
+        }
+        return new ResponseEntity<>(gson.toJson(Response.failed(verifyResult.getStatusCode(), errorMesage)),
             HttpStatus.FORBIDDEN);
       }
     } catch (DispatchException e) {
