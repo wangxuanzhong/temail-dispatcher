@@ -3,20 +3,25 @@ package com.syswin.temail.dispatcher;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.Data;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.http.HttpMethod;
+import org.springframework.stereotype.Component;
 
 @Data
-@ConfigurationProperties(prefix = "temail.dispatcher")
+@ConfigurationProperties(prefix = "app.dispatcher")
 public class DispatcherProperties {
 
   private String authVerifyUrl;
   private String temailChannelUrl;
-  private RocketMQ rocketmq = new RocketMQ();
+  @Autowired
+  private RocketMQ rocketmq;
   private HttpCliet httpCliet = new HttpCliet();
   private Map<String, Request> cmdMap = new HashMap<>();
 
   @Data
+  @Component
+  @ConfigurationProperties(prefix = "spring.rocketmq")
   public static class RocketMQ {
 
     private String namesrvAddr;
