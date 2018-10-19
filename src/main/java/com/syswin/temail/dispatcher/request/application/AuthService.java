@@ -7,10 +7,8 @@ import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED;
 import com.syswin.temail.dispatcher.request.controller.Response;
 import com.syswin.temail.dispatcher.request.entity.CDTPPacketTrans;
 import com.syswin.temail.dispatcher.request.entity.CDTPPacketTrans.Header;
-import com.syswin.temail.dispatcher.request.utils.CommonPacketDecode;
 import com.syswin.temail.dispatcher.request.utils.DigestUtil;
 import com.syswin.temail.dispatcher.request.utils.HexUtil;
-import com.syswin.temail.dispatcher.request.utils.PacketDecode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -29,7 +27,6 @@ public class AuthService {
   static final String SIGNATURE = "SIGNATURE";
   static final String ALGORITHM = "ALGORITHM";
   private final RestTemplate restTemplate;
-  private final PacketDecode packetDecode;
   private final String authUrl;
   private final String specialAuthUrl;
   private final HttpHeaders headers = new HttpHeaders();
@@ -49,12 +46,11 @@ public class AuthService {
       this.specialAuthUrl = authUrl + "verifyRecieverTemail";
     }
     this.headers.setContentType(APPLICATION_FORM_URLENCODED);
-    this.packetDecode = new CommonPacketDecode();
   }
 
   public ResponseEntity<Response<String>> verify(CDTPPacketTrans packet) {
     Header header = packet.getHeader();
-    if (packetDecode.isSendSingleMsg(packet) || packetDecode.isGroupJoin(packet)) {
+    if (PacketDecode.isSendSingleMsg(packet) || PacketDecode.isGroupJoin(packet)) {
       return verifyRecieverTemail(header.getSender(), header.getSenderPK(), extractUnsignedData(packet),
           header.getSignature(), String.valueOf(header.getSignatureAlgorithm()));
     } else {
@@ -96,7 +92,7 @@ public class AuthService {
     String dataSha256 = data == null ? "" :
         HexUtil.encodeHex(
             DigestUtil.sha256(
-                packetDecode.decodeData(packet)));
+                PacketDecode.decodeData(packet)));
 
     return String.valueOf(packet.getCommandSpace() + packet.getCommand())
         + targetAddress

@@ -12,8 +12,6 @@ import com.syswin.temail.dispatcher.request.entity.CDTPPacketTrans;
 import com.syswin.temail.dispatcher.request.entity.CDTPPacketTrans.Header;
 import com.syswin.temail.dispatcher.request.entity.CDTPParams;
 import com.syswin.temail.dispatcher.request.exceptions.DispatchException;
-import com.syswin.temail.dispatcher.request.utils.CommonPacketDecode;
-import com.syswin.temail.dispatcher.request.utils.PacketDecode;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -29,7 +27,6 @@ class RequestFactory {
   static final String CDTP_HEADER = "CDTP-header";
   private Gson gson = new Gson();
   private DispatcherProperties properties;
-  private PacketDecode packetDecode = new CommonPacketDecode();
 
   RequestFactory(DispatcherProperties properties) {
     this.properties = properties;
@@ -39,7 +36,7 @@ class RequestFactory {
     CDTPParams params;
     Gson gson = new Gson();
     try {
-      if (packetDecode.isSendSingleMsg(packet)) {
+      if (PacketDecode.isSendSingleMsg(packet)) {
         params = buildSendSingleMsgParams(packet);
       } else {
         params = gson.fromJson(packet.getData(), CDTPParams.class);
