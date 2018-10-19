@@ -38,6 +38,8 @@ class RequestFactory {
     try {
       if (DispatcherPacketUtil.isSendSingleMsg(packet)) {
         params = buildSendSingleMsgParams(packet);
+      } else if (PacketDecode.isSendGroupMsg(packet)) {
+        params = buildSendGroupMsgParams(packet);
       } else {
         params = gson.fromJson(packet.getData(), CDTPParams.class);
       }
@@ -64,7 +66,6 @@ class RequestFactory {
     log.debug("转发的请求：URL={}, method={}, entity={}", url, request.getMethod(), entity);
     return new TemailRequest(url, request.getMethod(), entity);
   }
-
 
   private HttpEntity<?> composeHttpEntity(Request request, Header cdtpHeader, CDTPParams params) {
     MultiValueMap<String, String> headers = addHeaders(cdtpHeader, params);
@@ -129,4 +130,12 @@ class RequestFactory {
     return new CDTPParams(body);
   }
 
+  private CDTPParams buildSendGroupMsgParams(CDTPPacketTrans packet) {
+    Header header = packet.getHeader();
+    Map<String, Object> body = gson.fromJson(gson.toJson(header), new TypeToken<Map<String, Object>>() {
+    }.getType());
+    body.put("msgData", packet.getData());
+
+    return new CDTPParams(body);
+  }
 }

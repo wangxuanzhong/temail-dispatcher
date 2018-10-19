@@ -9,15 +9,15 @@ import java.util.Base64;
 public class DispatcherPacketUtil {
 
   public static boolean isSendSingleMsg(CDTPPacketTrans packet) {
-    short commandSpace = packet.getCommandSpace();
-    short command = packet.getCommand();
-    return commandSpace == 1 && command == 1;
+    return packet.getCommandSpace() == 1 && packet.getCommand() == 1;
+  }
+
+  public static boolean isSendGroupMsg(CDTPPacketTrans packet) {
+    return packet.getCommandSpace() == 2 && packet.getCommand() == 1;
   }
 
   public static boolean isGroupJoin(CDTPPacketTrans packet) {
-    short commandSpace = packet.getCommandSpace();
-    short command = packet.getCommand();
-    return commandSpace == 2 && command == 0x0107;
+    return packet.getCommandSpace() == 2 && packet.getCommand() == 0x0107;
   }
 
   public static byte[] decodeData(CDTPPacketTrans packet) {
