@@ -36,7 +36,7 @@ class RequestFactory {
     CDTPParams params;
     Gson gson = new Gson();
     try {
-      if (PacketDecode.isSendSingleMsg(packet)) {
+      if (DispatcherPacketUtil.isSendSingleMsg(packet)) {
         params = buildSendSingleMsgParams(packet);
       } else {
         params = gson.fromJson(packet.getData(), CDTPParams.class);

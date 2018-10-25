@@ -1,10 +1,12 @@
 package com.syswin.temail.dispatcher.request.application;
 
 import com.syswin.temail.dispatcher.request.entity.CDTPPacketTrans;
+import com.syswin.temail.ps.common.entity.CDTPPacket;
+import com.syswin.temail.ps.common.utils.PacketUtil;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
-public class PacketDecode {
+public class DispatcherPacketUtil {
 
   public static boolean isSendSingleMsg(CDTPPacketTrans packet) {
     short commandSpace = packet.getCommandSpace();
@@ -24,7 +26,9 @@ public class PacketDecode {
       return new byte[0];
     }
     if (isSendSingleMsg(packet)) {
-      return Base64.getUrlDecoder().decode(data);
+      byte[] packetBytes = Base64.getUrlDecoder().decode(data);
+      CDTPPacket originalPacket = PacketUtil.unpacket(packetBytes);
+      return originalPacket.getData();
     } else {
       return data.getBytes(StandardCharsets.UTF_8);
     }

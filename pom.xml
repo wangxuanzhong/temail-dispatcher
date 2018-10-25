@@ -22,9 +22,15 @@
     <ocm-swagger.version>1.7.0.RELEASE</ocm-swagger.version>
     <swagger2.version>2.6.1</swagger2.version>
     <zookeeper.version>3.4.9</zookeeper.version>
+    <ps.version>1.0.1-SNAPSHOT</ps.version>
   </properties>
 
   <dependencies>
+    <dependency>
+      <groupId>com.syswin.temail</groupId>
+      <artifactId>ps-packet</artifactId>
+      <version>${ps.version}</version>
+    </dependency>
     <dependency>
       <groupId>com.systoon.integration</groupId>
       <artifactId>disconf-spring-boot-starter</artifactId>

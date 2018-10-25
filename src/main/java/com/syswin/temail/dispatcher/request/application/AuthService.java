@@ -50,7 +50,7 @@ public class AuthService {
 
   public ResponseEntity<Response<String>> verify(CDTPPacketTrans packet) {
     Header header = packet.getHeader();
-    if (PacketDecode.isSendSingleMsg(packet) || PacketDecode.isGroupJoin(packet)) {
+    if (DispatcherPacketUtil.isSendSingleMsg(packet) || DispatcherPacketUtil.isGroupJoin(packet)) {
       return verifyRecieverTemail(header.getSender(), header.getSenderPK(), extractUnsignedData(packet),
           header.getSignature(), String.valueOf(header.getSignatureAlgorithm()));
     } else {
@@ -92,7 +92,7 @@ public class AuthService {
     String dataSha256 = data == null ? "" :
         HexUtil.encodeHex(
             DigestUtil.sha256(
-                PacketDecode.decodeData(packet)));
+                DispatcherPacketUtil.decodeData(packet)));
 
     return String.valueOf(packet.getCommandSpace() + packet.getCommand())
         + targetAddress
