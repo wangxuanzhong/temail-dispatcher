@@ -28,8 +28,8 @@ public class DispatcherProperties {
     private String producerGroup;
     private String consumerGroup;
     private String consumerTopic;
-    private String pushTopic = "temail-push-offline-message";
-    private String pushTag = "*";
+    private String pushTopic = "";
+    private String pushTag = "";
   }
 
   @Data
