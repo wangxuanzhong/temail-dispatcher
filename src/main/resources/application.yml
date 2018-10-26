@@ -6,7 +6,8 @@ spring.rocketmq:
   producer-group: temail-dispatcher-producer
   consumer-group: temail-dispatcher-consumer-x
   consumer-topic: temail-notification
-  push-topic: temail-push-offline-message push-tag: '*'
+  push-topic: temail-push-offline-message
+  push-tag: '*'
 
 app:
   dispatcher:
