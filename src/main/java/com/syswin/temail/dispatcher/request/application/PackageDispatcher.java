@@ -1,7 +1,7 @@
 package com.syswin.temail.dispatcher.request.application;
 
 import com.syswin.temail.dispatcher.DispatcherProperties;
-import com.syswin.temail.dispatcher.request.entity.CDTPPacketTrans;
+import com.syswin.temail.ps.common.entity.CDTPPacketTrans;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;

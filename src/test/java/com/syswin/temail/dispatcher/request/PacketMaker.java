@@ -1,7 +1,8 @@
 package com.syswin.temail.dispatcher.request;
 
-import com.syswin.temail.dispatcher.request.entity.CDTPPacketTrans;
-import com.syswin.temail.dispatcher.request.entity.CDTPPacketTrans.Header;
+
+import com.syswin.temail.ps.common.entity.CDTPHeader;
+import com.syswin.temail.ps.common.entity.CDTPPacketTrans;
 
 public class PacketMaker {
 
@@ -11,7 +12,7 @@ public class PacketMaker {
     packet.setCommand((short) 0xF0F);
     packet.setVersion((short) 1);
 
-    Header header = new Header();
+    CDTPHeader header = new CDTPHeader();
     header.setSignatureAlgorithm(1);
     header.setSignature("sign");
     header.setDataEncryptionMethod(1);

@@ -16,7 +16,8 @@ import com.google.gson.Gson;
 import com.syswin.temail.dispatcher.request.application.AuthService;
 import com.syswin.temail.dispatcher.request.application.PackageDispatcher;
 import com.syswin.temail.dispatcher.request.controller.Response;
-import com.syswin.temail.dispatcher.request.entity.CDTPPacketTrans;
+import com.syswin.temail.ps.common.entity.CDTPHeader;
+import com.syswin.temail.ps.common.entity.CDTPPacketTrans;
 import java.util.HashMap;
 import java.util.Map;
 import org.jetbrains.annotations.NotNull;
@@ -95,7 +96,7 @@ public class DispatcherProviderTest {
     cdtpPacketTrans.setCommand((short) 1);
     cdtpPacketTrans.setVersion(CDTP_VERSION);
 
-    CDTPPacketTrans.Header cdtpPacketTransHeader = new CDTPPacketTrans.Header();
+    CDTPHeader cdtpPacketTransHeader = new CDTPHeader();
     cdtpPacketTransHeader.setSignatureAlgorithm(1);
     cdtpPacketTransHeader.setSignature("sign");
     cdtpPacketTransHeader.setDataEncryptionMethod(0);

@@ -1,7 +1,5 @@
 package com.syswin.temail.dispatcher.notify;
 
-import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import au.com.dius.pact.consumer.MessagePactBuilder;
@@ -16,7 +14,7 @@ import com.syswin.temail.dispatcher.notify.entity.MessageBody;
 import com.syswin.temail.dispatcher.notify.entity.MqMessage;
 import com.syswin.temail.dispatcher.notify.entity.PushData;
 import com.syswin.temail.dispatcher.notify.entity.TemailAccountLocation;
-import com.syswin.temail.dispatcher.request.entity.CDTPPacketTrans.Header;
+import com.syswin.temail.ps.common.entity.CDTPHeader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -50,7 +48,7 @@ public class MqOffLineMessageHandlerConsummerTest2 {
     MessageBody payload = new MessageBody();
     payload.setReceiver(recipient);
 
-    Header header = new Header();
+    CDTPHeader header = new CDTPHeader();
     header.setReceiver(recipient);
     payload.setHeader(gson.toJson(header));
 
@@ -109,19 +107,16 @@ public class MqOffLineMessageHandlerConsummerTest2 {
 
     NotificationMessageFactory notificationMsgFactory = new NotificationMessageFactory();
     Optional<String> body = notificationMsgFactory
-        .getPushMessage(pushDatapayload.getReceiver(), gson.fromJson(pushDatapayload.getHeader(), Header.class),
+        .getPushMessage(pushDatapayload.getReceiver(), gson.fromJson(pushDatapayload.getHeader(), CDTPHeader.class),
             pushDatapayload.getData());
 
     MessageHandler messageHandler = new MessageHandler(rocketMQProducer, gatewayLocator,
         "temail-message", "*");
 
-    for (int i=0; i<5;i++){
+    for (int i = 0; i < 5; i++) {
       messageHandler.onMessageReceived(gson.toJson(pushDatapayload));
     }
-
-
   }
-
 
   public void setMessage(byte[] messageContents) {
     currentMessage = messageContents;

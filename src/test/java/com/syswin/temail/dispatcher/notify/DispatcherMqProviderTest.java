@@ -12,7 +12,8 @@ import au.com.dius.pact.provider.junit.target.Target;
 import au.com.dius.pact.provider.junit.target.TestTarget;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
-import com.syswin.temail.dispatcher.request.entity.CDTPPacketTrans;
+import com.syswin.temail.ps.common.entity.CDTPHeader;
+import com.syswin.temail.ps.common.entity.CDTPPacketTrans;
 import org.junit.Ignore;
 import org.junit.runner.RunWith;
 
@@ -41,7 +42,7 @@ public class DispatcherMqProviderTest {
 
   @PactVerifyProvider("online notification")
   public String verifyMessageForOrder() {
-    CDTPPacketTrans.Header header = gson.fromJson(headerJson, CDTPPacketTrans.Header.class);
+    CDTPHeader header = gson.fromJson(headerJson, CDTPHeader.class);
 
     NotificationMessageFactory factory = new NotificationMessageFactory();
 

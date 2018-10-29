@@ -8,10 +8,12 @@ import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 import com.syswin.temail.dispatcher.DispatcherProperties;
 import com.syswin.temail.dispatcher.DispatcherProperties.Request;
-import com.syswin.temail.dispatcher.request.entity.CDTPPacketTrans;
-import com.syswin.temail.dispatcher.request.entity.CDTPPacketTrans.Header;
 import com.syswin.temail.dispatcher.request.entity.CDTPParams;
 import com.syswin.temail.dispatcher.request.exceptions.DispatchException;
+import com.syswin.temail.ps.common.entity.CDTPHeader;
+import com.syswin.temail.ps.common.entity.CDTPPacket;
+import com.syswin.temail.ps.common.entity.CDTPPacketTrans;
+import com.syswin.temail.ps.common.utils.PacketUtil;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -35,10 +37,12 @@ class RequestFactory {
   TemailRequest toRequest(CDTPPacketTrans packet) {
     CDTPParams params;
     Gson gson = new Gson();
+    short commandSpace = packet.getCommandSpace();
+    short command = packet.getCommand();
     try {
-      if (DispatcherPacketUtil.isSendSingleMsg(packet)) {
+      if (PacketUtil.isSendSingleMsg(commandSpace, command)) {
         params = buildSendSingleMsgParams(packet);
-      } else if (PacketDecode.isSendGroupMsg(packet)) {
+      } else if (PacketUtil.isSendGroupMsg(commandSpace, command)) {
         params = buildSendGroupMsgParams(packet);
       } else {
         params = gson.fromJson(packet.getData(), CDTPParams.class);
@@ -47,13 +51,13 @@ class RequestFactory {
       log.error("Body的Json格式解析错误，请求参数：{}", packet);
       throw new DispatchException(e, packet);
     }
-    int command = (packet.getCommandSpace() << 16) + packet.getCommand();
-    String cmdHex = Integer.toHexString(command).toUpperCase();
+    int combinedCommand = (commandSpace << 16) + command;
+    String cmdHex = Integer.toHexString(combinedCommand).toUpperCase();
     Request request = properties.getCmdMap().get(cmdHex);
 
     if (request == null) {
       log.error("不支持的命令类型：{}, 请求参数：{}", cmdHex, packet);
-      throw new DispatchException("不支持的命令类型：" + command, packet);
+      throw new DispatchException("不支持的命令类型：" + combinedCommand, packet);
     }
 
     HttpEntity<?> entity = composeHttpEntity(request, packet.getHeader(), params);
@@ -67,7 +71,7 @@ class RequestFactory {
     return new TemailRequest(url, request.getMethod(), entity);
   }
 
-  private HttpEntity<?> composeHttpEntity(Request request, Header cdtpHeader, CDTPParams params) {
+  private HttpEntity<?> composeHttpEntity(Request request, CDTPHeader cdtpHeader, CDTPParams params) {
     MultiValueMap<String, String> headers = addHeaders(cdtpHeader, params);
 
     switch (request.getMethod()) {
@@ -105,7 +109,7 @@ class RequestFactory {
     return url;
   }
 
-  private MultiValueMap<String, String> addHeaders(Header cdtpHeader, CDTPParams params) {
+  private MultiValueMap<String, String> addHeaders(CDTPHeader cdtpHeader, CDTPParams params) {
     Map<String, String> paramsHeaders = params.getHeader();
     MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
     if (paramsHeaders != null && !paramsHeaders.isEmpty()) {
@@ -118,7 +122,7 @@ class RequestFactory {
   }
 
   private CDTPParams buildSendSingleMsgParams(CDTPPacketTrans packet) {
-    Header header = packet.getHeader();
+    CDTPHeader header = packet.getHeader();
     Map<String, Object> extraData = gson
         .fromJson(header.getExtraData(), new TypeToken<Map<String, Object>>() {
         }.getType());
@@ -131,7 +135,11 @@ class RequestFactory {
   }
 
   private CDTPParams buildSendGroupMsgParams(CDTPPacketTrans packet) {
-    Header header = packet.getHeader();
+    CDTPPacket originalPacket = PacketUtil.unpack(packet.getData());
+    CDTPParams  params = gson.fromJson(new String(originalPacket.getData()), CDTPParams.class);
+    originalPacket.getHeader();
+
+    CDTPHeader header = packet.getHeader();
     Map<String, Object> body = gson.fromJson(gson.toJson(header), new TypeToken<Map<String, Object>>() {
     }.getType());
     body.put("msgData", packet.getData());

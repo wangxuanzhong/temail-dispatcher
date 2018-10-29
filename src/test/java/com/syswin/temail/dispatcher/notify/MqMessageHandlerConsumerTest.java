@@ -16,7 +16,7 @@ import com.syswin.temail.dispatcher.notify.entity.MessageBody;
 import com.syswin.temail.dispatcher.notify.entity.MqMessage;
 import com.syswin.temail.dispatcher.notify.entity.TemailAccountLocation;
 import com.syswin.temail.dispatcher.request.controller.Response;
-import com.syswin.temail.dispatcher.request.entity.CDTPPacketTrans.Header;
+import com.syswin.temail.ps.common.entity.CDTPHeader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -48,7 +48,7 @@ public class MqMessageHandlerConsumerTest {
     MessageBody payload = new MessageBody();
     payload.setReceiver(recipient);
 
-    Header header = new Header();
+    CDTPHeader header = new CDTPHeader();
     header.setReceiver(recipient);
     payload.setHeader(gson.toJson(header));
 
@@ -92,7 +92,7 @@ public class MqMessageHandlerConsumerTest {
     List<MqMessage> msgList = new ArrayList<>();
     NotificationMessageFactory notificationMsgFactory = new NotificationMessageFactory();
     String body = notificationMsgFactory
-        .notificationOf(payload.getReceiver(), gson.fromJson(payload.getHeader(), Header.class), payload.getData());
+        .notificationOf(payload.getReceiver(), gson.fromJson(payload.getHeader(), CDTPHeader.class), payload.getData());
     msgList.add(new MqMessage(mqTopic, mqTag, body));
 
     MessageHandler messageHandler = new MessageHandler(producer, gatewayLocator, properties.getRocketmq().getPushTopic(), properties.getRocketmq().getPushTag());

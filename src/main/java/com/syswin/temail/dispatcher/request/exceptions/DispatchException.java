@@ -1,6 +1,6 @@
 package com.syswin.temail.dispatcher.request.exceptions;
 
-import com.syswin.temail.dispatcher.request.entity.CDTPPacketTrans;
+import com.syswin.temail.ps.common.entity.CDTPPacketTrans;
 import lombok.Getter;
 import lombok.Setter;
 

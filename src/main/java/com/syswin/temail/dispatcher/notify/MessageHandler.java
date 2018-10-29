@@ -5,7 +5,7 @@ import com.google.gson.JsonSyntaxException;
 import com.syswin.temail.dispatcher.notify.entity.MessageBody;
 import com.syswin.temail.dispatcher.notify.entity.MqMessage;
 import com.syswin.temail.dispatcher.notify.entity.TemailAccountLocation;
-import com.syswin.temail.dispatcher.request.entity.CDTPPacketTrans.Header;
+import com.syswin.temail.ps.common.entity.CDTPHeader;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -37,7 +37,7 @@ class MessageHandler {
     try {
       MessageBody messageBody = gson.fromJson(msg, MessageBody.class);
       if (messageBody != null) {
-        Header header = gson.fromJson(messageBody.getHeader(), Header.class);
+        CDTPHeader header = gson.fromJson(messageBody.getHeader(), CDTPHeader.class);
         if (header != null) {
           String receiver = messageBody.getReceiver();
           List<TemailAccountLocation> statusList = gatewayLocator.locate(receiver);

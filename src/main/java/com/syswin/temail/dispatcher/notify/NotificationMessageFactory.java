@@ -8,8 +8,8 @@ import com.google.gson.Gson;
 import com.syswin.temail.dispatcher.Constants;
 import com.syswin.temail.dispatcher.notify.entity.PushData;
 import com.syswin.temail.dispatcher.notify.entity.PushMessage;
-import com.syswin.temail.dispatcher.request.entity.CDTPPacketTrans;
-import com.syswin.temail.dispatcher.request.entity.CDTPPacketTrans.Header;
+import com.syswin.temail.ps.common.entity.CDTPHeader;
+import com.syswin.temail.ps.common.entity.CDTPPacketTrans;
 import java.util.Optional;
 import org.springframework.beans.BeanUtils;
 
@@ -21,7 +21,7 @@ class NotificationMessageFactory {
     gson = new Gson();
   }
 
-  String notificationOf(String receiver, Header header, String body) {
+  String notificationOf(String receiver, CDTPHeader header, String body) {
     CDTPPacketTrans packet = new CDTPPacketTrans();
     packet.setCommandSpace(NOTIFY_COMMAND_SPACE);
     packet.setCommand(NOTIFY_COMMAND);
@@ -32,7 +32,7 @@ class NotificationMessageFactory {
     return gson.toJson(packet);
   }
 
-  Optional<String> getPushMessage(String receiver, Header header, String body) {
+  Optional<String> getPushMessage(String receiver, CDTPHeader header, String body) {
 
     PushData pushData = gson.fromJson(body, PushData.class);
     if (pushData.getEventType().equals(Constants.COMMON_MSG_EVENT_TYPE)) {

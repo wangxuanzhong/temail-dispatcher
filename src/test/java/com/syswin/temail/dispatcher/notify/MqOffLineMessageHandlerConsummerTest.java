@@ -16,7 +16,7 @@ import com.syswin.temail.dispatcher.notify.entity.MessageBody;
 import com.syswin.temail.dispatcher.notify.entity.MqMessage;
 import com.syswin.temail.dispatcher.notify.entity.PushData;
 import com.syswin.temail.dispatcher.notify.entity.TemailAccountLocation;
-import com.syswin.temail.dispatcher.request.entity.CDTPPacketTrans.Header;
+import com.syswin.temail.ps.common.entity.CDTPHeader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -51,7 +51,7 @@ public class MqOffLineMessageHandlerConsummerTest {
     MessageBody payload = new MessageBody();
     payload.setReceiver(recipient);
 
-    Header header = new Header();
+    CDTPHeader header = new CDTPHeader();
     header.setReceiver(recipient);
     payload.setHeader(gson.toJson(header));
 
@@ -100,14 +100,15 @@ public class MqOffLineMessageHandlerConsummerTest {
 
     NotificationMessageFactory notificationMsgFactory = new NotificationMessageFactory();
     Optional<String> body = notificationMsgFactory
-        .getPushMessage(pushDatapayload.getReceiver(), gson.fromJson(pushDatapayload.getHeader(), Header.class),
+        .getPushMessage(pushDatapayload.getReceiver(), gson.fromJson(pushDatapayload.getHeader(), CDTPHeader.class),
             pushDatapayload.getData());
 
     List<MqMessage> msgList = new ArrayList<>();
     msgList
         .add(new MqMessage(properties.getRocketmq().getPushTopic(), properties.getRocketmq().getPushTag(), body.get()));
 
-    MessageHandler messageHandler = new MessageHandler(producer, gatewayLocator, properties.getRocketmq().getPushTopic(), properties.getRocketmq().getPushTag());
+    MessageHandler messageHandler = new MessageHandler(producer, gatewayLocator,
+        properties.getRocketmq().getPushTopic(), properties.getRocketmq().getPushTag());
     messageHandler.onMessageReceived(new String(currentMessage));
     verify(producer).send(argThat(matchesPayload(msgList)));
   }
