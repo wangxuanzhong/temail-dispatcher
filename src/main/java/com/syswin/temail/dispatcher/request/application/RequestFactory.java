@@ -40,9 +40,9 @@ class RequestFactory {
     short commandSpace = packet.getCommandSpace();
     short command = packet.getCommand();
     try {
-      if (PacketUtil.isSendSingleMsg(commandSpace, command)) {
+      if (CommandAwarePacketUtil.isSendSingleMsg(commandSpace, command)) {
         params = buildSendSingleMsgParams(packet);
-      } else if (PacketUtil.isSendGroupMsg(commandSpace, command)) {
+      } else if (CommandAwarePacketUtil.isSendGroupMsg(commandSpace, command)) {
         params = buildSendGroupMsgParams(packet);
       } else {
         params = gson.fromJson(packet.getData(), CDTPParams.class);
@@ -60,7 +60,7 @@ class RequestFactory {
       throw new DispatchException("不支持的命令类型：" + combinedCommand, packet);
     }
 
-    HttpEntity<?> entity = composeHttpEntity(request, packet.getHeader(), params);
+    HttpEntity<Map<String, Object>> entity = composeHttpEntity(request, packet.getHeader(), params);
     if (entity == null) {
       log.error("不支持的请求类型：{}，请求参数：{}", request.getMethod(), packet);
       throw new DispatchException("不支持的请求类型：" + request.getMethod(), packet);
@@ -71,7 +71,7 @@ class RequestFactory {
     return new TemailRequest(url, request.getMethod(), entity);
   }
 
-  private HttpEntity<?> composeHttpEntity(Request request, CDTPHeader cdtpHeader, CDTPParams params) {
+  private HttpEntity<Map<String, Object>> composeHttpEntity(Request request, CDTPHeader cdtpHeader, CDTPParams params) {
     MultiValueMap<String, String> headers = addHeaders(cdtpHeader, params);
 
     switch (request.getMethod()) {
@@ -136,14 +136,9 @@ class RequestFactory {
 
   private CDTPParams buildSendGroupMsgParams(CDTPPacketTrans packet) {
     CDTPPacket originalPacket = PacketUtil.unpack(packet.getData());
-    CDTPParams  params = gson.fromJson(new String(originalPacket.getData()), CDTPParams.class);
-    originalPacket.getHeader();
-
-    CDTPHeader header = packet.getHeader();
-    Map<String, Object> body = gson.fromJson(gson.toJson(header), new TypeToken<Map<String, Object>>() {
-    }.getType());
-    body.put("msgData", packet.getData());
-
-    return new CDTPParams(body);
+    CDTPParams params = gson.fromJson(new String(originalPacket.getData()), CDTPParams.class);
+    params.getBody().put("meta", originalPacket.getHeader());
+    params.getBody().put("packet", packet.getData());
+    return params;
   }
 }

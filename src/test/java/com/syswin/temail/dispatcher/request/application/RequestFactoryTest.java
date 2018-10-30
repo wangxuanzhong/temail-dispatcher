@@ -21,7 +21,9 @@ import com.syswin.temail.dispatcher.DispatcherProperties.Request;
 import com.syswin.temail.dispatcher.request.entity.CDTPParams;
 import com.syswin.temail.dispatcher.request.exceptions.DispatchException;
 import com.syswin.temail.ps.common.entity.CDTPHeader;
+import com.syswin.temail.ps.common.entity.CDTPPacket;
 import com.syswin.temail.ps.common.entity.CDTPPacketTrans;
+import com.syswin.temail.ps.common.utils.PacketUtil;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,6 +31,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 
 @RunWith(JUnit4.class)
@@ -41,7 +44,7 @@ public class RequestFactoryTest {
   private final HttpMethod[] methods = {GET, POST, PUT, DELETE};
   private final RequestFactory requestFactory = new RequestFactory(properties);
 
-  private static CDTPPacketTrans initCDTPPackage() {
+  private static CDTPPacketTrans initCDTPPacketTrans() {
     CDTPPacketTrans packet = new CDTPPacketTrans();
     packet.setCommandSpace((short) 0xA);
     packet.setCommand((short) 0xF0F);
@@ -65,6 +68,26 @@ public class RequestFactoryTest {
     return packet;
   }
 
+  private static CDTPPacket initCDTPPacket() {
+    CDTPPacket packet = new CDTPPacket();
+    packet.setCommandSpace((short) 0xA);
+    packet.setCommand((short) 0xF0F);
+    packet.setVersion((short) 1);
+
+    CDTPHeader header = new CDTPHeader();
+    header.setSignatureAlgorithm(1);
+    header.setSignature("sign");
+    header.setDataEncryptionMethod(1);
+    header.setTimestamp(System.currentTimeMillis());
+    header.setPacketId("pkgId");
+    header.setSender("yaohuacheng@syswin.com");
+    header.setSenderPK("SenderPK");
+    header.setReceiver("yaohuacheng@syswin.com");
+    header.setReceiverPK("ReceiverPK");
+    packet.setHeader(header);
+    return packet;
+  }
+
   @Before
   public void setUp() {
     String urlPath = "test";
@@ -76,7 +99,7 @@ public class RequestFactoryTest {
 
   @Test
   public void plainRequest() {
-    CDTPPacketTrans packet = initCDTPPackage();
+    CDTPPacketTrans packet = initCDTPPacketTrans();
     for (HttpMethod method : methods) {
       request.setMethod(method);
 
@@ -93,7 +116,7 @@ public class RequestFactoryTest {
 
   @Test
   public void requestWithHeader() {
-    CDTPPacketTrans packet = initCDTPPackage();
+    CDTPPacketTrans packet = initCDTPPacketTrans();
     Map<String, String> headers = ImmutableMap.of(
         uniquify("headerName1"), "headerValue1",
         uniquify("headerName2"), "headerValue2");
@@ -123,7 +146,7 @@ public class RequestFactoryTest {
   public void requestWithPathVariable() {
     request.setUrl(baseUrl + "/{Name1}/{Name2}");
 
-    CDTPPacketTrans packet = initCDTPPackage();
+    CDTPPacketTrans packet = initCDTPPacketTrans();
     Map<String, Object> pathVariables = ImmutableMap.of(
         "Name1", "Value1",
         "Name2", "Value2");
@@ -148,7 +171,7 @@ public class RequestFactoryTest {
 
   @Test
   public void requestWithBody() {
-    CDTPPacketTrans packet = initCDTPPackage();
+    CDTPPacketTrans packet = initCDTPPacketTrans();
     final Map<String, Object> body = ImmutableMap.of(
         "foo", "bar",
         "hello", "world");
@@ -176,7 +199,7 @@ public class RequestFactoryTest {
 
   @Test
   public void requestWithSingleChat() {
-    CDTPPacketTrans packet = initCDTPPackage();
+    CDTPPacketTrans packet = initCDTPPacketTrans();
     packet.setCommandSpace((short) 1);
     packet.setCommand((short) 1);
 
@@ -193,10 +216,11 @@ public class RequestFactoryTest {
 
     assertThat(temailRequest.url()).isEqualTo(request.getUrl());
     assertThat(temailRequest.method()).isEqualTo(request.getMethod());
-    assertThat(temailRequest.entity().getHeaders())
+    HttpEntity<Map<String, Object>> entity = temailRequest.entity();
+    assertThat(entity.getHeaders())
         .contains(new SimpleEntry<>(CONTENT_TYPE, singletonList(APPLICATION_JSON_UTF8_VALUE)));
 
-    assertThat(temailRequest.entity().getHeaders())
+    assertThat(entity.getHeaders())
         .contains(new SimpleEntry<>(CDTP_HEADER, singletonList(gson.toJson(header))));
 
     Map<String, Object> testMap = new HashMap<>(3);
@@ -204,21 +228,63 @@ public class RequestFactoryTest {
     testMap.put("receiver", header.getReceiver());
     testMap.put("msgData", packet.getData());
 
-    Map<String, Object> bodyMap = (Map<String, Object>) temailRequest.entity().getBody();
+    Map<String, Object> bodyMap = entity.getBody();
     assertThat(bodyMap)
         .containsAllEntriesOf(testMap);
   }
 
+  @Test
+  public void requestWithGroupChat() {
+    CDTPPacket packet = initCDTPPacket();
+    packet.setCommandSpace((short) 2);
+    packet.setCommand((short) 1);
+
+    Map<String, Object> bodyData = new HashMap<>();
+    bodyData.put("from", "sender@t.email");
+    bodyData.put("to", "group@t.email");
+    bodyData.put("message", "对称加密报文base64");
+    bodyData.put("type", "0");
+    bodyData.put("msgId", "消息ID");
+    String paramString = gson.toJson(new CDTPParams(bodyData));
+    packet.setData(paramString.getBytes());
+
+    byte[] bytes = PacketUtil.pack(packet, true);
+    CDTPPacket newPacket = new CDTPPacket(packet);
+    newPacket.setData(bytes);
+    CDTPPacketTrans newPacketTrans = CDTPPacketConverter.toTrans(newPacket);
+
+    request.setMethod(POST);
+    properties.setCmdMap(singletonMap("20001", request));
+
+    TemailRequest temailRequest = requestFactory.toRequest(newPacketTrans);
+
+    assertThat(temailRequest.url()).isEqualTo(request.getUrl());
+    assertThat(temailRequest.method()).isEqualTo(request.getMethod());
+    HttpEntity<Map<String, Object>> entity = temailRequest.entity();
+//    System.out.println(gson.toJson(entity.getBody()));
+    assertThat(entity.getHeaders())
+        .contains(new SimpleEntry<>(CONTENT_TYPE, singletonList(APPLICATION_JSON_UTF8_VALUE)));
+
+    CDTPHeader header = packet.getHeader();
+    assertThat(entity.getHeaders())
+        .contains(new SimpleEntry<>(CDTP_HEADER, singletonList(gson.toJson(header))));
+
+    Map<String, Object> bodyMap = entity.getBody();
+    assertThat(bodyMap)
+        .containsAllEntriesOf(bodyData);
+    assertThat(bodyMap).containsKeys("meta", "packet");
+  }
+
   @Test(expected = DispatchException.class)
   public void blowsUpWhenCommandIsNotMapped() {
-    CDTPPacketTrans packet = initCDTPPackage();
+    CDTPPacketTrans packet = initCDTPPacketTrans();
     packet.setCommand((short) 0xFF);
     requestFactory.toRequest(packet);
   }
 
   @Test(expected = DispatchException.class)
   public void blowsUpWhenMethodIsNotSupported() {
-    CDTPPacketTrans packet = initCDTPPackage();
+    CDTPPacketTrans packet = initCDTPPacketTrans();
     request.setMethod(TRACE);
     requestFactory.toRequest(packet);
   }

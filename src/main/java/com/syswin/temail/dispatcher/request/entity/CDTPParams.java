@@ -1,9 +1,11 @@
 package com.syswin.temail.dispatcher.request.entity;
 
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import java.util.Map;
 import lombok.Data;
 
 @Data
+@JsonNaming
 public class CDTPParams {
 
   private Map<String, String> header;

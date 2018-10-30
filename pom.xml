@@ -22,7 +22,7 @@
     <ocm-swagger.version>1.7.0.RELEASE</ocm-swagger.version>
     <swagger2.version>2.6.1</swagger2.version>
     <zookeeper.version>3.4.9</zookeeper.version>
-    <ps.version>1.0.1</ps.version>
+    <ps.version>1.0.3-SNAPSHOT</ps.version>
   </properties>
 
   <dependencies>
