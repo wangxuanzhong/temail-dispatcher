@@ -38,7 +38,9 @@ public class DispatchController {
   @PostMapping(value = "/verify", consumes = APPLICATION_JSON_UTF8_VALUE, produces = APPLICATION_JSON_VALUE)
   public ResponseEntity<Response<String>> verify(@RequestBody CDTPPacketTrans packet) {
     log.debug("verify服务接收到的请求信息为：{}", gson.toJson(packet));
-    ResponseEntity<Response<String>> result = authService.verify(packet);
+    ResponseEntity<Response<String>> responseEntity = authService.verify(packet);
+    ResponseEntity<Response<String>> result = new ResponseEntity<>(responseEntity.getBody(),
+        responseEntity.getStatusCode());
     log.debug("verify服务返回的结果为：{}", gson.toJson(result));
     return result;
   }
