@@ -8,7 +8,7 @@ import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VALUE;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 
 import au.com.dius.pact.consumer.ConsumerPactTestMk2;
 import au.com.dius.pact.consumer.MockServer;
@@ -36,7 +36,7 @@ public class AuthVerificationConsumerTest extends ConsumerPactTestMk2 {
   @Override
   public RequestResponsePact createPact(PactDslWithProvider pactDslWithProvider) {
     Map<String, String> reqHeaders = singletonMap(CONTENT_TYPE, APPLICATION_FORM_URLENCODED_VALUE);
-    Map<String, String> respHeaders = singletonMap(CONTENT_TYPE, APPLICATION_JSON_VALUE);
+    Map<String, String> respHeaders = singletonMap(CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE);
 //    Map<String, String> respHeaders = new HashMap<>();
 //    respHeaders.put(CONTENT_TYPE, APPLICATION_FORM_URLENCODED_VALUE);
 

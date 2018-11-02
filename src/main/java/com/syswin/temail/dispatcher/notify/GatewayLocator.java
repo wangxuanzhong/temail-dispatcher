@@ -1,7 +1,7 @@
 package com.syswin.temail.dispatcher.notify;
 
 import static org.springframework.http.HttpMethod.GET;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8;
 
 import com.syswin.temail.dispatcher.notify.entity.TemailAccountLocation;
 import com.syswin.temail.dispatcher.notify.entity.TemailAccountLocations;
@@ -30,7 +30,7 @@ class GatewayLocator {
     this.discoveryUrl = discoveryUrl;
 
     HttpHeaders headers = new HttpHeaders();
-    headers.setContentType(APPLICATION_JSON);
+    headers.setContentType(APPLICATION_JSON_UTF8);
     this.httpEntity = new HttpEntity<>(headers);
   }
 

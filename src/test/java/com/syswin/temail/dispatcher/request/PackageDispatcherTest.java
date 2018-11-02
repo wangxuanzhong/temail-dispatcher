@@ -10,13 +10,13 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.seanyinx.github.unit.scaffolding.Randomness.uniquify;
 import static org.apache.http.HttpHeaders.CONTENT_TYPE;
 import static org.apache.http.HttpStatus.SC_OK;
-import static org.apache.http.entity.ContentType.APPLICATION_JSON;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.HttpMethod.PUT;
 import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import com.google.common.collect.ImmutableMap;
@@ -70,7 +70,7 @@ public class PackageDispatcherTest {
         .withHeader("h2", containing("v21"))
         .willReturn(
             aResponse()
-                .withHeader(CONTENT_TYPE, APPLICATION_JSON.getMimeType())
+                .withHeader(CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE)
                 .withStatus(SC_OK)
                 .withBody(responseBody1)));
 
@@ -80,7 +80,7 @@ public class PackageDispatcherTest {
         .withRequestBody(equalToJson(gson.toJson(body)))
         .willReturn(
             aResponse()
-                .withHeader(CONTENT_TYPE, APPLICATION_JSON.getMimeType())
+                .withHeader(CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE)
                 .withStatus(SC_OK)
                 .withBody(responseBody2)));
   }

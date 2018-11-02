@@ -1,7 +1,6 @@
 package com.syswin.temail.dispatcher.request.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 import com.google.gson.Gson;
 import com.syswin.temail.dispatcher.request.application.AuthService;
@@ -35,7 +34,7 @@ public class DispatchController {
   }
 
   @ApiOperation("CDTP认证服务")
-  @PostMapping(value = "/verify", consumes = APPLICATION_JSON_UTF8_VALUE, produces = APPLICATION_JSON_VALUE)
+  @PostMapping(value = "/verify", consumes = APPLICATION_JSON_UTF8_VALUE, produces = APPLICATION_JSON_UTF8_VALUE)
   public ResponseEntity<Response<String>> verify(@RequestBody CDTPPacketTrans packet) {
     log.debug("verify服务接收到的请求信息为：{}", gson.toJson(packet));
     ResponseEntity<Response<String>> responseEntity = authService.verify(packet);
@@ -46,7 +45,7 @@ public class DispatchController {
   }
 
   @ApiOperation("CDTP请求转发")
-  @PostMapping(value = "/dispatch", consumes = APPLICATION_JSON_UTF8_VALUE, produces = APPLICATION_JSON_VALUE)
+  @PostMapping(value = "/dispatch", consumes = APPLICATION_JSON_UTF8_VALUE, produces = APPLICATION_JSON_UTF8_VALUE)
   public ResponseEntity<String> dispatch(@RequestBody CDTPPacketTrans packet) {
     try {
       ResponseEntity<Response<String>> verifyResult = authService.verify(packet);

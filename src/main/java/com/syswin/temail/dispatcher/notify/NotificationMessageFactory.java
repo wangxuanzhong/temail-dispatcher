@@ -40,7 +40,7 @@ class NotificationMessageFactory {
       BeanUtils.copyProperties(pushData, pushMsg);
       return Optional.ofNullable(gson.toJson(pushMsg));
     }
-    
+
     return Optional.empty();
   }
 }

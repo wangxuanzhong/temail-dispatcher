@@ -14,6 +14,7 @@ import springfox.documentation.spring.web.json.Json;
 
 @Component
 public class WebMvcConfig implements WebMvcConfigurer {
+
   private final boolean swaggerJsonPresent =
       ClassUtils.isPresent("springfox.documentation.spring.web.json.Json",
           getClass().getClassLoader());

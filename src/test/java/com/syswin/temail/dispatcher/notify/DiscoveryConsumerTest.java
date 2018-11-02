@@ -6,7 +6,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.HttpStatus.OK;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 
 import au.com.dius.pact.consumer.ConsumerPactTestMk2;
 import au.com.dius.pact.consumer.MockServer;
@@ -52,7 +52,7 @@ public class DiscoveryConsumerTest extends ConsumerPactTestMk2 {
           .path(path + "/" + sean)
           .willRespondWith()
           .status(200)
-          .headers(singletonMap(CONTENT_TYPE, APPLICATION_JSON_VALUE))
+          .headers(singletonMap(CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE))
           .body(gson.toJson(Response.ok(OK, locations)))
         .given("Remote discovery service error")
           .uponReceiving("request to unavailable discovery service")
@@ -60,7 +60,7 @@ public class DiscoveryConsumerTest extends ConsumerPactTestMk2 {
           .path(path + "/" + jack)
           .willRespondWith()
           .status(500)
-          .headers(singletonMap(CONTENT_TYPE, APPLICATION_JSON_VALUE))
+          .headers(singletonMap(CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE))
           .body(gson.toJson(Response.failed(INTERNAL_SERVER_ERROR)))
         .toPact();
   }
