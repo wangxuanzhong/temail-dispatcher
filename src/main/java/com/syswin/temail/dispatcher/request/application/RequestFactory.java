@@ -1,5 +1,7 @@
 package com.syswin.temail.dispatcher.request.application;
 
+import static com.syswin.temail.dispatcher.request.application.CommandAwarePacketUtil.isSendGroupMsg;
+import static com.syswin.temail.dispatcher.request.application.CommandAwarePacketUtil.isSendSingleMsg;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 
@@ -40,9 +42,9 @@ class RequestFactory {
     short commandSpace = packet.getCommandSpace();
     short command = packet.getCommand();
     try {
-      if (CommandAwarePacketUtil.isSendSingleMsg(commandSpace, command)) {
+      if (isSendSingleMsg(commandSpace, command)) {
         params = buildSendSingleMsgParams(packet);
-      } else if (CommandAwarePacketUtil.isSendGroupMsg(commandSpace, command)) {
+      } else if (isSendGroupMsg(commandSpace, command) && properties.isGroupPacketEnabled()) {
         params = buildSendGroupMsgParams(packet);
       } else {
         params = gson.fromJson(packet.getData(), CDTPParams.class);
