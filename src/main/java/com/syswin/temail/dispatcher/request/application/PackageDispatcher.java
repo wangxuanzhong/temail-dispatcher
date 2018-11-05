@@ -12,8 +12,8 @@ public class PackageDispatcher {
   private final RestTemplate restTemplate;
   private RequestFactory requestFactory;
 
-  public PackageDispatcher(DispatcherProperties properties, RestTemplate restTemplate) {
-    this.requestFactory = new RequestFactory(properties);
+  public PackageDispatcher(DispatcherProperties properties, RestTemplate restTemplate, CDTPPacketUtil packetUtil) {
+    this.requestFactory = new RequestFactory(properties, packetUtil);
     this.restTemplate = restTemplate;
   }
 

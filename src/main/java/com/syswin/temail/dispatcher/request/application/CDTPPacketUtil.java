@@ -1,19 +1,24 @@
 package com.syswin.temail.dispatcher.request.application;
 
-
-import static com.syswin.temail.dispatcher.request.application.CommandAwarePacketUtil.decodeData;
-import static com.syswin.temail.dispatcher.request.application.CommandAwarePacketUtil.encodeData;
-
+import com.syswin.temail.dispatcher.request.entity.CDTPParams;
 import com.syswin.temail.ps.common.entity.CDTPPacket;
 import com.syswin.temail.ps.common.entity.CDTPPacketTrans;
 
 /**
+ * CDTP Packet的Data数据编码解码器
+ *
  * @author 姚华成
- * @date 2018-10-30
+ * @date 2018-11-05
  */
-public class CDTPPacketConverter {
+public interface CDTPPacketUtil {
 
-  public static CDTPPacketTrans toTrans(CDTPPacket packet) {
+  String encodeData(CDTPPacket packet);
+
+  byte[] decodeData(CDTPPacketTrans packet);
+
+  CDTPParams buildParams(CDTPPacketTrans packet);
+
+  default CDTPPacketTrans toTrans(CDTPPacket packet) {
     if (packet == null) {
       return null;
     }
@@ -21,12 +26,12 @@ public class CDTPPacketConverter {
         packet.getHeader().clone(), encodeData(packet));
   }
 
-  public static CDTPPacket fromTrans(CDTPPacketTrans packetTrans) {
+  default CDTPPacket fromTrans(CDTPPacketTrans packetTrans) {
     if (packetTrans == null) {
       return null;
     }
     return new CDTPPacket(packetTrans.getCommandSpace(), packetTrans.getCommand(), packetTrans.getVersion(),
         packetTrans.getHeader().clone(),
-        decodeData(packetTrans, false));
+        decodeData(packetTrans));
   }
 }

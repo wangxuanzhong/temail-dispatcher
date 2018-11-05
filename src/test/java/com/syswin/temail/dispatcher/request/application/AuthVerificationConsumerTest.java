@@ -17,6 +17,7 @@ import au.com.dius.pact.consumer.dsl.PactDslWithProvider;
 import au.com.dius.pact.model.RequestResponsePact;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.syswin.temail.dispatcher.DispatcherProperties;
 import com.syswin.temail.dispatcher.request.controller.Response;
 import java.util.Map;
 import org.junit.Before;
@@ -153,8 +154,7 @@ public class AuthVerificationConsumerTest extends ConsumerPactTestMk2 {
           .status(BAD_REQUEST.value())
           .headers(respHeaders)
           .body(objectMapper.writeValueAsString(Response.failed(BAD_REQUEST,
-              "temail or publicKey or signature or UNSIGNED_BYTES is null")))
-          ;
+              "temail or publicKey or signature or UNSIGNED_BYTES is null")));
 
       return response.toPact();
     } catch (JsonProcessingException e) {
@@ -165,7 +165,8 @@ public class AuthVerificationConsumerTest extends ConsumerPactTestMk2 {
   @Override
   public void runTest(MockServer mockServer) {
     String url = mockServer.getUrl();
-    AuthService authService = new AuthService(restTemplate, url);
+    CommandAwarePacketUtil packetUtil = new CommandAwarePacketUtil(new DispatcherProperties());
+    AuthService authService = new AuthService(restTemplate, url, packetUtil);
 
     // verify
     ResponseEntity<Response<String>> response;

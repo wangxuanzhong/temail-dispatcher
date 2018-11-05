@@ -31,9 +31,12 @@ public class AuthService {
   private final String specialAuthUrl;
   private final HttpHeaders headers = new HttpHeaders();
   private final ParameterizedTypeReference<Response<String>> responseType = responseType();
+  private final CommandAwarePacketUtil packetUtil;
 
-  public AuthService(RestTemplate restTemplate, String authUrl) {
+  public AuthService(RestTemplate restTemplate, String authUrl,
+      CommandAwarePacketUtil packetUtil) {
     this.restTemplate = restTemplate;
+    this.packetUtil = packetUtil;
     if (authUrl.endsWith("verify")) {
       // 对老配置做一个兼容
       this.authUrl = authUrl;
@@ -52,8 +55,7 @@ public class AuthService {
     CDTPHeader header = packet.getHeader();
     short commandSpace = packet.getCommandSpace();
     short command = packet.getCommand();
-    if (CommandAwarePacketUtil.isSendSingleMsg(commandSpace, command) || CommandAwarePacketUtil
-        .isGroupJoin(commandSpace, command)) {
+    if (packetUtil.isSendSingleMsg(commandSpace, command) || packetUtil.isGroupJoin(commandSpace, command)) {
       return verifyRecieverTemail(header.getSender(), header.getSenderPK(), extractUnsignedData(packet),
           header.getSignature(), String.valueOf(header.getSignatureAlgorithm()));
     } else {
@@ -95,7 +97,7 @@ public class AuthService {
     String dataSha256 = data == null ? "" :
         HexUtil.encodeHex(
             DigestUtil.sha256(
-                CommandAwarePacketUtil.decodeData(packet, true)));
+                packetUtil.decodeOriginalData(packet)));
 
     return String.valueOf(packet.getCommandSpace() + packet.getCommand())
         + targetAddress

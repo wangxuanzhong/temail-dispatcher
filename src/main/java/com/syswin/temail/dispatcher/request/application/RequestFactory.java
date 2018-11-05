@@ -1,22 +1,15 @@
 package com.syswin.temail.dispatcher.request.application;
 
-import static com.syswin.temail.dispatcher.request.application.CommandAwarePacketUtil.isSendGroupMsg;
-import static com.syswin.temail.dispatcher.request.application.CommandAwarePacketUtil.isSendSingleMsg;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
-import com.google.gson.reflect.TypeToken;
 import com.syswin.temail.dispatcher.DispatcherProperties;
 import com.syswin.temail.dispatcher.DispatcherProperties.Request;
 import com.syswin.temail.dispatcher.request.entity.CDTPParams;
 import com.syswin.temail.dispatcher.request.exceptions.DispatchException;
 import com.syswin.temail.ps.common.entity.CDTPHeader;
-import com.syswin.temail.ps.common.entity.CDTPPacket;
 import com.syswin.temail.ps.common.entity.CDTPPacketTrans;
-import com.syswin.temail.ps.common.utils.PacketUtil;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import lombok.extern.slf4j.Slf4j;
@@ -31,29 +24,15 @@ class RequestFactory {
   static final String CDTP_HEADER = "CDTP-header";
   private Gson gson = new Gson();
   private DispatcherProperties properties;
+  private CDTPPacketUtil packetUtil;
 
-  RequestFactory(DispatcherProperties properties) {
+  RequestFactory(DispatcherProperties properties, CDTPPacketUtil packetUtil) {
     this.properties = properties;
+    this.packetUtil = packetUtil;
   }
 
   TemailRequest toRequest(CDTPPacketTrans packet) {
-    CDTPParams params;
-    Gson gson = new Gson();
-    short commandSpace = packet.getCommandSpace();
-    short command = packet.getCommand();
-    try {
-      if (isSendSingleMsg(commandSpace, command)) {
-        params = buildSendSingleMsgParams(packet);
-      } else if (isSendGroupMsg(commandSpace, command) && properties.isGroupPacketEnabled()) {
-        params = buildSendGroupMsgParams(packet);
-      } else {
-        params = gson.fromJson(packet.getData(), CDTPParams.class);
-      }
-    } catch (JsonSyntaxException e) {
-      log.error("Body的Json格式解析错误，请求参数：{}", packet);
-      throw new DispatchException(e, packet);
-    }
-    int combinedCommand = (commandSpace << 16) + command;
+    int combinedCommand = (packet.getCommandSpace() << 16) + packet.getCommand();
     String cmdHex = Integer.toHexString(combinedCommand).toUpperCase();
     Request request = properties.getCmdMap().get(cmdHex);
 
@@ -62,6 +41,7 @@ class RequestFactory {
       throw new DispatchException("不支持的命令类型：" + combinedCommand, packet);
     }
 
+    CDTPParams params = packetUtil.buildParams(packet);
     HttpEntity<Map<String, Object>> entity = composeHttpEntity(request, packet.getHeader(), params);
     if (entity == null) {
       log.error("不支持的请求类型：{}，请求参数：{}", request.getMethod(), packet);
@@ -123,24 +103,4 @@ class RequestFactory {
     return headers;
   }
 
-  private CDTPParams buildSendSingleMsgParams(CDTPPacketTrans packet) {
-    CDTPHeader header = packet.getHeader();
-    Map<String, Object> extraData = gson
-        .fromJson(header.getExtraData(), new TypeToken<Map<String, Object>>() {
-        }.getType());
-    Map<String, Object> body = new HashMap<>(extraData);
-    body.put("sender", header.getSender());
-    body.put("receiver", header.getReceiver());
-    body.put("msgData", packet.getData());
-
-    return new CDTPParams(body);
-  }
-
-  private CDTPParams buildSendGroupMsgParams(CDTPPacketTrans packet) {
-    CDTPPacket originalPacket = PacketUtil.unpack(packet.getData());
-    CDTPParams params = gson.fromJson(new String(originalPacket.getData()), CDTPParams.class);
-    params.getBody().put("meta", originalPacket.getHeader());
-    params.getBody().put("packet", packet.getData());
-    return params;
-  }
 }

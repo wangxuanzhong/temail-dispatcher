@@ -23,6 +23,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import com.syswin.temail.dispatcher.DispatcherProperties;
 import com.syswin.temail.dispatcher.DispatcherProperties.Request;
+import com.syswin.temail.dispatcher.request.application.CommandAwarePacketUtil;
 import com.syswin.temail.dispatcher.request.application.PackageDispatcher;
 import com.syswin.temail.dispatcher.request.entity.CDTPParams;
 import com.syswin.temail.ps.common.entity.CDTPHeader;
@@ -61,7 +62,8 @@ public class PackageDispatcherTest {
   private final Map<String, String> queries = ImmutableMap.of(
       "q1", "v1",
       "q2", "v22");
-  private final PackageDispatcher packageDispatcher = new PackageDispatcher(properties, restTemplate);
+  private final PackageDispatcher packageDispatcher = new PackageDispatcher(properties, restTemplate,
+      new CommandAwarePacketUtil(properties));
 
   @BeforeClass
   public static void beforeClass() {

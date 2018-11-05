@@ -42,7 +42,8 @@ public class RequestFactoryTest {
   private final Request request = new Request();
   private final String baseUrl = "http://localhost:" + nextInt(1000);
   private final HttpMethod[] methods = {GET, POST, PUT, DELETE};
-  private final RequestFactory requestFactory = new RequestFactory(properties);
+  private CDTPPacketUtil packetUtil = new CommandAwarePacketUtil(properties);
+  private final RequestFactory requestFactory = new RequestFactory(properties, packetUtil);
 
   private static CDTPPacketTrans initCDTPPacketTrans() {
     CDTPPacketTrans packet = new CDTPPacketTrans();
@@ -234,7 +235,8 @@ public class RequestFactoryTest {
   }
 
   @Test
-  public void requestWithGroupChat() {
+  public void requestWithGroupChatAndGroupPacketEnabled() {
+    properties.setGroupPacketEnabled(true);
     CDTPPacket packet = initCDTPPacket();
     packet.setCommandSpace((short) 2);
     packet.setCommand((short) 1);
@@ -251,7 +253,46 @@ public class RequestFactoryTest {
     byte[] bytes = PacketUtil.pack(packet, true);
     CDTPPacket newPacket = new CDTPPacket(packet);
     newPacket.setData(bytes);
-    CDTPPacketTrans newPacketTrans = CDTPPacketConverter.toTrans(newPacket);
+    CDTPPacketTrans newPacketTrans = packetUtil.toTrans(newPacket);
+
+    request.setMethod(POST);
+    properties.setCmdMap(singletonMap("20001", request));
+
+    TemailRequest temailRequest = requestFactory.toRequest(newPacketTrans);
+
+    assertThat(temailRequest.url()).isEqualTo(request.getUrl());
+    assertThat(temailRequest.method()).isEqualTo(request.getMethod());
+    HttpEntity<Map<String, Object>> entity = temailRequest.entity();
+    assertThat(entity.getHeaders())
+        .contains(new SimpleEntry<>(CONTENT_TYPE, singletonList(APPLICATION_JSON_UTF8_VALUE)));
+
+    CDTPHeader header = packet.getHeader();
+    assertThat(entity.getHeaders())
+        .contains(new SimpleEntry<>(CDTP_HEADER, singletonList(gson.toJson(header))));
+
+    Map<String, Object> bodyMap = entity.getBody();
+    assertThat(bodyMap)
+        .containsAllEntriesOf(bodyData);
+    assertThat(bodyMap).containsKeys("meta", "packet");
+  }
+
+  @Test
+  public void requestWithGroupChatAndGroupPacketDisabled() {
+    properties.setGroupPacketEnabled(false);
+    CDTPPacket packet = initCDTPPacket();
+    packet.setCommandSpace((short) 2);
+    packet.setCommand((short) 1);
+
+    Map<String, Object> bodyData = new HashMap<>();
+    bodyData.put("from", "sender@t.email");
+    bodyData.put("to", "group@t.email");
+    bodyData.put("message", "对称加密报文base64");
+    bodyData.put("type", "0");
+    bodyData.put("msgId", "消息ID");
+    String paramString = gson.toJson(new CDTPParams(bodyData));
+    packet.setData(paramString.getBytes());
+
+    CDTPPacketTrans newPacketTrans = packetUtil.toTrans(packet);
 
     request.setMethod(POST);
     properties.setCmdMap(singletonMap("20001", request));
@@ -272,7 +313,7 @@ public class RequestFactoryTest {
     Map<String, Object> bodyMap = entity.getBody();
     assertThat(bodyMap)
         .containsAllEntriesOf(bodyData);
-    assertThat(bodyMap).containsKeys("meta", "packet");
+    assertThat(bodyMap).doesNotContainKeys("meta", "packet");
   }
 
   @Test(expected = DispatchException.class)
