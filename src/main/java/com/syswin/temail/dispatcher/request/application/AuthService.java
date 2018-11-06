@@ -97,7 +97,7 @@ public class AuthService {
     String dataSha256 = data == null ? "" :
         HexUtil.encodeHex(
             DigestUtil.sha256(
-                packetUtil.decodeOriginalData(packet)));
+                packetUtil.decodeData(packet)));
 
     return String.valueOf(packet.getCommandSpace() + packet.getCommand())
         + targetAddress
