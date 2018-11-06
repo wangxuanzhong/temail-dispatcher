@@ -112,6 +112,7 @@ public class CommandAwarePacketUtil implements CDTPPacketUtil {
     body.put("sender", header.getSender());
     body.put("receiver", header.getReceiver());
     body.put("msgData", packet.getData());
+    body.put("meta", header);
 
     return new CDTPParams(body);
   }
