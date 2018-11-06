@@ -46,8 +46,7 @@ public class CommandAwarePacketUtil implements CDTPPacketUtil {
     }
   }
 
-  @Override
-  public byte[] decodeData(CDTPPacketTrans packet) {
+  public byte[] decodeData(CDTPPacketTrans packet, boolean original) {
     String data;
     if (packet == null || (data = packet.getData()) == null) {
       return new byte[0];
@@ -56,19 +55,21 @@ public class CommandAwarePacketUtil implements CDTPPacketUtil {
     short command = packet.getCommand();
     if (isSendSingleMsg(commandSpace, command) ||
         isSendGroupMsg(commandSpace, command)) {
-      return Base64.getUrlDecoder().decode(data);
+      byte[] dataBytes = Base64.getUrlDecoder().decode(data);
+      if (original) {
+        CDTPPacket originalPacket = unpack(dataBytes);
+        return originalPacket.getData();
+      } else {
+        return dataBytes;
+      }
     } else {
       return defaultPacketUtil.decodeData(packet);
     }
   }
 
-  public byte[] decodeOriginalData(CDTPPacketTrans packet) {
-    byte[] packetBytes;
-    if ((packetBytes = decodeData(packet)) == null) {
-      return new byte[0];
-    }
-    CDTPPacket originalPacket = unpack(packetBytes);
-    return originalPacket.getData();
+  @Override
+  public byte[] decodeData(CDTPPacketTrans packet) {
+    return decodeData(packet, false);
   }
 
   @Override
