@@ -18,7 +18,7 @@ public class SimplePacketUtil implements CDTPPacketUtil {
   public String encodeData(CDTPPacket packet) {
     byte[] data;
     if (packet == null || (data = packet.getData()) == null) {
-      return null;
+      return "";
     }
     return new String(data, StandardCharsets.UTF_8);
   }
@@ -27,7 +27,7 @@ public class SimplePacketUtil implements CDTPPacketUtil {
   public byte[] decodeData(CDTPPacketTrans packet) {
     String data;
     if (packet == null || (data = packet.getData()) == null) {
-      return null;
+      return new byte[0];
     }
     return data.getBytes(StandardCharsets.UTF_8);
   }

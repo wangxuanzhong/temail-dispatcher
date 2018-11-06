@@ -39,7 +39,7 @@ public class CommandAwarePacketUtil implements CDTPPacketUtil {
     short commandSpace = packet.getCommandSpace();
     short command = packet.getCommand();
     if (isSendSingleMsg(commandSpace, command) ||
-        (isSendGroupMsg(commandSpace, command) && properties.isGroupPacketEnabled())) {
+        isSendGroupMsg(commandSpace, command)) {
       return Base64.getUrlEncoder().encodeToString(packet.getData());
     } else {
       return defaultPacketUtil.encodeData(packet);
@@ -50,12 +50,12 @@ public class CommandAwarePacketUtil implements CDTPPacketUtil {
   public byte[] decodeData(CDTPPacketTrans packet) {
     String data;
     if (packet == null || (data = packet.getData()) == null) {
-      return null;
+      return new byte[0];
     }
     short commandSpace = packet.getCommandSpace();
     short command = packet.getCommand();
     if (isSendSingleMsg(commandSpace, command) ||
-        (isSendGroupMsg(commandSpace, command)) && properties.isGroupPacketEnabled()) {
+        isSendGroupMsg(commandSpace, command)) {
       return Base64.getUrlDecoder().decode(data);
     } else {
       return defaultPacketUtil.decodeData(packet);
@@ -65,7 +65,7 @@ public class CommandAwarePacketUtil implements CDTPPacketUtil {
   public byte[] decodeOriginalData(CDTPPacketTrans packet) {
     byte[] packetBytes;
     if ((packetBytes = decodeData(packet)) == null) {
-      return null;
+      return new byte[0];
     }
     CDTPPacket originalPacket = unpack(packetBytes);
     return originalPacket.getData();
@@ -78,7 +78,7 @@ public class CommandAwarePacketUtil implements CDTPPacketUtil {
     try {
       if (isSendSingleMsg(commandSpace, command)) {
         return buildSendSingleMsgParams(packet);
-      } else if (isSendGroupMsg(commandSpace, command) && properties.isGroupPacketEnabled()) {
+      } else if (isSendGroupMsg(commandSpace, command)) {
         return buildSendGroupMsgParams(packet);
       } else {
         return defaultPacketUtil.buildParams(packet);
@@ -94,7 +94,8 @@ public class CommandAwarePacketUtil implements CDTPPacketUtil {
   }
 
   private boolean isSendGroupMsg(short commandSpace, short command) {
-    return commandSpace == GROUP_MESSAGE_CODE && command == 1;
+    return (commandSpace == GROUP_MESSAGE_CODE && command == 1) &&
+        properties.isGroupPacketEnabled();
   }
 
   boolean isGroupJoin(short commandSpace, short command) {
