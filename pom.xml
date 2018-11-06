@@ -15,6 +15,7 @@
   </parent>
 
   <properties>
+    <ps.version>1.0.3</ps.version>
     <protobuf-java.version>3.6.1</protobuf-java.version>
     <rocketmq-client.version>4.3.0</rocketmq-client.version>
     <pact.version>3.5.20</pact.version>
@@ -22,7 +23,6 @@
     <ocm-swagger.version>1.7.0.RELEASE</ocm-swagger.version>
     <swagger2.version>2.6.1</swagger2.version>
     <zookeeper.version>3.4.9</zookeeper.version>
-    <ps.version>1.0.3-SNAPSHOT</ps.version>
   </properties>
 
   <dependencies>
