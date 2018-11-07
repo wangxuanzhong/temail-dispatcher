@@ -2,7 +2,6 @@ package com.syswin.temail.dispatcher.request.application;
 
 import static com.syswin.temail.ps.common.entity.CommandSpaceType.GROUP_MESSAGE_CODE;
 import static com.syswin.temail.ps.common.entity.CommandSpaceType.SINGLE_MESSAGE_CODE;
-import static com.syswin.temail.ps.common.utils.PacketUtil.unpack;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
@@ -10,10 +9,13 @@ import com.google.gson.reflect.TypeToken;
 import com.syswin.temail.dispatcher.DispatcherProperties;
 import com.syswin.temail.dispatcher.request.entity.CDTPParams;
 import com.syswin.temail.dispatcher.request.exceptions.DispatchException;
+import com.syswin.temail.ps.common.codec.BodyExtractor;
+import com.syswin.temail.ps.common.codec.SimpleBodyExtractor;
 import com.syswin.temail.ps.common.entity.CDTPHeader;
 import com.syswin.temail.ps.common.entity.CDTPPacket;
 import com.syswin.temail.ps.common.entity.CDTPPacketTrans;
-import com.syswin.temail.ps.common.utils.PacketUtil;
+import com.syswin.temail.ps.common.packet.PacketUtil;
+import com.syswin.temail.ps.common.packet.SimplePacketUtil;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
@@ -24,14 +26,18 @@ import lombok.extern.slf4j.Slf4j;
  * @date 2018-11-05
  */
 @Slf4j
-public class CommandAwarePacketUtil implements CDTPPacketUtil {
+public class CommandAwarePacketUtil extends PacketUtil {
 
   private static Gson gson = new Gson();
   private final DispatcherProperties properties;
-  private final CDTPPacketUtil defaultPacketUtil = new SimplePacketUtil();
 
   public CommandAwarePacketUtil(DispatcherProperties properties) {
     this.properties = properties;
+  }
+
+  @Override
+  protected BodyExtractor getBodyExtractor() {
+    return SimpleBodyExtractor.INSTANCE;
   }
 
   @Override
@@ -42,7 +48,7 @@ public class CommandAwarePacketUtil implements CDTPPacketUtil {
         isSendGroupMsg(commandSpace, command)) {
       return Base64.getUrlEncoder().encodeToString(packet.getData());
     } else {
-      return defaultPacketUtil.encodeData(packet);
+      return SimplePacketUtil.INSTANCE.encodeData(packet);
     }
   }
 
@@ -63,7 +69,7 @@ public class CommandAwarePacketUtil implements CDTPPacketUtil {
         return dataBytes;
       }
     } else {
-      return defaultPacketUtil.decodeData(packet);
+      return SimplePacketUtil.INSTANCE.decodeData(packet);
     }
   }
 
@@ -72,7 +78,6 @@ public class CommandAwarePacketUtil implements CDTPPacketUtil {
     return decodeData(packet, false);
   }
 
-  @Override
   public CDTPParams buildParams(CDTPPacketTrans packet) {
     short commandSpace = packet.getCommandSpace();
     short command = packet.getCommand();
@@ -82,7 +87,7 @@ public class CommandAwarePacketUtil implements CDTPPacketUtil {
       } else if (isSendGroupMsg(commandSpace, command)) {
         return buildSendGroupMsgParams(packet);
       } else {
-        return defaultPacketUtil.buildParams(packet);
+        return gson.fromJson(packet.getData(), CDTPParams.class);
       }
     } catch (JsonSyntaxException e) {
       log.error("Body的Json格式解析错误，请求参数：{}", packet);
@@ -118,7 +123,7 @@ public class CommandAwarePacketUtil implements CDTPPacketUtil {
   }
 
   private CDTPParams buildSendGroupMsgParams(CDTPPacketTrans packet) {
-    CDTPPacket originalPacket = PacketUtil.unpack(packet.getData());
+    CDTPPacket originalPacket = unpack(packet.getData());
     CDTPParams params = gson.fromJson(new String(originalPacket.getData()), CDTPParams.class);
     params.getBody().put("meta", originalPacket.getHeader());
     params.getBody().put("packet", packet.getData());

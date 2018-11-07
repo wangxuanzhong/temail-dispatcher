@@ -23,7 +23,7 @@ import com.syswin.temail.dispatcher.request.exceptions.DispatchException;
 import com.syswin.temail.ps.common.entity.CDTPHeader;
 import com.syswin.temail.ps.common.entity.CDTPPacket;
 import com.syswin.temail.ps.common.entity.CDTPPacketTrans;
-import com.syswin.temail.ps.common.utils.PacketUtil;
+import com.syswin.temail.ps.common.packet.PacketUtil;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.HashMap;
 import java.util.Map;
@@ -42,7 +42,7 @@ public class RequestFactoryTest {
   private final Request request = new Request();
   private final String baseUrl = "http://localhost:" + nextInt(1000);
   private final HttpMethod[] methods = {GET, POST, PUT, DELETE};
-  private CDTPPacketUtil packetUtil = new CommandAwarePacketUtil(properties);
+  private CommandAwarePacketUtil packetUtil = new CommandAwarePacketUtil(properties);
   private final RequestFactory requestFactory = new RequestFactory(properties, packetUtil);
 
   private static CDTPPacketTrans initCDTPPacketTrans() {

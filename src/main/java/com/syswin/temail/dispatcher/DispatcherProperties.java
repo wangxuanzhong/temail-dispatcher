@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 @Data
 @ConfigurationProperties(prefix = "app.dispatcher")
 public class DispatcherProperties {
+
   // TODO 这个选项是为了在客户端未完成时，把代码更新到服务器而不影响客户端的功能使用。功能正式上线后选项要删除。
   private boolean groupPacketEnabled = false;
 

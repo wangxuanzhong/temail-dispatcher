@@ -24,9 +24,9 @@ class RequestFactory {
   static final String CDTP_HEADER = "CDTP-header";
   private Gson gson = new Gson();
   private DispatcherProperties properties;
-  private CDTPPacketUtil packetUtil;
+  private CommandAwarePacketUtil packetUtil;
 
-  RequestFactory(DispatcherProperties properties, CDTPPacketUtil packetUtil) {
+  RequestFactory(DispatcherProperties properties, CommandAwarePacketUtil packetUtil) {
     this.properties = properties;
     this.packetUtil = packetUtil;
   }

@@ -2,7 +2,6 @@ package com.syswin.temail.dispatcher;
 
 import com.systoon.ocm.framework.swagger.EnableSwagger2Doc;
 import com.syswin.temail.dispatcher.request.application.AuthService;
-import com.syswin.temail.dispatcher.request.application.CDTPPacketUtil;
 import com.syswin.temail.dispatcher.request.application.CommandAwarePacketUtil;
 import com.syswin.temail.dispatcher.request.application.PackageDispatcher;
 import com.syswin.temail.dispatcher.request.application.SilentResponseErrorHandler;
@@ -38,7 +37,7 @@ public class DispatcherApplication {
 
   @Bean
   public PackageDispatcher packageDispatcher(DispatcherProperties properties, RestTemplate restTemplate,
-      CDTPPacketUtil packetUtil) {
+      CommandAwarePacketUtil packetUtil) {
     return new PackageDispatcher(properties, restTemplate, packetUtil);
   }
 
