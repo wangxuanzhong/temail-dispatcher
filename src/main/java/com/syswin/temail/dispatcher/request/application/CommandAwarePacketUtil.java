@@ -30,9 +30,15 @@ public class CommandAwarePacketUtil extends PacketUtil {
 
   private static Gson gson = new Gson();
   private final DispatcherProperties properties;
+  private final SimplePacketUtil defaultPacketUtil;
 
   public CommandAwarePacketUtil(DispatcherProperties properties) {
+    this(properties, SimplePacketUtil.INSTANCE);
+  }
+
+  public CommandAwarePacketUtil(DispatcherProperties properties, SimplePacketUtil defaultPacketUtil) {
     this.properties = properties;
+    this.defaultPacketUtil = defaultPacketUtil;
   }
 
   @Override
@@ -48,7 +54,7 @@ public class CommandAwarePacketUtil extends PacketUtil {
         isSendGroupMsg(commandSpace, command)) {
       return Base64.getUrlEncoder().encodeToString(packet.getData());
     } else {
-      return SimplePacketUtil.INSTANCE.encodeData(packet);
+      return defaultPacketUtil.encodeData(packet);
     }
   }
 
