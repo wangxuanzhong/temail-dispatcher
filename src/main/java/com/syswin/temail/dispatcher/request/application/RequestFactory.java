@@ -22,6 +22,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 class RequestFactory {
 
   static final String CDTP_HEADER = "CDTP-header";
+  static final String X_PACKET_ID = "X-PACKET-ID";
   private Gson gson = new Gson();
   private DispatcherProperties properties;
   private CommandAwarePacketUtil packetUtil;
@@ -100,6 +101,7 @@ class RequestFactory {
       }
     }
     headers.add(CDTP_HEADER, gson.toJson(cdtpHeader));
+    headers.add(X_PACKET_ID, cdtpHeader.getPacketId());
     return headers;
   }
 
