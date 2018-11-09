@@ -75,7 +75,7 @@ public class CommandAwarePacketUtil extends PacketUtil {
         return dataBytes;
       }
     } else {
-      return SimplePacketUtil.INSTANCE.decodeData(packet);
+      return defaultPacketUtil.decodeData(packet);
     }
   }
 
