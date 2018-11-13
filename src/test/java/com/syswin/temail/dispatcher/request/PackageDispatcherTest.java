@@ -7,6 +7,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static com.seanyinx.github.unit.scaffolding.Randomness.uniquify;
 import static org.apache.http.HttpHeaders.CONTENT_TYPE;
 import static org.apache.http.HttpStatus.SC_OK;
@@ -40,7 +41,7 @@ import org.springframework.web.client.RestTemplate;
 public class PackageDispatcherTest {
 
   @ClassRule
-  public static final WireMockRule wireMockRule = new WireMockRule(8081);
+  public static final WireMockRule wireMockRule = new WireMockRule(wireMockConfig().dynamicPort());
   private static final String COMMAND1 = "command1";
   private static final String COMMAND2 = "command2";
 

@@ -21,11 +21,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.apache.rocketmq.client.producer.DefaultMQProducer;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.ArgumentMatcher;
 import org.mockito.Mockito;
 
+@Ignore
 public class MqOffLineMessageHandlerConsummerTest2 {
 
   private final static Gson gson = new Gson();

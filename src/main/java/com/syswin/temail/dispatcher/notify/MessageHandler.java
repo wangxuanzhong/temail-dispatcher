@@ -16,16 +16,18 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 class MessageHandler {
 
-  final Gson gson = new Gson();
-  final GatewayLocator gatewayLocator;
-  final NotificationMessageFactory notificationMsgFactory = new NotificationMessageFactory();
-  final MQProducer producer;
-  final String pushTopic;
-  final String pushTag;
+  private final Gson gson = new Gson();
+  private final GatewayLocator gatewayLocator;
+  private final NotificationMessageFactory notificationMsgFactory = new NotificationMessageFactory();
+  private final MQProducer producer;
+  private final String pushTopic;
+  private final String pushTag;
 
 
-  public MessageHandler(MQProducer producer, GatewayLocator gatewayLocator,
-      String pushTopic, String pushTag) {
+  public MessageHandler(MQProducer producer,
+      GatewayLocator gatewayLocator,
+      String pushTopic,
+      String pushTag) {
     this.producer = producer;
     this.gatewayLocator = gatewayLocator;
     this.pushTopic = pushTopic;
