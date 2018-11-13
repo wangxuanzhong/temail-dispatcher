@@ -1,41 +1,20 @@
 package com.syswin.temail.dispatcher.request.exceptions;
 
-import com.syswin.temail.ps.common.entity.CDTPPacketTrans;
+import com.syswin.temail.ps.common.entity.CDTPPacket;
 import lombok.Getter;
-import lombok.Setter;
 
-/**
- * @author 姚华成
- * @date 2018-8-15
- */
 public class DispatchException extends RuntimeException {
 
   @Getter
-  @Setter
-  private CDTPPacketTrans packet;
+  private final CDTPPacket packet;
 
-  public DispatchException(CDTPPacketTrans packet) {
-    setPacket(packet);
+  public DispatchException(Throwable throwable, CDTPPacket packet) {
+    super(throwable);
+    this.packet = packet;
   }
 
-  public DispatchException(String message, CDTPPacketTrans packet) {
-    super(message);
-    setPacket(packet);
-  }
-
-  public DispatchException(String message, Throwable cause, CDTPPacketTrans packet) {
-    super(message, cause);
-    setPacket(packet);
-  }
-
-  public DispatchException(Throwable cause, CDTPPacketTrans packet) {
+  public DispatchException(String cause, CDTPPacket packet) {
     super(cause);
-    setPacket(packet);
-  }
-
-  public DispatchException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace,
-      CDTPPacketTrans packet) {
-    super(message, cause, enableSuppression, writableStackTrace);
-    setPacket(packet);
+    this.packet = packet;
   }
 }

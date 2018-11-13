@@ -8,7 +8,7 @@ import com.syswin.temail.dispatcher.request.controller.Response;
 import com.syswin.temail.dispatcher.request.utils.DigestUtil;
 import com.syswin.temail.dispatcher.request.utils.HexUtil;
 import com.syswin.temail.ps.common.entity.CDTPHeader;
-import com.syswin.temail.ps.common.entity.CDTPPacketTrans;
+import com.syswin.temail.ps.common.entity.CDTPPacket;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -51,7 +51,7 @@ public class AuthService {
     this.headers.setContentType(APPLICATION_FORM_URLENCODED);
   }
 
-  public ResponseEntity<Response<String>> verify(CDTPPacketTrans packet) {
+  public ResponseEntity<Response<String>> verify(CDTPPacket packet) {
     CDTPHeader header = packet.getHeader();
     short commandSpace = packet.getCommandSpace();
     short command = packet.getCommand();
@@ -90,14 +90,14 @@ public class AuthService {
     return result;
   }
 
-  private String extractUnsignedData(CDTPPacketTrans packet) {
+  private String extractUnsignedData(CDTPPacket packet) {
     CDTPHeader header = packet.getHeader();
     String targetAddress = defaultString(header.getTargetAddress());
-    String data = packet.getData();
+    byte[] data = packet.getData();
     String dataSha256 = data == null ? "" :
         HexUtil.encodeHex(
             DigestUtil.sha256(
-                packetUtil.decodeData(packet, true)));
+                packetUtil.decodeData(packet)));
 
     return String.valueOf(packet.getCommandSpace() + packet.getCommand())
         + targetAddress

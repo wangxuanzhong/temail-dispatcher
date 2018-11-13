@@ -1,7 +1,7 @@
 package com.syswin.temail.dispatcher.request.application;
 
 import com.syswin.temail.dispatcher.DispatcherProperties;
-import com.syswin.temail.ps.common.entity.CDTPPacketTrans;
+import com.syswin.temail.ps.common.entity.CDTPPacket;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
@@ -18,7 +18,7 @@ public class PackageDispatcher {
     this.restTemplate = restTemplate;
   }
 
-  public ResponseEntity<String> dispatch(CDTPPacketTrans packet) {
+  public ResponseEntity<String> dispatch(CDTPPacket packet) {
     TemailRequest request = requestFactory.toRequest(packet);
     return restTemplate.exchange(request.url(), request.method(), request.entity(), String.class);
   }

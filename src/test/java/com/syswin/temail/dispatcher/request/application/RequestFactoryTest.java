@@ -22,9 +22,9 @@ import com.syswin.temail.dispatcher.request.entity.CDTPParams;
 import com.syswin.temail.dispatcher.request.exceptions.DispatchException;
 import com.syswin.temail.ps.common.entity.CDTPHeader;
 import com.syswin.temail.ps.common.entity.CDTPPacket;
-import com.syswin.temail.ps.common.entity.CDTPPacketTrans;
 import com.syswin.temail.ps.common.packet.PacketUtil;
 import java.util.AbstractMap.SimpleEntry;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.Before;
@@ -45,8 +45,8 @@ public class RequestFactoryTest {
   private CommandAwarePacketUtil packetUtil = new CommandAwarePacketUtil(properties);
   private final RequestFactory requestFactory = new RequestFactory(properties, packetUtil);
 
-  private static CDTPPacketTrans initCDTPPacketTrans() {
-    CDTPPacketTrans packet = new CDTPPacketTrans();
+  private static CDTPPacket initCDTPPacketTrans() {
+    CDTPPacket packet = new CDTPPacket();
     packet.setCommandSpace((short) 0xA);
     packet.setCommand((short) 0xF0F);
     packet.setVersion((short) 1);
@@ -64,7 +64,7 @@ public class RequestFactoryTest {
     packet.setHeader(header);
 
     CDTPParams cdtpParams = new CDTPParams();
-    packet.setData(gson.toJson(cdtpParams));
+    packet.setData(gson.toJson(cdtpParams).getBytes());
 
     return packet;
   }
@@ -100,7 +100,7 @@ public class RequestFactoryTest {
 
   @Test
   public void plainRequest() {
-    CDTPPacketTrans packet = initCDTPPacketTrans();
+    CDTPPacket packet = initCDTPPacketTrans();
     for (HttpMethod method : methods) {
       request.setMethod(method);
 
@@ -117,13 +117,13 @@ public class RequestFactoryTest {
 
   @Test
   public void requestWithHeader() {
-    CDTPPacketTrans packet = initCDTPPacketTrans();
+    CDTPPacket packet = initCDTPPacketTrans();
     Map<String, String> headers = ImmutableMap.of(
         uniquify("headerName1"), "headerValue1",
         uniquify("headerName2"), "headerValue2");
     CDTPParams cdtpParams = new CDTPParams();
     cdtpParams.setHeader(headers);
-    packet.setData(gson.toJson(cdtpParams));
+    packet.setData(gson.toJson(cdtpParams).getBytes());
 
     for (HttpMethod method : methods) {
       request.setMethod(method);
@@ -147,14 +147,14 @@ public class RequestFactoryTest {
   public void requestWithPathVariable() {
     request.setUrl(baseUrl + "/{Name1}/{Name2}");
 
-    CDTPPacketTrans packet = initCDTPPacketTrans();
+    CDTPPacket packet = initCDTPPacketTrans();
     Map<String, Object> pathVariables = ImmutableMap.of(
         "Name1", "Value1",
         "Name2", "Value2");
 
     CDTPParams cdtpParams = new CDTPParams();
     cdtpParams.setPath(pathVariables);
-    packet.setData(gson.toJson(cdtpParams));
+    packet.setData(gson.toJson(cdtpParams).getBytes());
 
     for (HttpMethod method : methods) {
       request.setMethod(method);
@@ -172,14 +172,14 @@ public class RequestFactoryTest {
 
   @Test
   public void requestWithBody() {
-    CDTPPacketTrans packet = initCDTPPacketTrans();
+    CDTPPacket packet = initCDTPPacketTrans();
     final Map<String, Object> body = ImmutableMap.of(
         "foo", "bar",
         "hello", "world");
     CDTPParams cdtpParams = new CDTPParams();
     cdtpParams.setBody(body);
 
-    packet.setData(gson.toJson(cdtpParams));
+    packet.setData(gson.toJson(cdtpParams).getBytes());
 
     for (HttpMethod method : new HttpMethod[]{POST, PUT}) {
       request.setMethod(method);
@@ -200,7 +200,7 @@ public class RequestFactoryTest {
 
   @Test
   public void requestWithSingleChat() {
-    CDTPPacketTrans packet = initCDTPPacketTrans();
+    CDTPPacket packet = initCDTPPacketTrans();
     packet.setCommandSpace((short) 1);
     packet.setCommand((short) 1);
 
@@ -208,7 +208,7 @@ public class RequestFactoryTest {
     CDTPHeader header = packet.getHeader();
     header.setExtraData(gson.toJson(extraData));
 
-    packet.setData("This is Encrypt Data");
+    packet.setData("This is Encrypt Data".getBytes());
 
     request.setMethod(POST);
     properties.setCmdMap(singletonMap("10001", request));
@@ -227,7 +227,8 @@ public class RequestFactoryTest {
     Map<String, Object> testMap = new HashMap<>(3);
     testMap.put("sender", header.getSender());
     testMap.put("receiver", header.getReceiver());
-    testMap.put("msgData", packet.getData());
+    testMap.put("meta", packet.getHeader());
+    testMap.put("msgData", Base64.getUrlEncoder().encode(packet.getData()));
 
     Map<String, Object> bodyMap = entity.getBody();
     assertThat(bodyMap)
@@ -253,12 +254,11 @@ public class RequestFactoryTest {
     byte[] bytes = PacketUtil.pack(packet, true);
     CDTPPacket newPacket = new CDTPPacket(packet);
     newPacket.setData(bytes);
-    CDTPPacketTrans newPacketTrans = packetUtil.toTrans(newPacket);
 
     request.setMethod(POST);
     properties.setCmdMap(singletonMap("20001", request));
 
-    TemailRequest temailRequest = requestFactory.toRequest(newPacketTrans);
+    TemailRequest temailRequest = requestFactory.toRequest(newPacket);
 
     assertThat(temailRequest.url()).isEqualTo(request.getUrl());
     assertThat(temailRequest.method()).isEqualTo(request.getMethod());
@@ -292,12 +292,10 @@ public class RequestFactoryTest {
     String paramString = gson.toJson(new CDTPParams(bodyData));
     packet.setData(paramString.getBytes());
 
-    CDTPPacketTrans newPacketTrans = packetUtil.toTrans(packet);
-
     request.setMethod(POST);
     properties.setCmdMap(singletonMap("20001", request));
 
-    TemailRequest temailRequest = requestFactory.toRequest(newPacketTrans);
+    TemailRequest temailRequest = requestFactory.toRequest(packet);
 
     assertThat(temailRequest.url()).isEqualTo(request.getUrl());
     assertThat(temailRequest.method()).isEqualTo(request.getMethod());
@@ -318,14 +316,14 @@ public class RequestFactoryTest {
 
   @Test(expected = DispatchException.class)
   public void blowsUpWhenCommandIsNotMapped() {
-    CDTPPacketTrans packet = initCDTPPacketTrans();
+    CDTPPacket packet = initCDTPPacketTrans();
     packet.setCommand((short) 0xFF);
     requestFactory.toRequest(packet);
   }
 
   @Test(expected = DispatchException.class)
   public void blowsUpWhenMethodIsNotSupported() {
-    CDTPPacketTrans packet = initCDTPPacketTrans();
+    CDTPPacket packet = initCDTPPacketTrans();
     request.setMethod(TRACE);
     requestFactory.toRequest(packet);
   }

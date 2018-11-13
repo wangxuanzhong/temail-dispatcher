@@ -1,12 +1,14 @@
 package com.syswin.temail.dispatcher.request.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
+import static org.springframework.http.MediaType.APPLICATION_OCTET_STREAM_VALUE;
 
 import com.google.gson.Gson;
+import com.syswin.temail.dispatcher.codec.RawPacketDecoder;
 import com.syswin.temail.dispatcher.request.application.AuthService;
 import com.syswin.temail.dispatcher.request.application.PackageDispatcher;
 import com.syswin.temail.dispatcher.request.exceptions.DispatchException;
-import com.syswin.temail.ps.common.entity.CDTPPacketTrans;
+import com.syswin.temail.ps.common.entity.CDTPPacket;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -25,17 +27,21 @@ public class DispatchController {
   private final PackageDispatcher packageDispatcher;
   private final AuthService authService;
   private final Gson gson = new Gson();
+  private final RawPacketDecoder packetDecoder;
 
   @Autowired
   public DispatchController(PackageDispatcher packageDispatcher,
-      AuthService authService) {
+      AuthService authService,
+      RawPacketDecoder packetDecoder) {
     this.packageDispatcher = packageDispatcher;
     this.authService = authService;
+    this.packetDecoder = packetDecoder;
   }
 
   @ApiOperation("CDTP认证服务")
-  @PostMapping(value = "/verify", consumes = APPLICATION_JSON_UTF8_VALUE, produces = APPLICATION_JSON_UTF8_VALUE)
-  public ResponseEntity<Response<String>> verify(@RequestBody CDTPPacketTrans packet) {
+  @PostMapping(value = "/verify", consumes = APPLICATION_OCTET_STREAM_VALUE, produces = APPLICATION_JSON_UTF8_VALUE)
+  public ResponseEntity<Response<String>> verify(@RequestBody byte[] payload) {
+    CDTPPacket packet = packetDecoder.decode(payload);
     log.debug("verify服务接收到的请求信息为：{}", gson.toJson(packet));
     ResponseEntity<Response<String>> responseEntity = authService.verify(packet);
     ResponseEntity<Response<String>> result = new ResponseEntity<>(responseEntity.getBody(),
@@ -45,8 +51,9 @@ public class DispatchController {
   }
 
   @ApiOperation("CDTP请求转发")
-  @PostMapping(value = "/dispatch", consumes = APPLICATION_JSON_UTF8_VALUE, produces = APPLICATION_JSON_UTF8_VALUE)
-  public ResponseEntity<String> dispatch(@RequestBody CDTPPacketTrans packet) {
+  @PostMapping(value = "/dispatch", consumes = APPLICATION_OCTET_STREAM_VALUE, produces = APPLICATION_JSON_UTF8_VALUE)
+  public ResponseEntity<String> dispatch(@RequestBody byte[] payload) {
+    CDTPPacket packet = packetDecoder.decode(payload);
     try {
       ResponseEntity<Response<String>> verifyResult = authService.verify(packet);
 

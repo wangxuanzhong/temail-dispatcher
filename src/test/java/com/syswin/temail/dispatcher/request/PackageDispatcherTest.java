@@ -27,7 +27,7 @@ import com.syswin.temail.dispatcher.request.application.CommandAwarePacketUtil;
 import com.syswin.temail.dispatcher.request.application.PackageDispatcher;
 import com.syswin.temail.dispatcher.request.entity.CDTPParams;
 import com.syswin.temail.ps.common.entity.CDTPHeader;
-import com.syswin.temail.ps.common.entity.CDTPPacketTrans;
+import com.syswin.temail.ps.common.entity.CDTPPacket;
 import java.util.Map;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -87,8 +87,8 @@ public class PackageDispatcherTest {
                 .withBody(responseBody2)));
   }
 
-  static CDTPPacketTrans initCDTPPackage() {
-    CDTPPacketTrans packet = new CDTPPacketTrans();
+  static CDTPPacket initCDTPPackage() {
+    CDTPPacket packet = new CDTPPacket();
     packet.setCommandSpace((short) 0x0A);
     packet.setCommand((short) 0x0F01);
     packet.setVersion((short) 1);
@@ -115,7 +115,7 @@ public class PackageDispatcherTest {
 
   @Test
   public void requestWithoutBody() {
-    CDTPPacketTrans packet = initCDTPPackage();
+    CDTPPacket packet = initCDTPPackage();
     packet.setCommandSpace((short) 0x0A);
     packet.setCommand((short) 0x0F01);
     request.setUrl(baseUrl + "/" + COMMAND1);
@@ -123,7 +123,7 @@ public class PackageDispatcherTest {
     CDTPParams params = new CDTPParams();
     params.setHeader(headers);
     params.setQuery(queries);
-    packet.setData(gson.toJson(params));
+    packet.setData(gson.toJson(params).getBytes());
 
     for (HttpMethod method : methods) {
       request.setMethod(method);
@@ -137,7 +137,7 @@ public class PackageDispatcherTest {
 
   @Test
   public void requestWithBody() {
-    CDTPPacketTrans packet = initCDTPPackage();
+    CDTPPacket packet = initCDTPPackage();
     packet.setCommandSpace((short) 0x0A);
     packet.setCommand((short) 0x0F02);
     request.setUrl(baseUrl + "/" + COMMAND2);
@@ -146,7 +146,7 @@ public class PackageDispatcherTest {
     params.setHeader(headers);
     params.setQuery(queries);
     params.setBody(body);
-    packet.setData(gson.toJson(params));
+    packet.setData(gson.toJson(params).getBytes());
     for (HttpMethod method : new HttpMethod[]{POST, PUT}) {
       request.setMethod(method);
 

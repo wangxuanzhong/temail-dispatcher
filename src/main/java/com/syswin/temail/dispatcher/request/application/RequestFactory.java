@@ -9,7 +9,7 @@ import com.syswin.temail.dispatcher.DispatcherProperties.Request;
 import com.syswin.temail.dispatcher.request.entity.CDTPParams;
 import com.syswin.temail.dispatcher.request.exceptions.DispatchException;
 import com.syswin.temail.ps.common.entity.CDTPHeader;
-import com.syswin.temail.ps.common.entity.CDTPPacketTrans;
+import com.syswin.temail.ps.common.entity.CDTPPacket;
 import java.util.Map;
 import java.util.Map.Entry;
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +32,7 @@ class RequestFactory {
     this.packetUtil = packetUtil;
   }
 
-  TemailRequest toRequest(CDTPPacketTrans packet) {
+  TemailRequest toRequest(CDTPPacket packet) {
     int combinedCommand = (packet.getCommandSpace() << 16) + packet.getCommand();
     String cmdHex = Integer.toHexString(combinedCommand).toUpperCase();
     Request request = properties.getCmdMap().get(cmdHex);

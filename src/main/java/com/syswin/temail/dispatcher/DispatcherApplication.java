@@ -1,10 +1,13 @@
 package com.syswin.temail.dispatcher;
 
 import com.systoon.ocm.framework.swagger.EnableSwagger2Doc;
+import com.syswin.temail.dispatcher.codec.CommandAwarePredicate;
+import com.syswin.temail.dispatcher.codec.RawPacketDecoder;
 import com.syswin.temail.dispatcher.request.application.AuthService;
 import com.syswin.temail.dispatcher.request.application.CommandAwarePacketUtil;
 import com.syswin.temail.dispatcher.request.application.PackageDispatcher;
 import com.syswin.temail.dispatcher.request.application.SilentResponseErrorHandler;
+import java.util.function.BiPredicate;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -19,6 +22,16 @@ public class DispatcherApplication {
 
   public static void main(String[] args) {
     SpringApplication.run(DispatcherApplication.class, args);
+  }
+
+  @Bean
+  BiPredicate<Short, Short> commandAwarePredicate(DispatcherProperties properties) {
+    return new CommandAwarePredicate(properties);
+  }
+
+  @Bean
+  RawPacketDecoder packetDecoder(BiPredicate<Short, Short> predicate) {
+    return new RawPacketDecoder(predicate);
   }
 
   @Bean

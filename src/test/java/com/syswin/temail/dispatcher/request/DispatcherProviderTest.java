@@ -1,5 +1,6 @@
 package com.syswin.temail.dispatcher.request;
 
+import static com.syswin.temail.dispatcher.request.PacketMaker.loginPacket;
 import static org.mockito.Mockito.when;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.DEFINED_PORT;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
@@ -13,15 +14,15 @@ import au.com.dius.pact.provider.junit.target.Target;
 import au.com.dius.pact.provider.junit.target.TestTarget;
 import au.com.dius.pact.provider.spring.SpringRestPactRunner;
 import com.google.gson.Gson;
+import com.syswin.temail.dispatcher.codec.PacketEncoder;
 import com.syswin.temail.dispatcher.request.application.AuthService;
 import com.syswin.temail.dispatcher.request.application.PackageDispatcher;
 import com.syswin.temail.dispatcher.request.controller.Response;
 import com.syswin.temail.ps.common.entity.CDTPHeader;
-import com.syswin.temail.ps.common.entity.CDTPPacketTrans;
+import com.syswin.temail.ps.common.entity.CDTPPacket;
 import java.util.HashMap;
 import java.util.Map;
 import org.jetbrains.annotations.NotNull;
-import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -34,63 +35,58 @@ import org.springframework.web.client.RestClientException;
 @Provider("temail-dispatcher")
 @SpringBootTest(webEnvironment = DEFINED_PORT, properties = "server.port=8081")
 @ActiveProfiles("dev")
-@Ignore
 public class DispatcherProviderTest {
 
   private static final String ackMessage = "Sent ackMessage";
   @TestTarget
   public final Target target = new HttpTarget(8081);
-  private final String unsignedBytes = "abcPackageDispatcher";
-  private final String signature = "signed-abc";
   private final String sender = "jack@t.email";
   private final String receiver = "sean@t.email";
-  private final String algorithm = "1";
   private final Gson gson = new Gson();
 
-  private final CDTPPacketTrans cdtpPacketTrans = singleChatPacket(sender, receiver);
+  private final PacketEncoder encoder = new PacketEncoder();
+  private final CDTPPacket authPacket = loginPacket("", "deviceId");
+  private final CDTPPacket cdtpPacket = privateMsgPacket(sender, receiver);
 
 
   @MockBean
   private AuthService authService;
-
 
   @MockBean
   private PackageDispatcher packageDispatcher;
 
   @State("User sean is registered")
   public void userIsRegistered() {
-    when(authService.verify("sean@t.email", unsignedBytes, signature, algorithm))
+    authPacket.getHeader().setSender("sean@t.email");
+    when(authService.verify(authPacket))
         .thenReturn(ResponseEntity.ok(Response.ok("Success")));
   }
 
   @State("User jack is not registered")
   public void userNotRegistered() {
-    when(authService.verify("jack@t.email", unsignedBytes, signature, algorithm))
+    authPacket.getHeader().setSender("jack@t.email");
+    when(authService.verify(authPacket))
         .thenReturn(new ResponseEntity<>(Response.failed(FORBIDDEN), FORBIDDEN));
   }
 
   @State("User mike is registered, but server is out of work")
   public void serverOutOfWork() {
-    when(authService.verify("mike@t.email", unsignedBytes, signature, algorithm)).thenThrow(RestClientException.class);
+    authPacket.getHeader().setSender("mike@t.email");
+    when(authService.verify(authPacket)).thenThrow(RestClientException.class);
   }
 
   @State("dispatch user request")
   public void dispatchUserRequest() {
-    when(packageDispatcher.dispatch(cdtpPacketTrans))
+    when(authService.verify(cdtpPacket))
+        .thenReturn(ResponseEntity.ok(Response.ok("Success")));
+
+    when(packageDispatcher.dispatch(cdtpPacket))
         .thenReturn(ResponseEntity.ok(gson.toJson(Response.ok(OK, ackPayload()))));
-
   }
-//
-//  @State("online notification")
-//  public void dispatchUserRequest0() {
-//    when(packageDispatcher.dispatch(cdtpPacketTrans))
-//        .thenReturn(ResponseEntity.ok(gson.toJson(Response.ok(OK, ackPayload()))));
-//  }
 
-  // 创建单聊消息体
-  public CDTPPacketTrans singleChatPacket(String sender, String recipient) {
+  private CDTPPacket privateMsgPacket(String sender, String recipient) {
 
-    CDTPPacketTrans cdtpPacketTrans = new CDTPPacketTrans();
+    CDTPPacket cdtpPacketTrans = new CDTPPacket();
     short CDTP_VERSION = 1;
     cdtpPacketTrans.setCommandSpace((short) 1);
     cdtpPacketTrans.setCommand((short) 1);
@@ -115,17 +111,18 @@ public class DispatcherProviderTest {
     extraData.put("msgId", "4298F38F87DC4775B264A3753E77B443");
     cdtpPacketTransHeader.setExtraData(gson.toJson(extraData));
     cdtpPacketTrans.setHeader(cdtpPacketTransHeader);
-    cdtpPacketTrans.setData("aGVsbG8gd29ybGQ=");
+    cdtpPacketTrans.setData("hello world".getBytes());
+    cdtpPacketTrans.setData(encoder.encode(cdtpPacketTrans));
     return cdtpPacketTrans;
   }
 
   @NotNull
-  private CDTPPacketTrans ackPayload() {
+  private CDTPPacket ackPayload() {
 
-    CDTPPacketTrans payload = new CDTPPacketTrans();
+    CDTPPacket payload = new CDTPPacket();
     payload.setCommandSpace((short) 1);
     payload.setCommand((short) 1);
-    payload.setData(gson.toJson(Response.ok(ackMessage)));
+    payload.setData(gson.toJson(Response.ok(ackMessage)).getBytes());
     return payload;
   }
 }
