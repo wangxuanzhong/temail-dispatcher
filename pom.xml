@@ -15,7 +15,7 @@
   </parent>
 
   <properties>
-    <ps.version>1.1.1</ps.version>
+    <ps.version>1.2.0-SNAPSHOT</ps.version>
     <protobuf-java.version>3.6.1</protobuf-java.version>
     <rocketmq-client.version>4.3.0</rocketmq-client.version>
     <pact.version>3.5.20</pact.version>
