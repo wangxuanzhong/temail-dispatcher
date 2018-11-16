@@ -6,6 +6,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
@@ -40,14 +41,12 @@ import org.springframework.test.context.junit4.SpringRunner;
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = RANDOM_PORT,
     properties = {
-        "app.dispatcher.auth-verify-url=http://localhost:8081/verify",
-        "app.dispatcher.cmd-map.10001.url=http://localhost:8081/usermail",
         "app.dispatcher.cmd-map.10001.method=POST"})
 @ActiveProfiles("dev")
 public class DispatcherApplicationTest {
 
   @ClassRule
-  public static WireMockRule wireMockRule = new WireMockRule(8081);
+  public static final WireMockRule wireMockRule = new WireMockRule(wireMockConfig().dynamicPort());
 
   private static final String ackMessage = "Sent ackMessage";
   private static final Gson gson = new GsonBuilder().serializeNulls().create();
@@ -62,6 +61,9 @@ public class DispatcherApplicationTest {
 
   @BeforeClass
   public static void setUp() {
+    System.setProperty("app.dispatcher.auth-verify-url", "http://localhost:" + wireMockRule.port() + "/verify");
+    System.setProperty("app.dispatcher.cmd-map.10001.url", "http://localhost:" + wireMockRule.port() + "/usermail");
+
     Map<String, Object> msgPayload = new HashMap<>(gson
         .fromJson(cdtpPacket.getHeader().getExtraData(), new TypeToken<Map<String, Object>>() {
         }.getType()));

@@ -225,10 +225,8 @@ public class RequestFactoryTest {
         .contains(new SimpleEntry<>(CDTP_HEADER, singletonList(gson.toJson(header))));
 
     Map<String, Object> testMap = new HashMap<>(3);
-    testMap.put("sender", header.getSender());
-    testMap.put("receiver", header.getReceiver());
     testMap.put("meta", packet.getHeader());
-    testMap.put("msgData", Base64.getUrlEncoder().encode(packet.getData()));
+    testMap.put("msgData", Base64.getUrlEncoder().encodeToString(packet.getData()));
 
     Map<String, Object> bodyMap = entity.getBody();
     assertThat(bodyMap)
