@@ -34,7 +34,7 @@ import org.springframework.web.client.RestClientException;
 @PactBroker(host = "172.28.50.206", port = "88")
 @Provider("temail-dispatcher")
 @SpringBootTest(webEnvironment = DEFINED_PORT, properties = "server.port=8081")
-@ActiveProfiles("dev")
+@ActiveProfiles({"dev", "pact"})
 public class DispatcherProviderTest {
 
   private static final String ackMessage = "Sent ackMessage";

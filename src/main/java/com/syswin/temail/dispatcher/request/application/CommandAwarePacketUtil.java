@@ -29,7 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class CommandAwarePacketUtil extends PacketUtil {
 
-  private static Gson gson = new Gson();
+  private static final Gson gson = new Gson();
   private final DispatcherProperties properties;
   private final SimplePacketUtil defaultPacketUtil;
 
@@ -108,8 +108,6 @@ public class CommandAwarePacketUtil extends PacketUtil {
         .fromJson(header.getExtraData(), new TypeToken<Map<String, Object>>() {
         }.getType());
     Map<String, Object> body = new HashMap<>(extraData);
-    body.put("sender", header.getSender());
-    body.put("receiver", header.getReceiver());
     body.put("msgData", encode(packet.getData()));
     body.put("meta", header);
 
@@ -124,7 +122,7 @@ public class CommandAwarePacketUtil extends PacketUtil {
     return params;
   }
 
-  private byte[] encode(byte[] data) {
-    return Base64.getUrlEncoder().encode(data);
+  private String encode(byte[] data) {
+    return Base64.getUrlEncoder().encodeToString(data);
   }
 }
