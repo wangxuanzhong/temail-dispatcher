@@ -3,7 +3,6 @@ package com.syswin.temail.dispatcher.request.controller;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_OCTET_STREAM_VALUE;
 
-import com.google.gson.Gson;
 import com.syswin.temail.dispatcher.codec.RawPacketDecoder;
 import com.syswin.temail.dispatcher.request.application.AuthService;
 import com.syswin.temail.dispatcher.request.application.PackageDispatcher;
@@ -13,7 +12,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,7 +24,6 @@ public class DispatchController {
 
   private final PackageDispatcher packageDispatcher;
   private final AuthService authService;
-  private final Gson gson = new Gson();
   private final RawPacketDecoder packetDecoder;
 
   @Autowired
@@ -42,17 +39,16 @@ public class DispatchController {
   @PostMapping(value = "/verify", consumes = APPLICATION_OCTET_STREAM_VALUE, produces = APPLICATION_JSON_UTF8_VALUE)
   public ResponseEntity<Response<String>> verify(@RequestBody byte[] payload) {
     CDTPPacket packet = packetDecoder.decode(payload);
-    log.debug("verify服务接收到的请求信息为：{}", gson.toJson(packet));
+    log.debug("verify服务接收到的请求信息为：{}", packet);
     ResponseEntity<Response<String>> responseEntity = authService.verify(packet);
-    ResponseEntity<Response<String>> result = new ResponseEntity<>(responseEntity.getBody(),
-        responseEntity.getStatusCode());
-    log.debug("verify服务返回的结果为：{}", gson.toJson(result));
+    ResponseEntity<Response<String>> result = repackageResponse(responseEntity);
+    log.debug("verify服务返回的结果为：{}", result.getBody());
     return result;
   }
 
   @ApiOperation("CDTP请求转发")
   @PostMapping(value = "/dispatch", consumes = APPLICATION_OCTET_STREAM_VALUE, produces = APPLICATION_JSON_UTF8_VALUE)
-  public ResponseEntity<String> dispatch(@RequestBody byte[] payload) {
+  public ResponseEntity<?> dispatch(@RequestBody byte[] payload) {
     CDTPPacket packet = packetDecoder.decode(payload);
     try {
       ResponseEntity<Response<String>> verifyResult = authService.verify(packet);
@@ -60,26 +56,21 @@ public class DispatchController {
       if (verifyResult.getStatusCode().is2xxSuccessful()) {
         log.debug("dispatch服务接收到的请求信息为：{}", packet);
         ResponseEntity<String> responseEntity = packageDispatcher.dispatch(packet);
-        ResponseEntity<String> result = new ResponseEntity<>(responseEntity.getBody(),
-            responseEntity.getStatusCode());
+        ResponseEntity<String> result = repackageResponse(responseEntity);
         log.debug("dispatch服务返回的结果为：{}", result);
         return result;
-      } else {
-        log.error("签名数据验证失败! 请求参数：{}", packet);
-        Response<String> resultBody = verifyResult.getBody();
-        String errorMesage;
-        if (resultBody != null) {
-          errorMesage = resultBody.getMessage();
-        } else {
-          errorMesage = "数据包签名验证未通过!";
-        }
-        return new ResponseEntity<>(gson.toJson(Response.failed(verifyResult.getStatusCode(), errorMesage)),
-            HttpStatus.FORBIDDEN);
       }
+
+      log.error("签名数据验证失败! 请求参数：{}", packet);
+      return repackageResponse(verifyResult);
     } catch (DispatchException e) {
       throw e;
     } catch (Exception e) {
       throw new DispatchException(e, packet);
     }
+  }
+
+  private <T> ResponseEntity<T> repackageResponse(ResponseEntity<T> responseEntity) {
+    return new ResponseEntity<>(responseEntity.getBody(), responseEntity.getStatusCode());
   }
 }
