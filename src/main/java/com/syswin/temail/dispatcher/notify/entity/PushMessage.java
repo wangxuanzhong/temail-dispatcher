@@ -18,4 +18,8 @@ public class PushMessage implements Serializable {
 
   private String message;
 
+  private String type;
+
+  private String cmd;
+
 }
