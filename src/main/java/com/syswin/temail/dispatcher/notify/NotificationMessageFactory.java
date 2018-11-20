@@ -3,14 +3,18 @@ package com.syswin.temail.dispatcher.notify;
 import static com.syswin.temail.dispatcher.Constants.CDTP_VERSION;
 import static com.syswin.temail.dispatcher.Constants.NOTIFY_COMMAND;
 import static com.syswin.temail.dispatcher.Constants.NOTIFY_COMMAND_SPACE;
+import static java.util.Collections.emptyMap;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
+import com.google.gson.reflect.TypeToken;
 import com.syswin.temail.dispatcher.Constants;
 import com.syswin.temail.dispatcher.notify.entity.PushData;
 import com.syswin.temail.dispatcher.notify.entity.PushMessage;
 import com.syswin.temail.ps.common.entity.CDTPHeader;
 import com.syswin.temail.ps.common.entity.CDTPPacketTrans;
+import java.lang.reflect.Type;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -21,6 +25,8 @@ import org.springframework.beans.BeanUtils;
 class NotificationMessageFactory {
 
   private final Gson gson;
+
+  private final Type type = new TypeToken<Map<String,Map<String,String>>>(){}.getType();
 
   NotificationMessageFactory() {
     gson = new Gson();
@@ -54,9 +60,9 @@ class NotificationMessageFactory {
   Map<String, String> extractPushOptions(CDTPHeader header) {
     Map<String, String> pushOptions = new HashMap<>();
     try {
-      Map<String, Map<String, String>> extraOption = Optional.ofNullable(
-          gson.fromJson(header.getExtraData(), Map.class)).orElse(new HashMap());
-      pushOptions = Optional.ofNullable(extraOption.get("push")).orElse(new HashMap<>());
+      Map<String, Map<String, String>> extraOption = (Map<String, Map<String, String>>) Optional.ofNullable(
+          gson.<Map<String, Map<String, String>>>fromJson(header.getExtraData(),type)).orElse(emptyMap());
+      pushOptions = Optional.ofNullable(extraOption.get("push")).orElse(emptyMap());
     } catch (JsonSyntaxException e) {
       log.error("从CDTPHeader中提取cmd 和 type 失败，extraData : {}", header.getExtraData(), e);
     }
