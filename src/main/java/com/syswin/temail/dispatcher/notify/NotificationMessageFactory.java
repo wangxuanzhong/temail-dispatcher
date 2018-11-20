@@ -49,8 +49,8 @@ class NotificationMessageFactory {
       PushMessage pushMsg = new PushMessage();
       BeanUtils.copyProperties(pushData, pushMsg);
       Map<String,String> pushOptions = this.extractPushOptions(header);
-      pushMsg.setCmd(Optional.ofNullable(pushOptions.get("cmd")).orElse(""));
-      pushMsg.setType(Optional.ofNullable(pushOptions.get("type")).orElse(""));
+      pushMsg.setCmd(Optional.ofNullable(pushOptions.get("cmd")).orElse(null));
+      pushMsg.setType(Optional.ofNullable(pushOptions.get("type")).orElse(null));
       return Optional.ofNullable(gson.toJson(pushMsg));
     }
     return Optional.empty();
@@ -62,12 +62,12 @@ class NotificationMessageFactory {
     try {
       Map<String, Map<String, String>> extraOption = Optional.ofNullable(
           gson.<Map<String, Map<String, String>>>fromJson(header.getExtraData(),type)).orElse(emptyMap());
-      pushOptions = Optional.ofNullable(extraOption.get("push")).orElse(emptyMap());
+      pushOptions = extraOption.getOrDefault("push",emptyMap());
     } catch (JsonSyntaxException e) {
       log.error("从CDTPHeader中提取cmd 和 type 失败，extraData : {}", header.getExtraData(), e);
     }
     return pushOptions;
   }
 
-
 }
+
