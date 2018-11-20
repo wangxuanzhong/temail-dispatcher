@@ -60,7 +60,7 @@ class NotificationMessageFactory {
   Map<String, String> extractPushOptions(CDTPHeader header) {
     Map<String, String> pushOptions = new HashMap<>();
     try {
-      Map<String, Map<String, String>> extraOption = (Map<String, Map<String, String>>) Optional.ofNullable(
+      Map<String, Map<String, String>> extraOption = Optional.ofNullable(
           gson.<Map<String, Map<String, String>>>fromJson(header.getExtraData(),type)).orElse(emptyMap());
       pushOptions = Optional.ofNullable(extraOption.get("push")).orElse(emptyMap());
     } catch (JsonSyntaxException e) {
