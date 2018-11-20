@@ -3,8 +3,6 @@ package com.syswin.temail.dispatcher.notify;
 import static com.syswin.temail.dispatcher.Constants.CDTP_VERSION;
 import static com.syswin.temail.dispatcher.Constants.NOTIFY_COMMAND;
 import static com.syswin.temail.dispatcher.Constants.NOTIFY_COMMAND_SPACE;
-import static javafx.scene.input.KeyCode.G;
-import static org.apache.rocketmq.remoting.protocol.RemotingSerializable.fromJson;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
@@ -17,7 +15,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.rocketmq.common.filter.impl.Op;
 import org.springframework.beans.BeanUtils;
 
 @Slf4j
@@ -65,5 +62,6 @@ class NotificationMessageFactory {
     }
     return pushOptions;
   }
+
 
 }
