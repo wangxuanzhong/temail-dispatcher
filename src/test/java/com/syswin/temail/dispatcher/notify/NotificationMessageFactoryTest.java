@@ -1,47 +1,61 @@
 package com.syswin.temail.dispatcher.notify;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import com.syswin.temail.ps.common.entity.CDTPHeader;
 import java.util.Map;
-import org.assertj.core.api.Assert;
-import org.assertj.core.api.Assertions;
-import org.assertj.core.api.Condition;
 import org.junit.Test;
-
-import static org.apache.coyote.http11.Constants.a;
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class NotificationMessageFactoryTest {
 
-  NotificationMessageFactory notificationMessageFactory = new NotificationMessageFactory();
+  final NotificationMessageFactory notificationMessageFactory = new NotificationMessageFactory();
+
+  final CDTPHeader cdtpHeader = new CDTPHeader();
 
   @Test
-  public void extractPushOptions() throws Exception {
-    CDTPHeader cdtpHeader = new CDTPHeader();
-    Map<String,String> pushOptions = null;
-
-    String nullOptions = "";
-    cdtpHeader.setExtraData(nullOptions);
-    pushOptions = notificationMessageFactory.extractPushOptions(cdtpHeader);
-    assertThat(pushOptions).isNotNull();
-    assertThat(pushOptions.size()).isEqualTo(0);
-
-    String notFullOptions = "{\"push\":{}}";
-    cdtpHeader.setExtraData(notFullOptions);
-    pushOptions = notificationMessageFactory.extractPushOptions(cdtpHeader);
-    assertThat(pushOptions).isNotNull();
-    assertThat(pushOptions.size()).isEqualTo(0);
-
-    String fullOptions = "{\"push\":{\"cmd\":\"0\",\"type\":\"1\"}}";
-    cdtpHeader.setExtraData(fullOptions);
-    pushOptions = notificationMessageFactory.extractPushOptions(cdtpHeader);
-    assertThat(pushOptions).isNotNull();
-    assertThat(pushOptions.get("cmd")).isEqualTo("0");
-    assertThat(pushOptions.get("type")).isEqualTo("1");
-
-    String errOptions = "{\"push\",{\"cmd\",\"0\",\"type\":\"1\"}}";
-    cdtpHeader.setExtraData(errOptions);
-    pushOptions = notificationMessageFactory.extractPushOptions(cdtpHeader);
-    assertThat(pushOptions.size()).isEqualTo(0);
+  public void nullIfExtraDataEmpty() {
+    Map<String, String> pushOptions = extractMap("");
+    assertThat(pushOptions.get("cmd")).isNull();
+    assertThat(pushOptions.get("type")).isNull();
   }
+
+  @Test
+  public void nullIfPushEmpty() {
+    Map<String, String> pushOptions = extractMap("{\"push\":{}}");
+    assertThat(pushOptions.get("cmd")).isNull();
+    assertThat(pushOptions.get("type")).isNull();
+  }
+
+  @Test
+  public void notNullIfPushFull() {
+    Map<String, String> pushOptions = extractMap("{\"push\":{\"cmd\":\"0\",\"type\":\"1\"}}");
+    assertThat(pushOptions.get("cmd")).isNotNull();
+    assertThat(pushOptions.get("type")).isNotNull();
+  }
+
+  @Test
+  public void notNullIfPushError() {
+    Map<String, String> pushOptions = extractMap("{\"push\",{\"cmd\",\"0\",\"type\":\"1\"}}");
+    assertThat(pushOptions.get("cmd")).isNull();
+    assertThat(pushOptions.get("type")).isNull();
+  }
+
+
+  @Test
+  public void notNullIfExtraDataFull() {
+    Map<String, String> pushOptions = extractMap(
+        "{\"from\":\"lhd-111111888@systoontest.com\",\"msgId\":\"c125e03f-3f23-4b41-8ba1-a95d11d315b1\","
+            + "\"push\":{\"cmd\":\"singleVideoAudio\",\"type\":\"1\"},"
+            + "\"storeType\":1,\"to\":\"wuning@systoontest.com\",\"type\":0}");
+    assertThat(pushOptions.get("cmd")).isNotNull();
+    assertThat(pushOptions.get("type")).isNotNull();
+  }
+
+  private Map<String, String> extractMap(String options) {
+    Map<String, String> pushOptions;
+    cdtpHeader.setExtraData(options);
+    pushOptions = notificationMessageFactory.extractPushOptions(cdtpHeader);
+    return pushOptions;
+  }
+
 
 }
