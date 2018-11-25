@@ -32,15 +32,6 @@ public class DispatcherApplication {
     return new RawPacketDecoder(predicate);
   }
 
-  //@Bean
-  //public RestTemplate restTemplate(DispatcherProperties properties) {
-  //  return new RestTemplateBuilder()
-  //      .setConnectTimeout(properties.getHttpCliet().getConnectTimeoutInMilli())
-  //      .setReadTimeout(properties.getHttpCliet().getReadTimeoutInMilli())
-  //      .errorHandler(new SilentResponseErrorHandler())
-  //      .build();
-  //}
-
   @Bean
   public CommandAwarePacketUtil packetUtil(DispatcherProperties properties) {
     return new CommandAwarePacketUtil(properties);
