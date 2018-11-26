@@ -18,7 +18,7 @@ public class HexUtil {
 
   public static byte[] decodeHex(String data) {
     if ((data.length() & 1) == 1) {
-      throw new RuntimeException("不是合法的16进制数据！" + data);
+      throw new RuntimeException("illegal hexadecimal number！" + data);
     }
     data = data.toUpperCase();
     byte[] bytes = new byte[data.length() >>> 1];
@@ -31,7 +31,7 @@ public class HexUtil {
         } else if (c1 >= 'A' && c1 <= 'F') {
           b = b << 4 & (c1 - 'A' + 10);
         } else {
-          throw new RuntimeException("不是合法的16进制数据！" + data);
+          throw new RuntimeException("illegal hexadecimal number！" + data);
         }
         i++;
       }

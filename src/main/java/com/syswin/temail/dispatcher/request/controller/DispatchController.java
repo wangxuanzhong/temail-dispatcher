@@ -39,10 +39,10 @@ public class DispatchController {
   @PostMapping(value = "/verify", consumes = APPLICATION_OCTET_STREAM_VALUE, produces = APPLICATION_JSON_UTF8_VALUE)
   public ResponseEntity<Response<String>> verify(@RequestBody byte[] payload) {
     CDTPPacket packet = packetDecoder.decode(payload);
-    log.debug("verify服务接收到的请求信息为：{}", packet);
+    log.debug("verify service receive a request：{}", packet);
     ResponseEntity<Response<String>> responseEntity = authService.verify(packet);
     ResponseEntity<Response<String>> result = repackageResponse(responseEntity);
-    log.debug("verify服务返回的结果为：{}", result.getBody());
+    log.debug("verify result：{}", result.getBody());
     return result;
   }
 
@@ -54,14 +54,14 @@ public class DispatchController {
       ResponseEntity<Response<String>> verifyResult = authService.verify(packet);
 
       if (verifyResult.getStatusCode().is2xxSuccessful()) {
-        log.debug("dispatch服务接收到的请求信息为：{}", packet);
+        log.debug("dispatch service receive a request：{}", packet);
         ResponseEntity<String> responseEntity = packageDispatcher.dispatch(packet);
         ResponseEntity<String> result = repackageResponse(responseEntity);
-        log.debug("dispatch服务返回的结果为：{}", result);
+        log.debug("dispatch result：{}", result);
         return result;
       }
 
-      log.error("签名数据验证失败! 请求参数：{}", packet);
+      log.error("signature verify fail! param: {}", packet);
       return repackageResponse(verifyResult);
     } catch (DispatchException e) {
       throw e;

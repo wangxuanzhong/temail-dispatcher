@@ -26,7 +26,7 @@ class RocketDispatchListener implements MessageListenerConcurrently {
       }
       return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;
     } catch (Exception e) {
-      log.error("队列传输出错！请求参数：" + msgs, e);
+      log.error("fail to send message!  param: " + msgs, e);
       return ConsumeConcurrentlyStatus.RECONSUME_LATER;
     }
   }

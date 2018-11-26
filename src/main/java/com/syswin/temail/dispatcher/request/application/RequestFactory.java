@@ -38,19 +38,19 @@ class RequestFactory {
     Request request = properties.getCmdMap().get(cmdHex);
 
     if (request == null) {
-      log.error("不支持的命令类型：{}, 请求参数：{}", cmdHex, packet);
-      throw new DispatchException("不支持的命令类型：" + combinedCommand, packet);
+      log.error("unsupported command type：{}, request param：{}", cmdHex, packet);
+      throw new DispatchException("unsupported command type：" + combinedCommand, packet);
     }
 
     CDTPParams params = packetUtil.buildParams(packet);
     HttpEntity<Map<String, Object>> entity = composeHttpEntity(request, packet.getHeader(), params);
     if (entity == null) {
-      log.error("不支持的请求类型：{}，请求参数：{}", request.getMethod(), packet);
-      throw new DispatchException("不支持的请求类型：" + request.getMethod(), packet);
+      log.error("unsupported request type：{}, request param：{}", request.getMethod(), packet);
+      throw new DispatchException("unsupported request type：" + request.getMethod(), packet);
     }
 
     String url = composeUrl(request, params.getPath(), params.getQuery());
-    log.debug("转发的请求：URL={}, method={}, entity={}", url, request.getMethod(), entity);
+    log.debug("dispatch request info ：URL={}, method={}, entity={}", url, request.getMethod(), entity);
     return new TemailRequest(url, request.getMethod(), entity);
   }
 

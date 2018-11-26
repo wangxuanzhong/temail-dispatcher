@@ -54,7 +54,7 @@ class NotificationMessageFactory {
       Map result = (Map) extraOption.getOrDefault("push", emptyMap());
       return result;
     } catch (Exception e) {
-      log.error("从CDTPHeader中提取cmd 和 type 失败，extraData : {}", header.getExtraData(), e);
+      log.error("fail to extract cmd and type from CDTPHeader, extraData : {}", header.getExtraData(), e);
       return emptyMap();
     }
   }
