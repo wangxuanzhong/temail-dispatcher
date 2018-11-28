@@ -16,19 +16,19 @@ import org.springframework.web.client.RestTemplate;
 @Configuration
 public class RestTemplateConfig {
 
-  @Value("${restTemplate.pool.maxTotal}")
+  @Value("${httpClient.pool.maxTotal}")
   private Integer maxToal;
 
-  @Value("${restTemplate.pool.defaultMaxPerRoute}")
+  @Value("${httpClient.pool.defaultMaxPerRoute}")
   private Integer defaultMaxPerRoute;
 
-  @Value("${restTemplate.pool.waitConnection}")
+  @Value("${httpClient.pool.waitConnection}")
   private Integer waitConnection;
 
-  @Value("${restTemplate.pool.httpCliet.connectTimeout}")
+  @Value("${httpClient.pool.connection.connectTimeout}")
   private Integer connectTimeout;
 
-  @Value("${restTemplate.pool.httpCliet.readTimeout}")
+  @Value("${httpClient.pool.connection.readTimeout}")
   private Integer readTimeout;
 
   @Bean
@@ -53,11 +53,12 @@ public class RestTemplateConfig {
       clientHttpRequestFactory.setConnectTimeout(connectTimeout);
       clientHttpRequestFactory.setReadTimeout(readTimeout);
       clientHttpRequestFactory.setConnectionRequestTimeout(waitConnection);
+
       return clientHttpRequestFactory;
 
     } catch (Exception e) {
       log.error("failed to initlize http pool..", e);
+      throw new IllegalStateException("http connection pool can not be initialized!",e);
     }
-    return null;
   }
 }
