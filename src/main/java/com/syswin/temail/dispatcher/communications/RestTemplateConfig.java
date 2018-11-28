@@ -16,19 +16,19 @@ import org.springframework.web.client.RestTemplate;
 @Configuration
 public class RestTemplateConfig {
 
-  @Value("${httpClient.pool.maxTotal}")
+  @Value("${app.httpClient.pool.maxTotal}")
   private Integer maxToal;
 
-  @Value("${httpClient.pool.defaultMaxPerRoute}")
+  @Value("${app.httpClient.pool.defaultMaxPerRoute}")
   private Integer defaultMaxPerRoute;
 
-  @Value("${httpClient.pool.waitConnection}")
-  private Integer waitConnection;
+  @Value("${app.httpClient.pool.connectionRequestTimeout}")
+  private Integer connectionRequestTimeout;
 
-  @Value("${httpClient.pool.connection.connectTimeout}")
+  @Value("${app.httpClient.pool.connection.connectTimeout}")
   private Integer connectTimeout;
 
-  @Value("${httpClient.pool.connection.readTimeout}")
+  @Value("${app.httpClient.pool.connection.readTimeout}")
   private Integer readTimeout;
 
   @Bean
@@ -52,13 +52,13 @@ public class RestTemplateConfig {
       HttpComponentsClientHttpRequestFactory clientHttpRequestFactory = new HttpComponentsClientHttpRequestFactory(httpClient);
       clientHttpRequestFactory.setConnectTimeout(connectTimeout);
       clientHttpRequestFactory.setReadTimeout(readTimeout);
-      clientHttpRequestFactory.setConnectionRequestTimeout(waitConnection);
+      clientHttpRequestFactory.setConnectionRequestTimeout(connectionRequestTimeout);
 
       return clientHttpRequestFactory;
 
     } catch (Exception e) {
       log.error("failed to initlize http pool..", e);
-      throw new IllegalStateException("http connection pool can not be initialized!",e);
+      throw e;
     }
   }
 }
