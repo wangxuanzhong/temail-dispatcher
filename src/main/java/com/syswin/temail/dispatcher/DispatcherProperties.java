@@ -19,7 +19,6 @@ public class DispatcherProperties {
   private String temailChannelUrl;
   @Autowired
   private RocketMQ rocketmq;
-  private HttpCliet httpCliet = new HttpCliet();
   private Map<String, Request> cmdMap = new HashMap<>();
 
   @Data
@@ -42,10 +41,4 @@ public class DispatcherProperties {
     private HttpMethod method;
   }
 
-  @Data
-  public static class HttpCliet {
-
-    private int readTimeoutInMilli = 3000;
-    private int connectTimeoutInMilli = 3000;
-  }
 }

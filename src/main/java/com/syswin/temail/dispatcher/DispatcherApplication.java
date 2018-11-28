@@ -6,12 +6,10 @@ import com.syswin.temail.dispatcher.codec.RawPacketDecoder;
 import com.syswin.temail.dispatcher.request.application.AuthService;
 import com.syswin.temail.dispatcher.request.application.CommandAwarePacketUtil;
 import com.syswin.temail.dispatcher.request.application.PackageDispatcher;
-import com.syswin.temail.dispatcher.request.application.SilentResponseErrorHandler;
 import java.util.function.BiPredicate;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.client.RestTemplate;
 
@@ -32,15 +30,6 @@ public class DispatcherApplication {
   @Bean
   RawPacketDecoder packetDecoder(BiPredicate<Short, Short> predicate) {
     return new RawPacketDecoder(predicate);
-  }
-
-  @Bean
-  public RestTemplate restTemplate(DispatcherProperties properties) {
-    return new RestTemplateBuilder()
-        .setConnectTimeout(properties.getHttpCliet().getConnectTimeoutInMilli())
-        .setReadTimeout(properties.getHttpCliet().getReadTimeoutInMilli())
-        .errorHandler(new SilentResponseErrorHandler())
-        .build();
   }
 
   @Bean
