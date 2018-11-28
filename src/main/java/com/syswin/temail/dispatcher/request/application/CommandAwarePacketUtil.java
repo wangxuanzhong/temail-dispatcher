@@ -84,7 +84,7 @@ public class CommandAwarePacketUtil extends PacketUtil {
         return gson.fromJson(new String(packet.getData(), UTF_8), CDTPParams.class);
       }
     } catch (JsonSyntaxException e) {
-      log.error("Body的Json格式解析错误，请求参数：{}", packet);
+      log.error("fail to parse json format data of Body, param：{}", packet);
       throw new DispatchException(e, packet);
     }
   }

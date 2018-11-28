@@ -35,7 +35,7 @@ class MessageHandler {
   }
 
   void onMessageReceived(String msg) throws Exception {
-    log.debug("接收到的消息是：{}", msg);
+    log.debug("received message from message queue ：{}", msg);
     try {
       MessageBody messageBody = gson.fromJson(msg, MessageBody.class);
       if (messageBody != null) {
@@ -56,7 +56,7 @@ class MessageHandler {
                   }
                 }
             );
-            log.debug("发送消息到gateway {}", msgList);
+            log.debug("send message by message queue to gateway server {}", msgList);
             producer.send(msgList);
           } else {
             Optional<String> pushMessage = notificationMsgFactory
@@ -69,9 +69,9 @@ class MessageHandler {
               try {
                 producer.send(msgList);
               } catch (Exception ex) {
-                log.error("离线push信息{},  失败:{}", mqMessage.toString(), ex);
+                log.error("fail to push offLine message : {}", mqMessage, ex);
               }
-              log.debug("离线push信息:{}", pushMessage.get());
+              log.debug("succeed to push offLine message : {}", pushMessage.get());
             });
 
           }
@@ -79,7 +79,7 @@ class MessageHandler {
       }
     } catch (JsonSyntaxException e) {
       // 数据格式错误，记录错误，直接跳过
-      log.error("消息内容为：" + msg, e);
+      log.error("Invalid message format：{}", msg, e);
     }
   }
 }
