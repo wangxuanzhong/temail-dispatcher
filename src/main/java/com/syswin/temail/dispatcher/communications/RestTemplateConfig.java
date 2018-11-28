@@ -57,7 +57,7 @@ public class RestTemplateConfig {
       return clientHttpRequestFactory;
 
     } catch (Exception e) {
-      log.error("failed to initlize http pool..", e);
+      log.error("Failed to initialize http pool..", e);
       throw e;
     }
   }
