@@ -26,7 +26,7 @@ class RocketDispatchListener implements MessageListenerConcurrently {
       }
       return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;
     } catch (Exception e) {
-      log.error("fail to send message!  param: " + msgs, e);
+      log.error("fail to send message!  param: {}", msgs, e);
       return ConsumeConcurrentlyStatus.RECONSUME_LATER;
     }
   }

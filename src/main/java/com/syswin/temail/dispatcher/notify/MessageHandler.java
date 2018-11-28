@@ -35,7 +35,7 @@ class MessageHandler {
   }
 
   void onMessageReceived(String msg) throws Exception {
-    log.debug("receiving message from message queue ：{}", msg);
+    log.debug("received message from message queue ：{}", msg);
     try {
       MessageBody messageBody = gson.fromJson(msg, MessageBody.class);
       if (messageBody != null) {
@@ -69,9 +69,9 @@ class MessageHandler {
               try {
                 producer.send(msgList);
               } catch (Exception ex) {
-                log.error("fail to push offLine message : {},  cause:{}", mqMessage.toString(), ex);
+                log.error("fail to push offLine message : {}", mqMessage, ex);
               }
-              log.debug("success to push offLine message : {}", pushMessage.get());
+              log.debug("succeed to push offLine message : {}", pushMessage.get());
             });
 
           }
@@ -79,7 +79,7 @@ class MessageHandler {
       }
     } catch (JsonSyntaxException e) {
       // 数据格式错误，记录错误，直接跳过
-      log.error("message's formation is wrong：" + msg, e);
+      log.error("Invalid message format：{}", msg, e);
     }
   }
 }

@@ -50,7 +50,7 @@ class GatewayLocator {
         if (response != null) {
           List<TemailAccountLocation> statuses = response.getData().getStatuses();
           if (statuses != null) {
-            log.debug("success to get user's channel locations from channel server. url = {}, temail = {}, response = {}", discoveryUrl, temail, response);
+            log.debug("succeed to get user's channel locations from channel server. url = {}, temail = {}, response = {}", discoveryUrl, temail, response);
             return statuses;
           }
         }
