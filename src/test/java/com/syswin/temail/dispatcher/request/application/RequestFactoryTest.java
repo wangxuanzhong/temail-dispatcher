@@ -13,7 +13,6 @@ import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.HttpMethod.PUT;
 import static org.springframework.http.HttpMethod.TRACE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
-
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import com.syswin.temail.dispatcher.DispatcherProperties;

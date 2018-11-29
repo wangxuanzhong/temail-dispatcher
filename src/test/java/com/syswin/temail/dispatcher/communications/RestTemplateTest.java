@@ -14,22 +14,39 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import com.google.gson.Gson;
+import com.syswin.temail.dispatcher.DispatcherApplication;
 import com.syswin.temail.dispatcher.request.controller.Response;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import lombok.extern.slf4j.Slf4j;
 import org.awaitility.Awaitility;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.client.RestTemplate;
 
+
+@Slf4j
+@SpringBootTest(classes = {DispatcherApplication.class},
+    properties = {
+    "app.httpClient.pool.maxTotal=3000",
+    "app.httpClient.pool.defaultMaxPerRoute=500",
+    "app.httpClient.pool.connectionRequestTimeout=3000",
+    "app.httpClient.pool.connection.connectTimeout=3000",
+    "app.httpClient.pool.connection.readTimeout=3000"
+    })
+@RunWith(SpringRunner.class)
 @ActiveProfiles("dev")
 public class RestTemplateTest {
 
@@ -39,6 +56,9 @@ public class RestTemplateTest {
   private static final Gson GSON = new Gson();
 
   private static String baseUrl = "";
+
+  @Autowired
+  private RestTemplate restTemplate;
 
   @BeforeClass
   public static void beforeClass() {
@@ -57,7 +77,6 @@ public class RestTemplateTest {
 
   @Test
   public void highPerformance4PoolBuilded() {
-    RestTemplate restTemplate = new RestTemplateConfig().restTemplate();
     ExecutorService executorService = Executors.newFixedThreadPool(200);
     AtomicInteger restTimes = new AtomicInteger(Runtime.getRuntime().availableProcessors()*100);
     for (int i = 0; i < Runtime.getRuntime().availableProcessors(); i++) {
