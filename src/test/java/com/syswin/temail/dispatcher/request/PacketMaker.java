@@ -1,9 +1,6 @@
 package com.syswin.temail.dispatcher.request;
 
 
-import static com.syswin.temail.ps.common.Constants.CDTP_VERSION;
-import static com.syswin.temail.ps.common.entity.CommandSpaceType.CHANNEL_CODE;
-
 import com.google.gson.Gson;
 import com.syswin.temail.ps.common.entity.CDTPHeader;
 import com.syswin.temail.ps.common.entity.CDTPPacket;
@@ -13,6 +10,9 @@ import com.syswin.temail.ps.common.entity.CommandSpaceType;
 import com.syswin.temail.ps.common.entity.CommandType;
 import java.util.HashMap;
 import java.util.Map;
+
+import static com.syswin.temail.ps.common.Constants.CDTP_VERSION;
+import static com.syswin.temail.ps.common.entity.CommandSpaceType.CHANNEL_CODE;
 
 public class PacketMaker {
 
@@ -28,7 +28,7 @@ public class PacketMaker {
     CDTPHeader header = new CDTPHeader();
     header.setSignatureAlgorithm(1);
     header.setSignature("sign");
-    header.setDataEncryptionMethod(0);
+    header.setDataEncryptionMethod(4);
     header.setTimestamp(1535713173935L);
     header.setPacketId("pkgId");
     header.setDeviceId(deviceId);

@@ -1,17 +1,17 @@
 package com.syswin.temail.dispatcher.codec;
 
-import static com.syswin.temail.ps.common.entity.CommandSpaceType.GROUP_MESSAGE_CODE;
-import static com.syswin.temail.ps.common.entity.CommandSpaceType.SINGLE_MESSAGE_CODE;
-
 import com.syswin.temail.dispatcher.DispatcherProperties;
 import java.util.Random;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 
+import static com.syswin.temail.ps.common.entity.CommandSpaceType.GROUP_MESSAGE_CODE;
+import static com.syswin.temail.ps.common.entity.CommandSpaceType.SINGLE_MESSAGE_CODE;
+
 public class CommandAwarePredicateTest {
 
   private final DispatcherProperties properties = new DispatcherProperties();
-  private final CommandAwarePredicate predicate = new CommandAwarePredicate(properties);
+  private final CommandAwarePredicate predicate = new CommandAwarePredicate(new PacketTypeJudger(properties));
 
   @Test
   public void trueIfPrivateMessage() {

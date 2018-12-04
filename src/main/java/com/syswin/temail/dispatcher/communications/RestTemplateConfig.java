@@ -1,5 +1,6 @@
 package com.syswin.temail.dispatcher.communications;
 
+import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.DefaultHttpRequestRetryHandler;
@@ -8,8 +9,10 @@ import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.DefaultResponseErrorHandler;
+import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
 
 @Slf4j
@@ -35,7 +38,7 @@ public class RestTemplateConfig {
   public RestTemplate restTemplate() {
     RestTemplate restTemplate = new RestTemplate();
     restTemplate.setRequestFactory(clientHttpRequestFactory());
-    restTemplate.setErrorHandler(new DefaultResponseErrorHandler());
+    restTemplate.setErrorHandler(getResponseErrorHandler());
     return restTemplate;
   }
 
@@ -49,7 +52,8 @@ public class RestTemplateConfig {
       httpClientBuilder.setRetryHandler(new DefaultHttpRequestRetryHandler(1, true));
       HttpClient httpClient = httpClientBuilder.build();
 
-      HttpComponentsClientHttpRequestFactory clientHttpRequestFactory = new HttpComponentsClientHttpRequestFactory(httpClient);
+      HttpComponentsClientHttpRequestFactory clientHttpRequestFactory = new HttpComponentsClientHttpRequestFactory(
+          httpClient);
       clientHttpRequestFactory.setConnectTimeout(connectTimeout);
       clientHttpRequestFactory.setReadTimeout(readTimeout);
       clientHttpRequestFactory.setConnectionRequestTimeout(connectionRequestTimeout);
@@ -61,4 +65,18 @@ public class RestTemplateConfig {
       throw e;
     }
   }
+
+  public ResponseErrorHandler getResponseErrorHandler() {
+
+    return new DefaultResponseErrorHandler() {
+      @Override
+      public boolean hasError(ClientHttpResponse response) throws IOException {
+        //always delegate responseEntity to client, no matter the status code is 2xx or not.
+        return false;
+      }
+
+    };
+
+  }
+
 }

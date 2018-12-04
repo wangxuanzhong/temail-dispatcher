@@ -1,7 +1,5 @@
 package com.syswin.temail.dispatcher.notify;
 
-import static org.mockito.Mockito.when;
-
 import au.com.dius.pact.consumer.MessagePactBuilder;
 import au.com.dius.pact.consumer.MessagePactProviderRule;
 import au.com.dius.pact.consumer.Pact;
@@ -10,6 +8,7 @@ import au.com.dius.pact.consumer.dsl.PactDslJsonBody;
 import au.com.dius.pact.model.v3.messaging.MessagePact;
 import com.google.gson.Gson;
 import com.syswin.temail.dispatcher.DispatcherProperties;
+import com.syswin.temail.dispatcher.codec.PacketTypeJudger;
 import com.syswin.temail.dispatcher.notify.entity.MessageBody;
 import com.syswin.temail.dispatcher.notify.entity.MqMessage;
 import com.syswin.temail.dispatcher.notify.entity.PushData;
@@ -26,6 +25,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.ArgumentMatcher;
 import org.mockito.Mockito;
+
+import static org.mockito.Mockito.when;
 
 @Ignore
 public class MqOffLineMessageHandlerConsummerTest2 {
@@ -113,7 +114,7 @@ public class MqOffLineMessageHandlerConsummerTest2 {
             pushDatapayload.getData());
 
     MessageHandler messageHandler = new MessageHandler(rocketMQProducer, gatewayLocator,
-        "temail-message", "*");
+        "temail-message", "*", new PacketTypeJudger(properties));
 
     for (int i = 0; i < 5; i++) {
       messageHandler.onMessageReceived(gson.toJson(pushDatapayload));

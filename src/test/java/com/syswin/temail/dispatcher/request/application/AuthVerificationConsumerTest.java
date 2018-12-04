@@ -1,5 +1,20 @@
 package com.syswin.temail.dispatcher.request.application;
 
+import au.com.dius.pact.consumer.ConsumerPactTestMk2;
+import au.com.dius.pact.consumer.MockServer;
+import au.com.dius.pact.consumer.dsl.PactDslResponse;
+import au.com.dius.pact.consumer.dsl.PactDslWithProvider;
+import au.com.dius.pact.model.RequestResponsePact;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.syswin.temail.dispatcher.DispatcherProperties;
+import com.syswin.temail.dispatcher.codec.PacketTypeJudger;
+import com.syswin.temail.dispatcher.request.controller.Response;
+import java.util.Map;
+import org.junit.Before;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestTemplate;
+
 import static java.util.Collections.singletonMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
@@ -9,20 +24,6 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
-
-import au.com.dius.pact.consumer.ConsumerPactTestMk2;
-import au.com.dius.pact.consumer.MockServer;
-import au.com.dius.pact.consumer.dsl.PactDslResponse;
-import au.com.dius.pact.consumer.dsl.PactDslWithProvider;
-import au.com.dius.pact.model.RequestResponsePact;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.syswin.temail.dispatcher.DispatcherProperties;
-import com.syswin.temail.dispatcher.request.controller.Response;
-import java.util.Map;
-import org.junit.Before;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.RestTemplate;
 
 public class AuthVerificationConsumerTest extends ConsumerPactTestMk2 {
 
@@ -165,7 +166,7 @@ public class AuthVerificationConsumerTest extends ConsumerPactTestMk2 {
   @Override
   public void runTest(MockServer mockServer) {
     String url = mockServer.getUrl();
-    CommandAwarePacketUtil packetUtil = new CommandAwarePacketUtil(new DispatcherProperties());
+    CommandAwarePacketUtil packetUtil = new CommandAwarePacketUtil(new PacketTypeJudger(new DispatcherProperties()));
     AuthService authService = new AuthService(restTemplate, url, packetUtil);
 
     // verify

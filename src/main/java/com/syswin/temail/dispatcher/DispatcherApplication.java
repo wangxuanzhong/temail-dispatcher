@@ -2,6 +2,7 @@ package com.syswin.temail.dispatcher;
 
 import com.systoon.ocm.framework.swagger.EnableSwagger2Doc;
 import com.syswin.temail.dispatcher.codec.CommandAwarePredicate;
+import com.syswin.temail.dispatcher.codec.PacketTypeJudger;
 import com.syswin.temail.dispatcher.codec.RawPacketDecoder;
 import com.syswin.temail.dispatcher.request.application.AuthService;
 import com.syswin.temail.dispatcher.request.application.CommandAwarePacketUtil;
@@ -23,8 +24,13 @@ public class DispatcherApplication {
   }
 
   @Bean
-  BiPredicate<Short, Short> commandAwarePredicate(DispatcherProperties properties) {
-    return new CommandAwarePredicate(properties);
+  PacketTypeJudger packetTypeJudger(DispatcherProperties properties) {
+    return new PacketTypeJudger(properties);
+  }
+
+  @Bean
+  BiPredicate<Short, Short> commandAwarePredicate(PacketTypeJudger packetTypeJudger) {
+    return new CommandAwarePredicate(packetTypeJudger);
   }
 
   @Bean
@@ -33,8 +39,8 @@ public class DispatcherApplication {
   }
 
   @Bean
-  public CommandAwarePacketUtil packetUtil(DispatcherProperties properties) {
-    return new CommandAwarePacketUtil(properties);
+  public CommandAwarePacketUtil packetUtil(PacketTypeJudger packetTypeJudger) {
+    return new CommandAwarePacketUtil(packetTypeJudger);
   }
 
   @Bean

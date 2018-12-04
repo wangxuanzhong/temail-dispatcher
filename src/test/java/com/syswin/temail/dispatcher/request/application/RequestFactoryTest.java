@@ -1,22 +1,10 @@
 package com.syswin.temail.dispatcher.request.application;
 
-import static com.seanyinx.github.unit.scaffolding.Randomness.nextInt;
-import static com.seanyinx.github.unit.scaffolding.Randomness.uniquify;
-import static com.syswin.temail.dispatcher.request.application.RequestFactory.CDTP_HEADER;
-import static java.util.Collections.singletonList;
-import static java.util.Collections.singletonMap;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
-import static org.springframework.http.HttpMethod.DELETE;
-import static org.springframework.http.HttpMethod.GET;
-import static org.springframework.http.HttpMethod.POST;
-import static org.springframework.http.HttpMethod.PUT;
-import static org.springframework.http.HttpMethod.TRACE;
-import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import com.syswin.temail.dispatcher.DispatcherProperties;
 import com.syswin.temail.dispatcher.DispatcherProperties.Request;
+import com.syswin.temail.dispatcher.codec.PacketTypeJudger;
 import com.syswin.temail.dispatcher.request.entity.CDTPParams;
 import com.syswin.temail.dispatcher.request.exceptions.DispatchException;
 import com.syswin.temail.ps.common.entity.CDTPHeader;
@@ -33,6 +21,20 @@ import org.junit.runners.JUnit4;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 
+import static com.seanyinx.github.unit.scaffolding.Randomness.nextInt;
+import static com.seanyinx.github.unit.scaffolding.Randomness.uniquify;
+import static com.syswin.temail.dispatcher.request.application.RequestFactory.CDTP_HEADER;
+import static java.util.Collections.singletonList;
+import static java.util.Collections.singletonMap;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
+import static org.springframework.http.HttpMethod.DELETE;
+import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpMethod.POST;
+import static org.springframework.http.HttpMethod.PUT;
+import static org.springframework.http.HttpMethod.TRACE;
+import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
+
 @RunWith(JUnit4.class)
 public class RequestFactoryTest {
 
@@ -41,7 +43,7 @@ public class RequestFactoryTest {
   private final Request request = new Request();
   private final String baseUrl = "http://localhost:" + nextInt(1000);
   private final HttpMethod[] methods = {GET, POST, PUT, DELETE};
-  private CommandAwarePacketUtil packetUtil = new CommandAwarePacketUtil(properties);
+  private CommandAwarePacketUtil packetUtil = new CommandAwarePacketUtil(new PacketTypeJudger(properties));
   private final RequestFactory requestFactory = new RequestFactory(properties, packetUtil);
 
   private static CDTPPacket initCDTPPacketTrans() {
@@ -206,7 +208,7 @@ public class RequestFactoryTest {
     Map<String, Object> extraData = new HashMap<>();
     CDTPHeader header = packet.getHeader();
     header.setExtraData(gson.toJson(extraData));
-
+    header.setDataEncryptionMethod(4);
     packet.setData("This is Encrypt Data".getBytes());
 
     request.setMethod(POST);

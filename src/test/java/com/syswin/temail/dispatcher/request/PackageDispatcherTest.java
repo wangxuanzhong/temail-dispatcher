@@ -1,5 +1,25 @@
 package com.syswin.temail.dispatcher.request;
 
+import com.github.tomakehurst.wiremock.junit.WireMockRule;
+import com.google.common.collect.ImmutableMap;
+import com.google.gson.Gson;
+import com.syswin.temail.dispatcher.DispatcherProperties;
+import com.syswin.temail.dispatcher.DispatcherProperties.Request;
+import com.syswin.temail.dispatcher.codec.PacketTypeJudger;
+import com.syswin.temail.dispatcher.request.application.CommandAwarePacketUtil;
+import com.syswin.temail.dispatcher.request.application.PackageDispatcher;
+import com.syswin.temail.dispatcher.request.entity.CDTPParams;
+import com.syswin.temail.ps.common.entity.CDTPHeader;
+import com.syswin.temail.ps.common.entity.CDTPPacket;
+import java.util.Map;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
+import org.junit.Test;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestTemplate;
+
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.any;
 import static com.github.tomakehurst.wiremock.client.WireMock.containing;
@@ -18,25 +38,6 @@ import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.HttpMethod.PUT;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
-
-import com.github.tomakehurst.wiremock.junit.WireMockRule;
-import com.google.common.collect.ImmutableMap;
-import com.google.gson.Gson;
-import com.syswin.temail.dispatcher.DispatcherProperties;
-import com.syswin.temail.dispatcher.DispatcherProperties.Request;
-import com.syswin.temail.dispatcher.request.application.CommandAwarePacketUtil;
-import com.syswin.temail.dispatcher.request.application.PackageDispatcher;
-import com.syswin.temail.dispatcher.request.entity.CDTPParams;
-import com.syswin.temail.ps.common.entity.CDTPHeader;
-import com.syswin.temail.ps.common.entity.CDTPPacket;
-import java.util.Map;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.RestTemplate;
 
 public class PackageDispatcherTest {
 
@@ -64,7 +65,7 @@ public class PackageDispatcherTest {
       "q1", "v1",
       "q2", "v22");
   private final PackageDispatcher packageDispatcher = new PackageDispatcher(properties, restTemplate,
-      new CommandAwarePacketUtil(properties));
+      new CommandAwarePacketUtil(new PacketTypeJudger(properties)));
 
   @BeforeClass
   public static void beforeClass() {

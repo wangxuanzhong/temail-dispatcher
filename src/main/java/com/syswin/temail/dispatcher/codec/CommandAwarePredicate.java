@@ -1,17 +1,14 @@
 package com.syswin.temail.dispatcher.codec;
 
-import static com.syswin.temail.ps.common.entity.CommandSpaceType.GROUP_MESSAGE_CODE;
-import static com.syswin.temail.ps.common.entity.CommandSpaceType.SINGLE_MESSAGE_CODE;
-
-import com.syswin.temail.dispatcher.DispatcherProperties;
 import java.util.function.BiPredicate;
 
 public class CommandAwarePredicate implements BiPredicate<Short, Short> {
 
-  private final DispatcherProperties properties;
+  private final PacketTypeJudger packetTypeJudger;
 
-  public CommandAwarePredicate(DispatcherProperties properties) {
-    this.properties = properties;
+  public CommandAwarePredicate(
+      PacketTypeJudger packetTypeJudger) {
+    this.packetTypeJudger = packetTypeJudger;
   }
 
   @Override
@@ -21,15 +18,15 @@ public class CommandAwarePredicate implements BiPredicate<Short, Short> {
   }
 
   private boolean isPrivateMessage(short commandSpace, short command) {
-    return commandSpace == SINGLE_MESSAGE_CODE && command == 1;
+    return packetTypeJudger.isPrivateMessage(commandSpace, command);
   }
 
   private boolean isGroupMessage(short commandSpace, short command) {
-    return (commandSpace == GROUP_MESSAGE_CODE && command == 1)
-        && properties.isGroupPacketEnabled();
+    return packetTypeJudger.isGroupMessage(commandSpace, command);
   }
 
   private boolean isGroupJoin(short commandSpace, short command) {
-    return commandSpace == 2 && command == 0x0107;
+    return packetTypeJudger.isGroupJoin(commandSpace, command);
   }
+
 }

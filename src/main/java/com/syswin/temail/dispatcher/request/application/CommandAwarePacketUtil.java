@@ -1,13 +1,9 @@
 package com.syswin.temail.dispatcher.request.application;
 
-import static com.syswin.temail.ps.common.entity.CommandSpaceType.GROUP_MESSAGE_CODE;
-import static com.syswin.temail.ps.common.entity.CommandSpaceType.SINGLE_MESSAGE_CODE;
-import static java.nio.charset.StandardCharsets.UTF_8;
-
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
-import com.syswin.temail.dispatcher.DispatcherProperties;
+import com.syswin.temail.dispatcher.codec.PacketTypeJudger;
 import com.syswin.temail.dispatcher.request.entity.CDTPParams;
 import com.syswin.temail.dispatcher.request.exceptions.DispatchException;
 import com.syswin.temail.ps.common.codec.BodyExtractor;
@@ -22,6 +18,8 @@ import java.util.HashMap;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 /**
  * @author 姚华成
  * @date 2018-11-05
@@ -30,16 +28,16 @@ import lombok.extern.slf4j.Slf4j;
 public class CommandAwarePacketUtil extends PacketUtil {
 
   private static final Gson gson = new Gson();
-  private final DispatcherProperties properties;
   private final SimplePacketUtil defaultPacketUtil;
+  private final PacketTypeJudger packetTypeJudger;
 
-  public CommandAwarePacketUtil(DispatcherProperties properties) {
-    this(properties, SimplePacketUtil.INSTANCE);
+  public CommandAwarePacketUtil(PacketTypeJudger packetTypeJudger) {
+    this(SimplePacketUtil.INSTANCE, packetTypeJudger);
   }
 
-  public CommandAwarePacketUtil(DispatcherProperties properties, SimplePacketUtil defaultPacketUtil) {
-    this.properties = properties;
+  public CommandAwarePacketUtil(SimplePacketUtil defaultPacketUtil, PacketTypeJudger packetTypeJudger) {
     this.defaultPacketUtil = defaultPacketUtil;
+    this.packetTypeJudger = packetTypeJudger;
   }
 
   @Override
@@ -76,7 +74,7 @@ public class CommandAwarePacketUtil extends PacketUtil {
     short commandSpace = packet.getCommandSpace();
     short command = packet.getCommand();
     try {
-      if (isSendSingleMsg(commandSpace, command)) {
+      if (packetTypeJudger.isPacketDataEncryptedByReceiver(packet.getHeader())) {
         return buildSendSingleMsgParams(packet);
       } else if (isSendGroupMsg(commandSpace, command)) {
         return buildSendGroupMsgParams(packet);
@@ -90,16 +88,15 @@ public class CommandAwarePacketUtil extends PacketUtil {
   }
 
   boolean isSendSingleMsg(short commandSpace, short command) {
-    return commandSpace == SINGLE_MESSAGE_CODE && command == 1;
+    return packetTypeJudger.isPrivateMessage(commandSpace, command);
   }
 
   private boolean isSendGroupMsg(short commandSpace, short command) {
-    return (commandSpace == GROUP_MESSAGE_CODE && command == 1) &&
-        properties.isGroupPacketEnabled();
+    return packetTypeJudger.isGroupMessage(commandSpace, command);
   }
 
   boolean isGroupJoin(short commandSpace, short command) {
-    return commandSpace == GROUP_MESSAGE_CODE && command == 0x0107;
+    return packetTypeJudger.isGroupJoin(commandSpace, command);
   }
 
   private CDTPParams buildSendSingleMsgParams(CDTPPacket packet) {
