@@ -33,7 +33,7 @@ public class CommandAwarePredicateTest {
   @Test
   public void falseIfAnyOtherPrivateMessage() {
     for (short i = Short.MIN_VALUE; i < Short.MAX_VALUE; i++) {
-      if (i != 1) {
+      if (i != 1 && i != 0x1005) {
         Assertions.assertThat(predicate.test(SINGLE_MESSAGE_CODE, i)).isFalse();
       }
     }
@@ -43,7 +43,7 @@ public class CommandAwarePredicateTest {
   public void falseIfAnyOtherGroupMessage() {
     properties.setGroupPacketEnabled(true);
     for (short i = Short.MIN_VALUE; i < Short.MAX_VALUE; i++) {
-      if (i != 1) {
+      if (i != 1 && i != 0x010E) {
         Assertions.assertThat(predicate.test(GROUP_MESSAGE_CODE, i)).isFalse();
       }
     }

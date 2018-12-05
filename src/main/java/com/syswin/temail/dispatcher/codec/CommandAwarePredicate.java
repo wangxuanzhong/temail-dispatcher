@@ -18,11 +18,11 @@ public class CommandAwarePredicate implements BiPredicate<Short, Short> {
   }
 
   private boolean isPrivateMessage(short commandSpace, short command) {
-    return packetTypeJudge.isPrivateMessage(commandSpace, command);
+    return packetTypeJudge.isPrivateDecryptType(commandSpace, command);
   }
 
   private boolean isGroupMessage(short commandSpace, short command) {
-    return packetTypeJudge.isGroupMessage(commandSpace, command);
+    return packetTypeJudge.isGroupDecryptType(commandSpace, command);
   }
 
   private boolean isGroupJoin(short commandSpace, short command) {

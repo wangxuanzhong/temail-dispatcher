@@ -74,7 +74,7 @@ public class CommandAwarePacketUtil extends PacketUtil {
     short commandSpace = packet.getCommandSpace();
     short command = packet.getCommand();
     try {
-      if (packetTypeJudge.isPacketDataEncryptedByReceiver(packet.getHeader())) {
+      if (isSendSingleMsg(commandSpace, command)) {
         return buildSendSingleMsgParams(packet);
       } else if (isSendGroupMsg(commandSpace, command)) {
         return buildSendGroupMsgParams(packet);
@@ -88,11 +88,11 @@ public class CommandAwarePacketUtil extends PacketUtil {
   }
 
   boolean isSendSingleMsg(short commandSpace, short command) {
-    return packetTypeJudge.isPrivateMessage(commandSpace, command);
+    return packetTypeJudge.isPrivateDecryptType(commandSpace, command);
   }
 
   private boolean isSendGroupMsg(short commandSpace, short command) {
-    return packetTypeJudge.isGroupMessage(commandSpace, command);
+    return packetTypeJudge.isGroupDecryptType(commandSpace, command);
   }
 
   boolean isGroupJoin(short commandSpace, short command) {
