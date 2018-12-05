@@ -3,7 +3,7 @@ package com.syswin.temail.dispatcher.request.application;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
-import com.syswin.temail.dispatcher.codec.PacketTypeJudger;
+import com.syswin.temail.dispatcher.codec.PacketTypeJudge;
 import com.syswin.temail.dispatcher.request.entity.CDTPParams;
 import com.syswin.temail.dispatcher.request.exceptions.DispatchException;
 import com.syswin.temail.ps.common.codec.BodyExtractor;
@@ -29,15 +29,15 @@ public class CommandAwarePacketUtil extends PacketUtil {
 
   private static final Gson gson = new Gson();
   private final SimplePacketUtil defaultPacketUtil;
-  private final PacketTypeJudger packetTypeJudger;
+  private final PacketTypeJudge packetTypeJudge;
 
-  public CommandAwarePacketUtil(PacketTypeJudger packetTypeJudger) {
-    this(SimplePacketUtil.INSTANCE, packetTypeJudger);
+  public CommandAwarePacketUtil(PacketTypeJudge packetTypeJudge) {
+    this(SimplePacketUtil.INSTANCE, packetTypeJudge);
   }
 
-  public CommandAwarePacketUtil(SimplePacketUtil defaultPacketUtil, PacketTypeJudger packetTypeJudger) {
+  public CommandAwarePacketUtil(SimplePacketUtil defaultPacketUtil, PacketTypeJudge packetTypeJudge) {
     this.defaultPacketUtil = defaultPacketUtil;
-    this.packetTypeJudger = packetTypeJudger;
+    this.packetTypeJudge = packetTypeJudge;
   }
 
   @Override
@@ -74,7 +74,7 @@ public class CommandAwarePacketUtil extends PacketUtil {
     short commandSpace = packet.getCommandSpace();
     short command = packet.getCommand();
     try {
-      if (packetTypeJudger.isPacketDataEncryptedByReceiver(packet.getHeader())) {
+      if (packetTypeJudge.isPacketDataEncryptedByReceiver(packet.getHeader())) {
         return buildSendSingleMsgParams(packet);
       } else if (isSendGroupMsg(commandSpace, command)) {
         return buildSendGroupMsgParams(packet);
@@ -88,15 +88,15 @@ public class CommandAwarePacketUtil extends PacketUtil {
   }
 
   boolean isSendSingleMsg(short commandSpace, short command) {
-    return packetTypeJudger.isPrivateMessage(commandSpace, command);
+    return packetTypeJudge.isPrivateMessage(commandSpace, command);
   }
 
   private boolean isSendGroupMsg(short commandSpace, short command) {
-    return packetTypeJudger.isGroupMessage(commandSpace, command);
+    return packetTypeJudge.isGroupMessage(commandSpace, command);
   }
 
   boolean isGroupJoin(short commandSpace, short command) {
-    return packetTypeJudger.isGroupJoin(commandSpace, command);
+    return packetTypeJudge.isGroupJoin(commandSpace, command);
   }
 
   private CDTPParams buildSendSingleMsgParams(CDTPPacket packet) {

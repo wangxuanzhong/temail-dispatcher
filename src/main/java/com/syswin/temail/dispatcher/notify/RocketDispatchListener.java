@@ -1,7 +1,7 @@
 package com.syswin.temail.dispatcher.notify;
 
 import com.syswin.temail.dispatcher.DispatcherProperties;
-import com.syswin.temail.dispatcher.codec.PacketTypeJudger;
+import com.syswin.temail.dispatcher.codec.PacketTypeJudge;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyContext;
@@ -15,9 +15,9 @@ class RocketDispatchListener implements MessageListenerConcurrently {
   private final MessageHandler messageHandler;
 
   public RocketDispatchListener(MQProducer producer, GatewayLocator gatewayLocator, DispatcherProperties properties,
-      PacketTypeJudger packetTypeJudger) {
+      PacketTypeJudge packetTypeJudge) {
     messageHandler = new MessageHandler(producer, gatewayLocator, properties.getRocketmq().getPushTopic(),
-        properties.getRocketmq().getPushTag(), packetTypeJudger);
+        properties.getRocketmq().getPushTag(), packetTypeJudge);
   }
 
   @Override

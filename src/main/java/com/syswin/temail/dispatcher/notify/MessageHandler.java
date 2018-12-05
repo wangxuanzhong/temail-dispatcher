@@ -2,7 +2,7 @@ package com.syswin.temail.dispatcher.notify;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
-import com.syswin.temail.dispatcher.codec.PacketTypeJudger;
+import com.syswin.temail.dispatcher.codec.PacketTypeJudge;
 import com.syswin.temail.dispatcher.notify.entity.MessageBody;
 import com.syswin.temail.dispatcher.notify.entity.MqMessage;
 import com.syswin.temail.dispatcher.notify.entity.TemailAccountLocation;
@@ -23,14 +23,14 @@ class MessageHandler {
   private final MQProducer producer;
   private final String pushTopic;
   private final String pushTag;
-  private final PacketTypeJudger judger;
+  private final PacketTypeJudge judger;
 
 
   public MessageHandler(MQProducer producer,
       GatewayLocator gatewayLocator,
       String pushTopic,
       String pushTag,
-      PacketTypeJudger judger) {
+      PacketTypeJudge judger) {
     this.producer = producer;
     this.gatewayLocator = gatewayLocator;
     this.pushTopic = pushTopic;

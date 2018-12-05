@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import com.syswin.temail.dispatcher.DispatcherProperties;
 import com.syswin.temail.dispatcher.DispatcherProperties.Request;
-import com.syswin.temail.dispatcher.codec.PacketTypeJudger;
+import com.syswin.temail.dispatcher.codec.PacketTypeJudge;
 import com.syswin.temail.dispatcher.request.entity.CDTPParams;
 import com.syswin.temail.dispatcher.request.exceptions.DispatchException;
 import com.syswin.temail.ps.common.entity.CDTPHeader;
@@ -43,7 +43,7 @@ public class RequestFactoryTest {
   private final Request request = new Request();
   private final String baseUrl = "http://localhost:" + nextInt(1000);
   private final HttpMethod[] methods = {GET, POST, PUT, DELETE};
-  private CommandAwarePacketUtil packetUtil = new CommandAwarePacketUtil(new PacketTypeJudger(properties));
+  private CommandAwarePacketUtil packetUtil = new CommandAwarePacketUtil(new PacketTypeJudge(properties));
   private final RequestFactory requestFactory = new RequestFactory(properties, packetUtil);
 
   private static CDTPPacket initCDTPPacketTrans() {

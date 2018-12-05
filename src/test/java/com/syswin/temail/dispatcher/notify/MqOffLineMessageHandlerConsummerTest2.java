@@ -8,7 +8,7 @@ import au.com.dius.pact.consumer.dsl.PactDslJsonBody;
 import au.com.dius.pact.model.v3.messaging.MessagePact;
 import com.google.gson.Gson;
 import com.syswin.temail.dispatcher.DispatcherProperties;
-import com.syswin.temail.dispatcher.codec.PacketTypeJudger;
+import com.syswin.temail.dispatcher.codec.PacketTypeJudge;
 import com.syswin.temail.dispatcher.notify.entity.MessageBody;
 import com.syswin.temail.dispatcher.notify.entity.MqMessage;
 import com.syswin.temail.dispatcher.notify.entity.PushData;
@@ -114,7 +114,7 @@ public class MqOffLineMessageHandlerConsummerTest2 {
             pushDatapayload.getData());
 
     MessageHandler messageHandler = new MessageHandler(rocketMQProducer, gatewayLocator,
-        "temail-message", "*", new PacketTypeJudger(properties));
+        "temail-message", "*", new PacketTypeJudge(properties));
 
     for (int i = 0; i < 5; i++) {
       messageHandler.onMessageReceived(gson.toJson(pushDatapayload));

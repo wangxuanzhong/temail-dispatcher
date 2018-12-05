@@ -5,7 +5,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import com.syswin.temail.dispatcher.DispatcherProperties;
 import com.syswin.temail.dispatcher.DispatcherProperties.Request;
-import com.syswin.temail.dispatcher.codec.PacketTypeJudger;
+import com.syswin.temail.dispatcher.codec.PacketTypeJudge;
 import com.syswin.temail.dispatcher.request.application.CommandAwarePacketUtil;
 import com.syswin.temail.dispatcher.request.application.PackageDispatcher;
 import com.syswin.temail.dispatcher.request.entity.CDTPParams;
@@ -65,7 +65,7 @@ public class PackageDispatcherTest {
       "q1", "v1",
       "q2", "v22");
   private final PackageDispatcher packageDispatcher = new PackageDispatcher(properties, restTemplate,
-      new CommandAwarePacketUtil(new PacketTypeJudger(properties)));
+      new CommandAwarePacketUtil(new PacketTypeJudge(properties)));
 
   @BeforeClass
   public static void beforeClass() {

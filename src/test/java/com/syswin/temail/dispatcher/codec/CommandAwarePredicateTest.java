@@ -11,7 +11,7 @@ import static com.syswin.temail.ps.common.entity.CommandSpaceType.SINGLE_MESSAGE
 public class CommandAwarePredicateTest {
 
   private final DispatcherProperties properties = new DispatcherProperties();
-  private final CommandAwarePredicate predicate = new CommandAwarePredicate(new PacketTypeJudger(properties));
+  private final CommandAwarePredicate predicate = new CommandAwarePredicate(new PacketTypeJudge(properties));
 
   @Test
   public void trueIfPrivateMessage() {

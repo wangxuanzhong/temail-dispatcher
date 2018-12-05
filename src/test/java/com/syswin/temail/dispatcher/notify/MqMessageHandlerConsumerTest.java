@@ -8,7 +8,7 @@ import au.com.dius.pact.consumer.dsl.PactDslJsonBody;
 import au.com.dius.pact.model.v3.messaging.MessagePact;
 import com.google.gson.Gson;
 import com.syswin.temail.dispatcher.DispatcherProperties;
-import com.syswin.temail.dispatcher.codec.PacketTypeJudger;
+import com.syswin.temail.dispatcher.codec.PacketTypeJudge;
 import com.syswin.temail.dispatcher.notify.entity.MessageBody;
 import com.syswin.temail.dispatcher.notify.entity.MqMessage;
 import com.syswin.temail.dispatcher.notify.entity.TemailAccountLocation;
@@ -96,7 +96,7 @@ public class MqMessageHandlerConsumerTest {
         .notificationOf(payload.getReceiver(), gson.fromJson(payload.getHeader(), CDTPHeader.class), payload.getData());
     msgList.add(new MqMessage(mqTopic, mqTag, body));
 
-    MessageHandler messageHandler = new MessageHandler(producer, gatewayLocator, properties.getRocketmq().getPushTopic(), properties.getRocketmq().getPushTag(),new PacketTypeJudger(properties));
+    MessageHandler messageHandler = new MessageHandler(producer, gatewayLocator, properties.getRocketmq().getPushTopic(), properties.getRocketmq().getPushTag(),new PacketTypeJudge(properties));
     messageHandler.onMessageReceived(new String(currentMessage));
     verify(producer).send(argThat(matchesPayload(msgList)));
   }

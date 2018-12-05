@@ -2,7 +2,7 @@ package com.syswin.temail.dispatcher.notify;
 
 import com.syswin.temail.dispatcher.DispatcherProperties;
 import com.syswin.temail.dispatcher.DispatcherProperties.RocketMQ;
-import com.syswin.temail.dispatcher.codec.PacketTypeJudger;
+import com.syswin.temail.dispatcher.codec.PacketTypeJudge;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.client.consumer.DefaultMQPushConsumer;
 import org.apache.rocketmq.client.consumer.MQConsumer;
@@ -22,14 +22,14 @@ class RocketMqConfiguration {
 
   @Bean
   MQConsumer consumer(DispatcherProperties properties, RestTemplate restTemplate, MQProducer producer,
-      PacketTypeJudger packetTypeJudger)
+      PacketTypeJudge packetTypeJudge)
       throws Exception {
     RocketMQ rocketMQ = properties.getRocketmq();
     DefaultMQPushConsumer consumer = new DefaultMQPushConsumer(rocketMQ.getConsumerGroup());
     consumer.setNamesrvAddr(rocketMQ.getNamesrvAddr());
     consumer.subscribe(rocketMQ.getConsumerTopic(), MQ_TOPIC_TAG);
     consumer.setMessageListener(new RocketDispatchListener(new RocketMQProducer(producer),
-        new GatewayLocator(restTemplate, properties.getTemailChannelUrl()), properties, packetTypeJudger));
+        new GatewayLocator(restTemplate, properties.getTemailChannelUrl()), properties, packetTypeJudge));
     consumer.start();
     log.info("Started listening to MQ topic {}, tag {}", rocketMQ.getConsumerTopic(), MQ_TOPIC_TAG);
     return consumer;

@@ -4,11 +4,11 @@ import java.util.function.BiPredicate;
 
 public class CommandAwarePredicate implements BiPredicate<Short, Short> {
 
-  private final PacketTypeJudger packetTypeJudger;
+  private final PacketTypeJudge packetTypeJudge;
 
   public CommandAwarePredicate(
-      PacketTypeJudger packetTypeJudger) {
-    this.packetTypeJudger = packetTypeJudger;
+      PacketTypeJudge packetTypeJudge) {
+    this.packetTypeJudge = packetTypeJudge;
   }
 
   @Override
@@ -18,15 +18,15 @@ public class CommandAwarePredicate implements BiPredicate<Short, Short> {
   }
 
   private boolean isPrivateMessage(short commandSpace, short command) {
-    return packetTypeJudger.isPrivateMessage(commandSpace, command);
+    return packetTypeJudge.isPrivateMessage(commandSpace, command);
   }
 
   private boolean isGroupMessage(short commandSpace, short command) {
-    return packetTypeJudger.isGroupMessage(commandSpace, command);
+    return packetTypeJudge.isGroupMessage(commandSpace, command);
   }
 
   private boolean isGroupJoin(short commandSpace, short command) {
-    return packetTypeJudger.isGroupJoin(commandSpace, command);
+    return packetTypeJudge.isGroupJoin(commandSpace, command);
   }
 
 }
