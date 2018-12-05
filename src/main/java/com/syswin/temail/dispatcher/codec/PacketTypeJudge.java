@@ -34,7 +34,8 @@ public class PacketTypeJudge {
   }
 
   public boolean isPacketDataEncryptedByReceiver(CDTPHeader cdtpHeader) {
-    return cdtpHeader.getDataEncryptionMethod() == 4;
+    return cdtpHeader.getDataEncryptionMethod() == 4 ||
+        cdtpHeader.getDataEncryptionMethod() == 5;
   }
 
 }
