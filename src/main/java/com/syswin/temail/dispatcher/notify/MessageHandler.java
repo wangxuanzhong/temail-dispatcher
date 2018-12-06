@@ -57,16 +57,17 @@ class MessageHandler {
                     mqTags.add(mqTag);
                     msgList.add(new MqMessage(status.getMqTopic(), mqTag, payload));
                   }
+                  log.debug("send message by message queue to gateway server {}", msgList);
                 }
             );
-            log.debug("send message by message queue to gateway server {}", msgList);
             try {
               producer.send(msgList);
             } catch (Exception ex) {
               log.error("Fail to send message : {}", msgList, ex);
             }
 
-          } else if (judger.isPrivateMessage(messageBody.getEventType())) {
+          } else if (judger.isPrivateMessage(messageBody.getEventType())
+              && !isSenderEqualsToRecevier(header)) {
             Optional<String> pushMessage = notificationMsgFactory
                 .getPushMessage(receiver, header, messageBody.getData());
             pushMessage.ifPresent(message -> {
@@ -83,7 +84,7 @@ class MessageHandler {
 
           } else {
             log.debug(
-                "No registered channel status was found, and the MQmsg is not private msg, so skip pushing the msg : {}",
+                "No registered channel status was found, and the MQmsg is not private or although it is private but sender is same to receiver, skip pushing the msg : {}",
                 msg);
 
           }
@@ -94,4 +95,10 @@ class MessageHandler {
       log.error("Invalid message format：{}", msg, e);
     }
   }
+
+  private boolean isSenderEqualsToRecevier(CDTPHeader cdtpHeader) {
+    return cdtpHeader.getSender() != null &&
+        cdtpHeader.getSender().equals(cdtpHeader.getReceiver());
+  }
+
 }
