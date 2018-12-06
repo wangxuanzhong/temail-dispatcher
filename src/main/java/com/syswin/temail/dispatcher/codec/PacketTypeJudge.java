@@ -57,7 +57,7 @@ public class PacketTypeJudge {
   }
 
   public boolean isPrivateMessage(Integer mqMsgEventType) {
-    return mqMsgEventType.intValue() == 0;
+    return mqMsgEventType != null && mqMsgEventType.intValue() == 0;
   }
 
   public boolean isPacketDataEncryptedByReceiver(CDTPHeader cdtpHeader) {
