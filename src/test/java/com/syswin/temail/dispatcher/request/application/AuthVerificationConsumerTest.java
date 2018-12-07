@@ -21,11 +21,9 @@ import com.syswin.temail.dispatcher.codec.PacketTypeJudge;
 import com.syswin.temail.dispatcher.request.controller.Response;
 import java.util.Map;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
-@Ignore
 public class AuthVerificationConsumerTest extends ConsumerPactTestMk2 {
 
   private final ObjectMapper objectMapper = new ObjectMapper();

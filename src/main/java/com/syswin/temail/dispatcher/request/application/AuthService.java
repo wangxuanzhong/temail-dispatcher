@@ -85,8 +85,8 @@ public class AuthService {
     entityBody.add(SIGNATURE, signature);
 
     //TODO - delete after debug
-    log.debug("unsigned data length is:{}", unsignedBytes.length());
-    log.debug("signature data length is:{}", signature.length());
+    log.debug("unsigned data length is:{}", unsignedBytes == null ? 0 : unsignedBytes.length());
+    log.debug("signature data length is:{}", signature == null ? 0 : signature.length());
 
     entityBody.add(ALGORITHM, algorithm);
     HttpEntity<?> requestEntity = new HttpEntity<>(entityBody, headers);
