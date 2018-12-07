@@ -63,7 +63,7 @@ public class CommandAwarePacketUtil extends PacketUtil {
     }
 
     //decode package for verify  sign
-    short commandSpace = packet.getCommandSpace();
+    /*short commandSpace = packet.getCommandSpace();
     short command = packet.getCommand();
     if (isSendSingleMsg(commandSpace, command) ||
         isSendGroupMsg(commandSpace, command)) {
@@ -72,7 +72,7 @@ public class CommandAwarePacketUtil extends PacketUtil {
       data =  originalPacket.getData();
     }
 
-    log.debug("payload before sha256 is : {}", data.toString());
+    log.debug("payload before sha256 is : {}", data.toString());*/
 
     return data;
   }
