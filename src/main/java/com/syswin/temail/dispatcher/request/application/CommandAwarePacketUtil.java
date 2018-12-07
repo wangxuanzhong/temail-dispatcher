@@ -69,8 +69,10 @@ public class CommandAwarePacketUtil extends PacketUtil {
         isSendGroupMsg(commandSpace, command)) {
       byte[] dataBytes = Base64.getUrlDecoder().decode(data);
       CDTPPacket originalPacket = unpack(dataBytes);
-      return originalPacket.getData();
+      data =  originalPacket.getData();
     }
+
+    log.debug("payload before sha256 is : {}", data.toString());
 
     return data;
   }
