@@ -1,5 +1,6 @@
 package com.syswin.temail.dispatcher.request.application;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
@@ -17,8 +18,6 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
-
-import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * @author 姚华成
@@ -62,6 +61,17 @@ public class CommandAwarePacketUtil extends PacketUtil {
     if (packet == null || (data = packet.getData()) == null) {
       return new byte[0];
     }
+
+    //decode package for verify  sign
+    short commandSpace = packet.getCommandSpace();
+    short command = packet.getCommand();
+    if (isSendSingleMsg(commandSpace, command) ||
+        isSendGroupMsg(commandSpace, command)) {
+      byte[] dataBytes = Base64.getUrlDecoder().decode(data);
+      CDTPPacket originalPacket = unpack(dataBytes);
+      return originalPacket.getData();
+    }
+
     return data;
   }
 
