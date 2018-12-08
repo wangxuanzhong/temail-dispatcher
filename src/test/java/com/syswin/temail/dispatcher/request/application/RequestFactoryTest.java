@@ -172,6 +172,28 @@ public class RequestFactoryTest {
   }
 
   @Test
+  public void requestWithQueries() {
+    CDTPPacket packet = initCDTPPacketTrans();
+    Map<String, String> query = ImmutableMap.of(
+        "Name", "Value1,Value2");
+
+    CDTPParams cdtpParams = new CDTPParams();
+    cdtpParams.setQuery(query);
+    packet.setData(gson.toJson(cdtpParams).getBytes());
+
+    for (HttpMethod method : methods) {
+      request.setMethod(method);
+
+      TemailRequest temailRequest = requestFactory.toRequest(packet);
+
+      assertThat(temailRequest.url()).isEqualTo(baseUrl + "/test?Name=Value1,Value2");
+      assertThat(temailRequest.method()).isEqualTo(request.getMethod());
+
+      assertThat(temailRequest.entity().getBody()).isNull();
+    }
+  }
+
+  @Test
   public void requestWithBody() {
     CDTPPacket packet = initCDTPPacketTrans();
     final Map<String, Object> body = ImmutableMap.of(
