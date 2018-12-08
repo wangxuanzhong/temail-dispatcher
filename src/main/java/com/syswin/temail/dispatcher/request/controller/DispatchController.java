@@ -40,8 +40,8 @@ public class DispatchController {
   public ResponseEntity<Response<String>> verify(@RequestBody byte[] payload) {
     CDTPPacket packet = packetDecoder.decode(payload);
     log.info("Received request to verify signature of packet: CommandSpace={},Command={},CDTPHeader={}",
-        packet.getCommandSpace(),
-        packet.getCommand(),
+        Integer.toHexString(packet.getCommandSpace()),
+        Integer.toHexString(packet.getCommand()),
         packet.getHeader());
 
     ResponseEntity<Response<String>> responseEntity = authService.verify(packet);
@@ -66,8 +66,8 @@ public class DispatchController {
       }
 
       log.error("Signature verification failed on dispatch for packet: CommandSpace={},Command={},CDTPHeader={},StatusCode={}",
-          packet.getCommandSpace(),
-          packet.getCommand(),
+          Integer.toHexString(packet.getCommandSpace()),
+          Integer.toHexString(packet.getCommand()),
           packet.getHeader(),
           verifyResult.getStatusCode());
 

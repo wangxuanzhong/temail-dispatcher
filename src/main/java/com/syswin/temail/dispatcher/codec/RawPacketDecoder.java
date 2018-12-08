@@ -36,8 +36,8 @@ public class RawPacketDecoder {
 
       if (log.isDebugEnabled()) {
         log.debug("Received packet：CommandSpace={},Command={},CDTPHeader={},Data={}, DataLength={}",
-            packet.getCommandSpace(),
-            packet.getCommand(),
+            Integer.toHexString(packet.getCommandSpace()),
+            Integer.toHexString(packet.getCommand()),
             packet.getHeader(),
             new String(packet.getData()),
             packet.getData().length);
