@@ -83,11 +83,6 @@ public class AuthService {
     }
     entityBody.add(UNSIGNED_BYTES, unsignedBytes);
     entityBody.add(SIGNATURE, signature);
-
-    //TODO - delete after debug
-    log.debug("unsigned data length is:{}", unsignedBytes == null ? 0 : unsignedBytes.length());
-    log.debug("signature data length is:{}", signature == null ? 0 : signature.length());
-
     entityBody.add(ALGORITHM, algorithm);
     HttpEntity<?> requestEntity = new HttpEntity<>(entityBody, headers);
     ResponseEntity<Response<String>> result = restTemplate.exchange(authUrl, POST, requestEntity, responseType);
