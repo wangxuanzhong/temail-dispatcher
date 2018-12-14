@@ -6,7 +6,7 @@
 
   <groupId>com.syswin.temail</groupId>
   <artifactId>temail-dispatcher</artifactId>
-  <version>1.1.7-SNAPSHOT</version>
+  <version>1.1.8-SNAPSHOT</version>
 
   <parent>
     <groupId>org.springframework.boot</groupId>
