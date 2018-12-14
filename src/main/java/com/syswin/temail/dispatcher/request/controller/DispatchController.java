@@ -73,8 +73,10 @@ public class DispatchController {
 
       return repackageResponse(verifyResult);
     } catch (DispatchException e) {
+      log.error("dispatch request error : ", e);
       throw e;
     } catch (Exception e) {
+      log.error("dispatch request error : ", e);
       throw new DispatchException(e, packet);
     }
   }
