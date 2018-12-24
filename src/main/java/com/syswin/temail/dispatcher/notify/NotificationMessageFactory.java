@@ -37,7 +37,8 @@ class NotificationMessageFactory {
 
   Optional<String> getPushMessage(String receiver, CDTPHeader header, String body) {
     PushData pushData = gson.fromJson(body, PushData.class);
-    if (pushData.getEventType().equals(Constants.COMMON_MSG_EVENT_TYPE)) {
+    if (pushData.getEventType().equals(Constants.COMMON_MSG_EVENT_TYPE) || pushData.getEventType()
+        .equals(Constants.NOTRACE_MSG_EVENT_TYPE)) {
       PushMessage pushMsg = new PushMessage();
       BeanUtils.copyProperties(pushData, pushMsg);
       Map<String, String> pushOptions = this.extractPushOptions(header);
