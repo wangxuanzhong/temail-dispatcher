@@ -1,9 +1,13 @@
 package com.syswin.temail.dispatcher.notify;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import com.syswin.temail.dispatcher.Constants;
+import com.syswin.temail.dispatcher.notify.entity.PushData;
 import com.syswin.temail.ps.common.entity.CDTPHeader;
 import java.util.Map;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 
 public class NotificationMessageFactoryTest {
 
@@ -55,6 +59,20 @@ public class NotificationMessageFactoryTest {
     cdtpHeader.setExtraData(options);
     pushOptions = notificationMessageFactory.extractPushOptions(cdtpHeader);
     return pushOptions;
+  }
+
+  @Test
+  public void trueIfIsCommonMsg(){
+    PushData pushData = Mockito.mock(PushData.class);
+    Mockito.when(pushData.getEventType()).thenReturn(Constants.COMMON_MSG_EVENT_TYPE);
+    assertThat(notificationMessageFactory.judgeMessage(pushData)).isTrue();
+  }
+
+  @Test
+  public void trueIfIsNotracbMsg(){
+    PushData pushData = Mockito.mock(PushData.class);
+    Mockito.when(pushData.getEventType()).thenReturn(Constants.NOTRACE_MSG_EVENT_TYPE);
+    assertThat(notificationMessageFactory.judgeMessage(pushData)).isTrue();
   }
 
 
