@@ -1,11 +1,11 @@
 package com.syswin.temail.dispatcher.codec;
 
+import static com.syswin.temail.ps.common.entity.CommandSpaceType.GROUP_MESSAGE_CODE;
+import static com.syswin.temail.ps.common.entity.CommandSpaceType.SINGLE_MESSAGE_CODE;
+import com.syswin.temail.dispatcher.Constants;
 import com.syswin.temail.dispatcher.DispatcherProperties;
 import com.syswin.temail.ps.common.entity.CDTPHeader;
 import lombok.Getter;
-
-import static com.syswin.temail.ps.common.entity.CommandSpaceType.GROUP_MESSAGE_CODE;
-import static com.syswin.temail.ps.common.entity.CommandSpaceType.SINGLE_MESSAGE_CODE;
 
 @Getter
 public class PacketTypeJudge {
@@ -36,9 +36,9 @@ public class PacketTypeJudge {
   }
 
 
-  public boolean isGroupDecryptType(short commandSpace, short command){
-    return this.isGroupMessage(commandSpace,command)
-        || this.isGroupMessageReply(commandSpace,command);
+  public boolean isGroupDecryptType(short commandSpace, short command) {
+    return this.isGroupMessage(commandSpace, command)
+        || this.isGroupMessageReply(commandSpace, command);
   }
 
   public boolean isGroupMessage(short commandSpace, short command) {
@@ -65,4 +65,8 @@ public class PacketTypeJudge {
         cdtpHeader.getDataEncryptionMethod() == 5;
   }
 
+  public boolean isToBePushedMsg(Integer eventType) {
+    return eventType.equals(Constants.COMMON_MSG_EVENT_TYPE)
+        || eventType.equals(Constants.NOTRACE_MSG_EVENT_TYPE);
+  }
 }

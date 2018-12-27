@@ -66,7 +66,7 @@ class MessageHandler {
               log.error("Fail to send message : {}", msgList, ex);
             }
 
-          } else if (judger.isPrivateMessage(messageBody.getEventType())
+          } else if (judger.isToBePushedMsg(messageBody.getEventType())
               && !isSenderEqualsToRecevier(header)) {
             Optional<String> pushMessage = notificationMsgFactory
                 .getPushMessage(receiver, header, messageBody.getData());

@@ -5,7 +5,6 @@ import static com.syswin.temail.dispatcher.Constants.NOTIFY_COMMAND;
 import static com.syswin.temail.dispatcher.Constants.NOTIFY_COMMAND_SPACE;
 import static java.util.Collections.emptyMap;
 import com.google.gson.Gson;
-import com.syswin.temail.dispatcher.Constants;
 import com.syswin.temail.dispatcher.notify.entity.PushData;
 import com.syswin.temail.dispatcher.notify.entity.PushMessage;
 import com.syswin.temail.ps.common.entity.CDTPHeader;
@@ -36,16 +35,18 @@ class NotificationMessageFactory {
   }
 
   Optional<String> getPushMessage(String receiver, CDTPHeader header, String body) {
-    PushData pushData = gson.fromJson(body, PushData.class);
-    if (judgeMessage(pushData)) {
+    try {
+      PushData pushData = gson.fromJson(body, PushData.class);
       PushMessage pushMsg = new PushMessage();
       BeanUtils.copyProperties(pushData, pushMsg);
       Map<String, String> pushOptions = this.extractPushOptions(header);
       pushMsg.setCmd(pushOptions.get("cmd"));
       pushMsg.setType(pushOptions.get("type"));
       return Optional.ofNullable(gson.toJson(pushMsg));
+    } catch (Exception e) {
+      log.error("failed to extract push data", e);
+      return Optional.empty();
     }
-    return Optional.empty();
   }
 
   Map<String, String> extractPushOptions(CDTPHeader header) {
@@ -57,11 +58,6 @@ class NotificationMessageFactory {
       log.error("fail to extract cmd and type from CDTPHeader, extraData : {}", header.getExtraData(), e);
       return emptyMap();
     }
-  }
-
-  public boolean judgeMessage(PushData pushData) {
-    return pushData.getEventType().equals(Constants.COMMON_MSG_EVENT_TYPE) || pushData.getEventType()
-        .equals(Constants.NOTRACE_MSG_EVENT_TYPE);
   }
 }
 
