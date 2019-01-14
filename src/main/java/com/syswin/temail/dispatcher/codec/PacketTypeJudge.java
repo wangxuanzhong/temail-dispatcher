@@ -34,7 +34,6 @@ public class PacketTypeJudge {
     return commandSpace == SINGLE_MESSAGE_CODE && command == 0x1005;
   }
 
-
   public boolean isGroupDecryptType(short commandSpace, short command) {
     return this.isGroupMessage(commandSpace, command)
         || this.isGroupMessageReply(commandSpace, command)
@@ -67,11 +66,11 @@ public class PacketTypeJudge {
   }
 
   public boolean isAssignedUserMessageBuild(short commandSpace, short command) {
-    return commandSpace == GROUP_MESSAGE_CODE && command == 0x0118;
+    return commandSpace == GROUP_MESSAGE_CODE && command == 0x011A;
   }
 
   public boolean isSendAssignedUserReplyMessage(short commandSpace, short command) {
-    return commandSpace == GROUP_MESSAGE_CODE && command == 0x011C;
+    return commandSpace == GROUP_MESSAGE_CODE && command == 0x011E;
   }
 
   public boolean isToBePushedMsg(Integer eventType) {
