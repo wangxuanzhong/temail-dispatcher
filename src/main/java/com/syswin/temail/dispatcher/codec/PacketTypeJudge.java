@@ -16,7 +16,6 @@ public class PacketTypeJudge {
     this.properties = properties;
   }
 
-
   public boolean isPrivateDecryptType(short commandSpace, short command) {
     return this.isPrivateMessage(commandSpace, command)
         || this.isPrivateMessageReply(commandSpace, command)
@@ -38,7 +37,9 @@ public class PacketTypeJudge {
 
   public boolean isGroupDecryptType(short commandSpace, short command) {
     return this.isGroupMessage(commandSpace, command)
-        || this.isGroupMessageReply(commandSpace, command);
+        || this.isGroupMessageReply(commandSpace, command)
+        || this.isAssignedUserMessageBuild(commandSpace, command)
+        || this.isSendAssignedUserReplyMessage(commandSpace, command);
   }
 
   public boolean isGroupMessage(short commandSpace, short command) {
@@ -63,6 +64,14 @@ public class PacketTypeJudge {
   public boolean isPacketDataEncryptedByReceiver(CDTPHeader cdtpHeader) {
     return cdtpHeader.getDataEncryptionMethod() == 4 ||
         cdtpHeader.getDataEncryptionMethod() == 5;
+  }
+
+  public boolean isAssignedUserMessageBuild(short commandSpace, short command) {
+    return commandSpace == GROUP_MESSAGE_CODE && command == 0x0118;
+  }
+
+  public boolean isSendAssignedUserReplyMessage(short commandSpace, short command) {
+    return commandSpace == GROUP_MESSAGE_CODE && command == 0x011C;
   }
 
   public boolean isToBePushedMsg(Integer eventType) {
