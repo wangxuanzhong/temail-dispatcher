@@ -1,12 +1,11 @@
 package com.syswin.temail.dispatcher.codec;
 
+import static com.syswin.temail.ps.common.entity.CommandSpaceType.GROUP_MESSAGE_CODE;
+import static com.syswin.temail.ps.common.entity.CommandSpaceType.SINGLE_MESSAGE_CODE;
 import com.syswin.temail.dispatcher.DispatcherProperties;
 import java.util.Random;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
-
-import static com.syswin.temail.ps.common.entity.CommandSpaceType.GROUP_MESSAGE_CODE;
-import static com.syswin.temail.ps.common.entity.CommandSpaceType.SINGLE_MESSAGE_CODE;
 
 public class CommandAwarePredicateTest {
 
@@ -43,7 +42,8 @@ public class CommandAwarePredicateTest {
   public void falseIfAnyOtherGroupMessage() {
     properties.setGroupPacketEnabled(true);
     for (short i = Short.MIN_VALUE; i < Short.MAX_VALUE; i++) {
-      if (i != 1 && i != 0x010E) {
+      if (i != 1 && i != 0x010E
+          && i != 0x011A && i != 0x011E) {
         Assertions.assertThat(predicate.test(GROUP_MESSAGE_CODE, i)).isFalse();
       }
     }
