@@ -1,5 +1,8 @@
 package com.syswin.temail.dispatcher.notify;
 
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import au.com.dius.pact.consumer.MessagePactBuilder;
 import au.com.dius.pact.consumer.MessagePactProviderRule;
 import au.com.dius.pact.consumer.Pact;
@@ -23,10 +26,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.ArgumentMatcher;
 import org.mockito.Mockito;
-
-import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 
 @Ignore
@@ -96,7 +95,7 @@ public class MqMessageHandlerConsumerTest {
         .notificationOf(payload.getReceiver(), gson.fromJson(payload.getHeader(), CDTPHeader.class), payload.getData());
     msgList.add(new MqMessage(mqTopic, mqTag, body));
 
-    MessageHandler messageHandler = new MessageHandler(producer, gatewayLocator, properties.getRocketmq().getPushTopic(), properties.getRocketmq().getPushTag(),new PacketTypeJudge(properties));
+    MessageHandler messageHandler = new MessageHandler(producer, gatewayLocator, properties.getRocketmq().getPushTopic(), properties.getRocketmq().getPushTag(),new PacketTypeJudge());
     messageHandler.onMessageReceived(new String(currentMessage));
     verify(producer).send(argThat(matchesPayload(msgList)));
   }

@@ -16,7 +16,6 @@ import au.com.dius.pact.consumer.dsl.PactDslWithProvider;
 import au.com.dius.pact.model.RequestResponsePact;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.syswin.temail.dispatcher.DispatcherProperties;
 import com.syswin.temail.dispatcher.codec.PacketTypeJudge;
 import com.syswin.temail.dispatcher.request.controller.Response;
 import java.util.Map;
@@ -165,7 +164,7 @@ public class AuthVerificationConsumerTest extends ConsumerPactTestMk2 {
   @Override
   public void runTest(MockServer mockServer) {
     String url = mockServer.getUrl();
-    CommandAwarePacketUtil packetUtil = new CommandAwarePacketUtil(new PacketTypeJudge(new DispatcherProperties()));
+    CommandAwarePacketUtil packetUtil = new CommandAwarePacketUtil(new PacketTypeJudge());
     AuthService authService = new AuthService(restTemplate, url, packetUtil);
 
     // verify

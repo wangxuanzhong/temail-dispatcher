@@ -2,7 +2,6 @@ package com.syswin.temail.dispatcher.request.application;
 
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
-
 import com.google.gson.Gson;
 import com.syswin.temail.dispatcher.DispatcherProperties;
 import com.syswin.temail.dispatcher.DispatcherProperties.Request;
@@ -10,6 +9,7 @@ import com.syswin.temail.dispatcher.request.entity.CDTPParams;
 import com.syswin.temail.dispatcher.request.exceptions.DispatchException;
 import com.syswin.temail.ps.common.entity.CDTPHeader;
 import com.syswin.temail.ps.common.entity.CDTPPacket;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +23,13 @@ class RequestFactory {
 
   static final String CDTP_HEADER = "CDTP-header";
   static final String X_PACKET_ID = "X-PACKET-ID";
+
+  static final String TE_MAIL = "TE-MAIL";
+  static final String PUBLIC_KEY = "PUBLIC-KEY";
+  static final String UNSIGNED_BYTES = "UNSIGNED-BYTES";
+  static final String SIGNATURE = "SIGNATURE";
+  static final String ALGORITHM = "ALGORITHM";
+
   private Gson gson = new Gson();
   private DispatcherProperties properties;
   private CommandAwarePacketUtil packetUtil;
@@ -36,18 +43,34 @@ class RequestFactory {
     int combinedCommand = (packet.getCommandSpace() << 16) + packet.getCommand();
     String cmdHex = Integer.toHexString(combinedCommand).toUpperCase();
     Request request = properties.getCmdMap().get(cmdHex);
-
     if (request == null) {
       log.error("unsupported command type：{}, request param：{}", cmdHex, packet);
       throw new DispatchException("unsupported command type：" + combinedCommand, packet);
     }
 
     CDTPParams params = packetUtil.buildParams(packet);
+    if(packetUtil.isGroupType(packet.getCommandSpace())){
+      Map<String, String> requestHeaders = new HashMap<>();
+      requestHeaders.put(TE_MAIL, packet.getHeader().getSender());
+      requestHeaders.put(PUBLIC_KEY, packet.getHeader().getSenderPK());
+      requestHeaders.put(UNSIGNED_BYTES, packetUtil.extractUnsignedData(packet));
+      requestHeaders.put(SIGNATURE, packet.getHeader().getSignature());
+      requestHeaders.put(ALGORITHM, String.valueOf(packet.getHeader().getSignatureAlgorithm()));
+      if(params.getHeader() == null){
+        params.setHeader(requestHeaders);
+      }else {
+        //in case that the params.header is unmodifable.
+        requestHeaders.putAll(params.getHeader());
+        params.setHeader(requestHeaders);
+      }
+    }
+
     HttpEntity<Map<String, Object>> entity = composeHttpEntity(request, packet.getHeader(), params);
     if (entity == null) {
       log.error("unsupported request type：{}, request param：{}", request.getMethod(), packet);
       throw new DispatchException("unsupported request type：" + request.getMethod(), packet);
     }
+
 
     String url = composeUrl(request, params.getPath(), params.getQuery());
     log.debug("dispatch request info ：URL={}, method={}, entity={}", url, request.getMethod(), entity);

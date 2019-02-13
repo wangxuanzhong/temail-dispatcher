@@ -24,8 +24,8 @@ public class DispatcherApplication {
   }
 
   @Bean
-  PacketTypeJudge packetTypeJudge(DispatcherProperties properties) {
-    return new PacketTypeJudge(properties);
+  PacketTypeJudge packetTypeJudge() {
+    return new PacketTypeJudge();
   }
 
   @Bean

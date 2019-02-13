@@ -12,13 +12,13 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "app.dispatcher")
 public class DispatcherProperties {
 
-  // TODO 这个选项是为了在客户端未完成时，把代码更新到服务器而不影响客户端的功能使用。功能正式上线后选项要删除。
-  private boolean groupPacketEnabled = false;
-
   private String authVerifyUrl;
+
   private String temailChannelUrl;
+
   @Autowired
   private RocketMQ rocketmq;
+
   private Map<String, Request> cmdMap = new HashMap<>();
 
   @Data
@@ -27,11 +27,17 @@ public class DispatcherProperties {
   public static class RocketMQ {
 
     private String namesrvAddr;
+
     private String producerGroup;
+
     private String consumerGroup;
+
     private String consumerTopic;
+
     private String pushTopic = "";
+
     private String pushTag = "";
+
   }
 
   @Data

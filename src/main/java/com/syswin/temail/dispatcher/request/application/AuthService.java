@@ -1,18 +1,15 @@
 package com.syswin.temail.dispatcher.request.application;
 
-import static org.apache.commons.lang3.StringUtils.defaultString;
 import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED;
-
 import com.syswin.temail.dispatcher.request.controller.Response;
-import com.syswin.temail.dispatcher.request.utils.DigestUtil;
-import com.syswin.temail.dispatcher.request.utils.HexUtil;
 import com.syswin.temail.ps.common.entity.CDTPHeader;
 import com.syswin.temail.ps.common.entity.CDTPPacket;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -20,7 +17,8 @@ import org.springframework.web.client.RestTemplate;
 
 @Slf4j
 public class AuthService {
-
+  static final ResponseEntity<Response<String>> ALWAYS_SUCCESS =
+      new ResponseEntity<Response<String>>(Response.ok(HttpStatus.OK,"Success"),HttpStatus.OK);
   static final String TE_MAIL = "TeMail";
   static final String PUBLIC_KEY = "publicKey";
   static final String UNSIGNED_BYTES = "UNSIGNED_BYTES";
@@ -55,11 +53,13 @@ public class AuthService {
     CDTPHeader header = packet.getHeader();
     short commandSpace = packet.getCommandSpace();
     short command = packet.getCommand();
-    if (packetUtil.isSendSingleMsg(commandSpace, command) || packetUtil.isGroupJoin(commandSpace, command)) {
-      return verifyRecieverTemail(header.getSender(), header.getSenderPK(), extractUnsignedData(packet),
+    if(packetUtil.isGroupType(commandSpace)){
+      return ALWAYS_SUCCESS;
+    }else if (packetUtil.isSendSingleMsg(commandSpace, command)) {
+      return verifyRecieverTemail(header.getSender(), header.getSenderPK(), packetUtil.extractUnsignedData(packet),
           header.getSignature(), String.valueOf(header.getSignatureAlgorithm()));
     } else {
-      return verify(header.getSender(), extractUnsignedData(packet),
+      return verify(header.getSender(), packetUtil.extractUnsignedData(packet),
           header.getSignature(), String.valueOf(header.getSignatureAlgorithm()));
     }
   }
@@ -88,21 +88,6 @@ public class AuthService {
     ResponseEntity<Response<String>> result = restTemplate.exchange(authUrl, POST, requestEntity, responseType);
     log.debug("{}, {}, {}, {} signature verify result ： {} ", temail, unsignedBytes, signature, algorithm, result.getStatusCode());
     return result;
-  }
-
-  private String extractUnsignedData(CDTPPacket packet) {
-    CDTPHeader header = packet.getHeader();
-    String targetAddress = defaultString(header.getTargetAddress());
-    byte[] data = packet.getData();
-    String dataSha256 = data == null ? "" :
-        HexUtil.encodeHex(
-            DigestUtil.sha256(
-                packetUtil.decodeData(packet)));
-
-    return String.valueOf(packet.getCommandSpace() + packet.getCommand())
-        + targetAddress
-        + String.valueOf(header.getTimestamp())
-        + dataSha256;
   }
 
   private ParameterizedTypeReference<Response<String>> responseType() {

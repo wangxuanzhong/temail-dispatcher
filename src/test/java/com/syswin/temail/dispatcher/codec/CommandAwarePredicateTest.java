@@ -10,7 +10,7 @@ import org.junit.Test;
 public class CommandAwarePredicateTest {
 
   private final DispatcherProperties properties = new DispatcherProperties();
-  private final CommandAwarePredicate predicate = new CommandAwarePredicate(new PacketTypeJudge(properties));
+  private final CommandAwarePredicate predicate = new CommandAwarePredicate(new PacketTypeJudge());
 
   @Test
   public void trueIfPrivateMessage() {
@@ -19,14 +19,7 @@ public class CommandAwarePredicateTest {
 
   @Test
   public void trueIfGroupMessage() {
-    properties.setGroupPacketEnabled(true);
     Assertions.assertThat(predicate.test(GROUP_MESSAGE_CODE, (short) 1)).isTrue();
-  }
-
-  @Test
-  public void falseIfGroupMessageToggledOff() {
-    properties.setGroupPacketEnabled(false);
-    Assertions.assertThat(predicate.test(GROUP_MESSAGE_CODE, (short) 1)).isFalse();
   }
 
   @Test
@@ -40,7 +33,6 @@ public class CommandAwarePredicateTest {
 
   @Test
   public void falseIfAnyOtherGroupMessage() {
-    properties.setGroupPacketEnabled(true);
     for (short i = Short.MIN_VALUE; i < Short.MAX_VALUE; i++) {
       if (i != 1 && i != 0x010E
           && i != 0x011A && i != 0x011E) {
@@ -52,7 +44,6 @@ public class CommandAwarePredicateTest {
   @Test
   public void falseIfAnythingElse() {
     final Random random = new Random();
-    properties.setGroupPacketEnabled(true);
     for (short i = Short.MIN_VALUE; i < Short.MAX_VALUE; i++) {
       if (i != SINGLE_MESSAGE_CODE && i != GROUP_MESSAGE_CODE) {
         Assertions.assertThat(predicate.test(i, (short) random.nextInt())).isFalse();

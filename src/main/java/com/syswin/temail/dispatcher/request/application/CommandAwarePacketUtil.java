@@ -1,12 +1,15 @@
 package com.syswin.temail.dispatcher.request.application;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.apache.commons.lang3.StringUtils.defaultString;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 import com.syswin.temail.dispatcher.codec.PacketTypeJudge;
 import com.syswin.temail.dispatcher.request.entity.CDTPParams;
 import com.syswin.temail.dispatcher.request.exceptions.DispatchException;
+import com.syswin.temail.dispatcher.request.utils.DigestUtil;
+import com.syswin.temail.dispatcher.request.utils.HexUtil;
 import com.syswin.temail.ps.common.codec.BodyExtractor;
 import com.syswin.temail.ps.common.codec.SimpleBodyExtractor;
 import com.syswin.temail.ps.common.entity.CDTPHeader;
@@ -15,6 +18,7 @@ import com.syswin.temail.ps.common.entity.CDTPPacketTrans;
 import com.syswin.temail.ps.common.packet.PacketUtil;
 import com.syswin.temail.ps.common.packet.SimplePacketUtil;
 import java.util.Base64;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
@@ -68,7 +72,7 @@ public class CommandAwarePacketUtil extends PacketUtil {
     if (isSendSingleMsg(commandSpace, command) ||
         isSendGroupMsg(commandSpace, command)) {
       CDTPPacket originalPacket = unpack(data);
-      data =  originalPacket.getData();
+      data = originalPacket.getData();
     }
 
     log.debug("payload before sha256 is : {}", data.toString());
@@ -97,6 +101,10 @@ public class CommandAwarePacketUtil extends PacketUtil {
     }
   }
 
+  boolean isGroupType(short commandSpace) {
+    return packetTypeJudge.isGroupType(commandSpace);
+  }
+
   boolean isSendSingleMsg(short commandSpace, short command) {
     return packetTypeJudge.isPrivateDecryptType(commandSpace, command);
   }
@@ -114,7 +122,7 @@ public class CommandAwarePacketUtil extends PacketUtil {
     Map<String, Object> extraData = gson
         .fromJson(header.getExtraData(), new TypeToken<Map<String, Object>>() {
         }.getType());
-    Map<String, Object> body = new HashMap<>(extraData);
+    Map<String, Object> body = new HashMap<>(extraData == null ? Collections.emptyMap() : extraData);
     body.put("msgData", encode(packet.getData()));
     body.put("meta", header);
 
@@ -133,4 +141,18 @@ public class CommandAwarePacketUtil extends PacketUtil {
     return Base64.getUrlEncoder().encodeToString(data);
   }
 
+  public String extractUnsignedData(CDTPPacket packet) {
+    CDTPHeader header = packet.getHeader();
+    String targetAddress = defaultString(header.getTargetAddress());
+    byte[] data = packet.getData();
+    String dataSha256 = data == null ? "" :
+        HexUtil.encodeHex(
+            DigestUtil.sha256(
+                this.decodeData(packet)));
+
+    return String.valueOf(packet.getCommandSpace() + packet.getCommand())
+        + targetAddress
+        + String.valueOf(header.getTimestamp())
+        + dataSha256;
+  }
 }

@@ -1,26 +1,5 @@
 package com.syswin.temail.dispatcher.request.application;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.gson.Gson;
-import com.syswin.temail.dispatcher.DispatcherProperties;
-import com.syswin.temail.dispatcher.DispatcherProperties.Request;
-import com.syswin.temail.dispatcher.codec.PacketTypeJudge;
-import com.syswin.temail.dispatcher.request.entity.CDTPParams;
-import com.syswin.temail.dispatcher.request.exceptions.DispatchException;
-import com.syswin.temail.ps.common.entity.CDTPHeader;
-import com.syswin.temail.ps.common.entity.CDTPPacket;
-import com.syswin.temail.ps.common.packet.PacketUtil;
-import java.util.AbstractMap.SimpleEntry;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.Map;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-
 import static com.seanyinx.github.unit.scaffolding.Randomness.nextInt;
 import static com.seanyinx.github.unit.scaffolding.Randomness.uniquify;
 import static com.syswin.temail.dispatcher.request.application.RequestFactory.CDTP_HEADER;
@@ -34,6 +13,30 @@ import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.HttpMethod.PUT;
 import static org.springframework.http.HttpMethod.TRACE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
+import com.google.common.collect.ImmutableMap;
+import com.google.gson.Gson;
+import com.syswin.temail.dispatcher.DispatcherProperties;
+import com.syswin.temail.dispatcher.DispatcherProperties.Request;
+import com.syswin.temail.dispatcher.codec.PacketEncoder;
+import com.syswin.temail.dispatcher.codec.PacketTypeJudge;
+import com.syswin.temail.dispatcher.request.entity.CDTPParams;
+import com.syswin.temail.dispatcher.request.exceptions.DispatchException;
+import com.syswin.temail.ps.common.entity.CDTPHeader;
+import com.syswin.temail.ps.common.entity.CDTPPacket;
+import com.syswin.temail.ps.common.entity.CommandSpaceType;
+import com.syswin.temail.ps.common.packet.PacketUtil;
+import java.util.AbstractMap.SimpleEntry;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.Map;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.mockito.Mockito;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.web.client.RestTemplate;
 
 @RunWith(JUnit4.class)
 public class RequestFactoryTest {
@@ -43,8 +46,14 @@ public class RequestFactoryTest {
   private final Request request = new Request();
   private final String baseUrl = "http://localhost:" + nextInt(1000);
   private final HttpMethod[] methods = {GET, POST, PUT, DELETE};
-  private CommandAwarePacketUtil packetUtil = new CommandAwarePacketUtil(new PacketTypeJudge(properties));
+  private CommandAwarePacketUtil packetUtil = new CommandAwarePacketUtil(new PacketTypeJudge());
   private final RequestFactory requestFactory = new RequestFactory(properties, packetUtil);
+
+  private final PacketTypeJudge packetTypeJudge = new PacketTypeJudge();
+  private final CommandAwarePacketUtil commandAwarePacketUtil = new CommandAwarePacketUtil(packetTypeJudge);
+  private final RestTemplate restTemplate = Mockito.mock(RestTemplate.class);
+  private final AuthService authService = new AuthService(restTemplate,
+      "http://auth.innermail.com:8081/verify", commandAwarePacketUtil);
 
   private static CDTPPacket initCDTPPacketTrans() {
     CDTPPacket packet = new CDTPPacket();
@@ -258,7 +267,6 @@ public class RequestFactoryTest {
 
   @Test
   public void requestWithGroupChatAndGroupPacketEnabled() {
-    properties.setGroupPacketEnabled(true);
     CDTPPacket packet = initCDTPPacket();
     packet.setCommandSpace((short) 2);
     packet.setCommand((short) 1);
@@ -297,44 +305,6 @@ public class RequestFactoryTest {
     assertThat(bodyMap).containsKeys("meta", "packet");
   }
 
-  @Test
-  public void requestWithGroupChatAndGroupPacketDisabled() {
-    properties.setGroupPacketEnabled(false);
-    CDTPPacket packet = initCDTPPacket();
-    packet.setCommandSpace((short) 2);
-    packet.setCommand((short) 1);
-
-    Map<String, Object> bodyData = new HashMap<>();
-    bodyData.put("from", "sender@t.email");
-    bodyData.put("to", "group@t.email");
-    bodyData.put("message", "对称加密报文base64");
-    bodyData.put("type", "0");
-    bodyData.put("msgId", "消息ID");
-    String paramString = gson.toJson(new CDTPParams(bodyData));
-    packet.setData(paramString.getBytes());
-
-    request.setMethod(POST);
-    properties.setCmdMap(singletonMap("20001", request));
-
-    TemailRequest temailRequest = requestFactory.toRequest(packet);
-
-    assertThat(temailRequest.url()).isEqualTo(request.getUrl());
-    assertThat(temailRequest.method()).isEqualTo(request.getMethod());
-    HttpEntity<Map<String, Object>> entity = temailRequest.entity();
-//    System.out.println(gson.toJson(entity.getBody()));
-    assertThat(entity.getHeaders())
-        .contains(new SimpleEntry<>(CONTENT_TYPE, singletonList(APPLICATION_JSON_UTF8_VALUE)));
-
-    CDTPHeader header = packet.getHeader();
-    assertThat(entity.getHeaders())
-        .contains(new SimpleEntry<>(CDTP_HEADER, singletonList(gson.toJson(header))));
-
-    Map<String, Object> bodyMap = entity.getBody();
-    assertThat(bodyMap)
-        .containsAllEntriesOf(bodyData);
-    assertThat(bodyMap).doesNotContainKeys("meta", "packet");
-  }
-
   @Test(expected = DispatchException.class)
   public void blowsUpWhenCommandIsNotMapped() {
     CDTPPacket packet = initCDTPPacketTrans();
@@ -348,4 +318,57 @@ public class RequestFactoryTest {
     request.setMethod(TRACE);
     requestFactory.toRequest(packet);
   }
+
+  @Test
+  public void verifyPramsIfGroupType(){
+    CDTPPacket cdtpPacket = initCDTPPacket();
+    cdtpPacket.setCommandSpace(CommandSpaceType.GROUP_MESSAGE_CODE);
+    cdtpPacket.setCommand((short) 1);
+    request.setMethod(POST);
+    properties.setCmdMap(singletonMap("20001", request));
+
+    Map<String, Object> bodyData = new HashMap<>();
+    bodyData.put("from", "sender@t.email");
+    bodyData.put("to", "group@t.email");
+    bodyData.put("message", "对称加密报文base64");
+    bodyData.put("type", "0");
+    bodyData.put("msgId", "消息ID");
+    String paramString = gson.toJson(new CDTPParams(bodyData));
+    cdtpPacket.setData(paramString.getBytes());
+    cdtpPacket.setData(new PacketEncoder().encode(cdtpPacket));
+
+    TemailRequest request = requestFactory.toRequest(cdtpPacket);
+    assertThat(request.entity().getHeaders().containsKey(RequestFactory.PUBLIC_KEY)).isTrue();
+    assertThat(request.entity().getHeaders().containsKey(RequestFactory.ALGORITHM)).isTrue();
+    assertThat(request.entity().getHeaders().containsKey(RequestFactory.SIGNATURE)).isTrue();
+    assertThat(request.entity().getHeaders().containsKey(RequestFactory.TE_MAIL)).isTrue();
+    assertThat(request.entity().getHeaders().containsKey(RequestFactory.UNSIGNED_BYTES)).isTrue();
+  }
+
+  @Test
+  public void noVerifyPramsIfGroupType(){
+    CDTPPacket cdtpPacket = initCDTPPacket();
+    cdtpPacket.setCommandSpace(CommandSpaceType.SINGLE_MESSAGE_CODE);
+    cdtpPacket.setCommand((short) 1);
+    request.setMethod(POST);
+    properties.setCmdMap(singletonMap("10001", request));
+
+    Map<String, Object> bodyData = new HashMap<>();
+    bodyData.put("from", "sender@t.email");
+    bodyData.put("to", "group@t.email");
+    bodyData.put("message", "对称加密报文base64");
+    bodyData.put("type", "0");
+    bodyData.put("msgId", "消息ID");
+    String paramString = gson.toJson(new CDTPParams(bodyData));
+    cdtpPacket.setData(paramString.getBytes());
+    cdtpPacket.setData(new PacketEncoder().encode(cdtpPacket));
+
+    TemailRequest request = requestFactory.toRequest(cdtpPacket);
+    assertThat(request.entity().getHeaders().containsKey(RequestFactory.PUBLIC_KEY)).isFalse();
+    assertThat(request.entity().getHeaders().containsKey(RequestFactory.ALGORITHM)).isFalse();
+    assertThat(request.entity().getHeaders().containsKey(RequestFactory.SIGNATURE)).isFalse();
+    assertThat(request.entity().getHeaders().containsKey(RequestFactory.TE_MAIL)).isFalse();
+    assertThat(request.entity().getHeaders().containsKey(RequestFactory.UNSIGNED_BYTES)).isFalse();
+  }
+
 }
