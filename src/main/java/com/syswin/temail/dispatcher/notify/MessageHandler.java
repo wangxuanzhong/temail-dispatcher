@@ -39,7 +39,7 @@ class MessageHandler {
   }
 
   void onMessageReceived(String msg) throws Exception {
-    log.debug("received message from message queue ：{}", msg);
+    log.info("Received message from message queue ：{}", msg);
     try {
       MessageBody messageBody = gson.fromJson(msg, MessageBody.class);
       if (messageBody != null) {
@@ -57,7 +57,7 @@ class MessageHandler {
                     mqTags.add(mqTag);
                     msgList.add(new MqMessage(status.getMqTopic(), mqTag, payload));
                   }
-                  log.debug("send message by message queue to gateway server {}", msgList);
+                  log.info("Send message by message queue to gateway server {}", msgList);
                 }
             );
             try {
@@ -77,13 +77,13 @@ class MessageHandler {
               try {
                 producer.send(msgList);
               } catch (Exception ex) {
-                log.error("fail to push offLine message : {}", mqMessage, ex);
+                log.error("Failed to push offLine message : {}", mqMessage, ex);
               }
-              log.debug("succeed to push offLine message : {}", pushMessage.get());
+              log.info("succeed to push offLine message : {}", pushMessage.get());
             });
 
           } else {
-            log.debug(
+            log.warn(
                 "No registered channel status was found, and the MQmsg is not private or although it is private but sender is same to receiver, skip pushing the msg : {}",
                 msg);
 

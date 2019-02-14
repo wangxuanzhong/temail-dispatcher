@@ -36,8 +36,6 @@ class GatewayLocator {
 
   List<TemailAccountLocation> locate(String temail) {
     try {
-      log.debug("try to get user's channel locations from channel server. url={}, temail={}", discoveryUrl, temail);
-
       ResponseEntity<Response<TemailAccountLocations>> responseEntity = restTemplate.exchange(
           discoveryUrl,
           GET,
@@ -50,19 +48,19 @@ class GatewayLocator {
         if (response != null) {
           List<TemailAccountLocation> statuses = response.getData().getStatuses();
           if (statuses != null) {
-            log.debug("succeed to get user's channel locations from channel server. url = {}, temail = {}, response = {}", discoveryUrl, temail, response);
+            log.info("Succeed to get {} locations: {} .", temail, response);
             return statuses;
           }
         }
       }
 
-      log.error("fail to get user's channel locations from channel server: url = {}, temail = {}, response status = {}, response body = {}",
-          discoveryUrl,
+      log.error("Failed to get {} locations, url: {}, response status: {}, response body: {} .",
           temail,
+          discoveryUrl,
           responseEntity.getStatusCode(),
           response);
     } catch (Exception e) {
-      log.error("exception happened while trying to get user's locations from channel server！", e);
+      log.error("Exception happened while trying to get user's locations from channel server！", e);
     }
 
     return Collections.emptyList();

@@ -34,15 +34,15 @@ public class RawPacketDecoder {
 
       readData(byteBuffer, packet, packetLength, headerLength);
 
-      if (log.isDebugEnabled()) {
-        log.debug("Received packet：CommandSpace={},Command={},CDTPHeader={},Data={}, DataLength={}",
-            Integer.toHexString(packet.getCommandSpace()),
-            Integer.toHexString(packet.getCommand()),
-            packet.getHeader(),
-            new String(packet.getData()),
-            packet.getData().length);
-      }
+      log.info("Received packet：CommandSpace={}, Command={}, CDTPHeader={}, Data={}, DataLength={} .",
+          packet.getCommandSpace(),
+          packet.getCommand(),
+          packet.getHeader(),
+          new String(packet.getData()),
+          packet.getData().length);
+
       return packet;
+
     } catch (IOException e) {
       throw new IllegalArgumentException("Failed to decode packet", e);
     }

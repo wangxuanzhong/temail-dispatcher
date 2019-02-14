@@ -73,7 +73,7 @@ class RequestFactory {
 
 
     String url = composeUrl(request, params.getPath(), params.getQuery());
-    log.debug("dispatch request info ：URL={}, method={}, entity={}", url, request.getMethod(), entity);
+    log.info("dispatch request info ：URL={}, method={}, entity={}", url, request.getMethod(), entity);
     return new TemailRequest(url, request.getMethod(), entity);
   }
 
