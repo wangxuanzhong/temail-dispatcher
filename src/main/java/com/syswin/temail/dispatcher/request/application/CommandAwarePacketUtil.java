@@ -116,6 +116,11 @@ public class CommandAwarePacketUtil extends PacketUtil {
   public boolean isToBeVerifyRecieverTemail(short commandSpace, short command){
     return this.packetTypeJudge.isToBeVerifyRecieverTemail(commandSpace, command);
   }
+
+  public boolean isToBeVerifySkipped(short commandSpace, short command){
+    return this.packetTypeJudge.isToBeVerifySkipped(commandSpace, command);
+  }
+
   boolean isGroupJoin(short commandSpace, short command) {
     return packetTypeJudge.isGroupJoin(commandSpace, command);
   }

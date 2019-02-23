@@ -67,7 +67,7 @@ public class PacketTypeJudge {
   }
 
   private Map<String, List<String>> verifyReceiverMap = new HashMap<>();
-
+  private Map<String, List<String>> verifySkipMap = new HashMap<>();
   public PacketTypeJudge() {
     List<String> singleCmds = new ArrayList<>();
     singleCmds.add("1");
@@ -82,13 +82,18 @@ public class PacketTypeJudge {
     topicCmds.add("1");
     topicCmds.add("2");
     topicCmds.add("4");
-    verifyReceiverMap.put("E", topicCmds);
-    this.verifyReceiverMap = verifyReceiverMap;
+    verifySkipMap.put("E", topicCmds);
   }
 
   public boolean isToBeVerifyRecieverTemail(short commandSpace, short command) {
     return this.verifyReceiverMap.containsKey((Integer.toHexString(commandSpace)).toUpperCase())
         && this.verifyReceiverMap.get((Integer.toHexString(commandSpace)).toUpperCase())
+        .contains((Integer.toHexString(command)).toUpperCase());
+  }
+
+  public boolean isToBeVerifySkipped(short commandSpace, short command) {
+    return this.verifySkipMap.containsKey((Integer.toHexString(commandSpace)).toUpperCase())
+        && this.verifySkipMap.get((Integer.toHexString(commandSpace)).toUpperCase())
         .contains((Integer.toHexString(command)).toUpperCase());
   }
 }
