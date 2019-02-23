@@ -55,7 +55,7 @@ public class AuthService {
     short command = packet.getCommand();
     if(packetUtil.isGroupType(commandSpace)){
       return ALWAYS_SUCCESS;
-    }else if (packetUtil.isSendSingleMsg(commandSpace, command)) {
+    }else if (packetUtil.isToBeVerifyRecieverTemail(commandSpace, command)) {
       return verifyRecieverTemail(header.getReceiver(), header.getSenderPK(), packetUtil.extractUnsignedData(packet),
           header.getSignature(), String.valueOf(header.getSignatureAlgorithm()));
     } else {
