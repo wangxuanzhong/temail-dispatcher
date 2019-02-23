@@ -1,6 +1,7 @@
 package com.syswin.temail.dispatcher;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,8 @@ public class DispatcherProperties {
   private RocketMQ rocketmq;
 
   private Map<String, Request> cmdMap = new HashMap<>();
+
+  private Map<String, List<String>> validStrategy = new HashMap<>();
 
   @Data
   @Component

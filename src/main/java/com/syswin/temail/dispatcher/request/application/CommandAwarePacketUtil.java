@@ -101,8 +101,8 @@ public class CommandAwarePacketUtil extends PacketUtil {
     }
   }
 
-  boolean isGroupType(short commandSpace) {
-    return packetTypeJudge.isGroupType(commandSpace);
+  boolean isBizServerValidType(short commandSpace) {
+    return packetTypeJudge.isBizServerValidType(commandSpace);
   }
 
   boolean isSendSingleMsg(short commandSpace, short command) {
@@ -113,17 +113,6 @@ public class CommandAwarePacketUtil extends PacketUtil {
     return packetTypeJudge.isGroupDecryptType(commandSpace, command);
   }
 
-  public boolean isToBeVerifyRecieverTemail(short commandSpace, short command){
-    return this.packetTypeJudge.isToBeVerifyRecieverTemail(commandSpace, command);
-  }
-
-  public boolean isToBeVerifySkipped(short commandSpace, short command){
-    return this.packetTypeJudge.isToBeVerifySkipped(commandSpace, command);
-  }
-
-  boolean isGroupJoin(short commandSpace, short command) {
-    return packetTypeJudge.isGroupJoin(commandSpace, command);
-  }
 
   private CDTPParams buildSendSingleMsgParams(CDTPPacket packet) {
     CDTPHeader header = packet.getHeader();

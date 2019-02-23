@@ -113,7 +113,7 @@ public class MqOffLineMessageHandlerConsummerTest2 {
             pushDatapayload.getData());
 
     MessageHandler messageHandler = new MessageHandler(rocketMQProducer, gatewayLocator,
-        "temail-message", "*", new PacketTypeJudge());
+        "temail-message", "*", new PacketTypeJudge(null));
 
     for (int i = 0; i < 5; i++) {
       messageHandler.onMessageReceived(gson.toJson(pushDatapayload));

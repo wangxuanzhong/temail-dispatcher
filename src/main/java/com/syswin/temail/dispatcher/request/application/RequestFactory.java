@@ -49,7 +49,7 @@ class RequestFactory {
     }
 
     CDTPParams params = packetUtil.buildParams(packet);
-    if(packetUtil.isGroupType(packet.getCommandSpace())){
+    if(packetUtil.isBizServerValidType(packet.getCommandSpace())){
       Map<String, String> requestHeaders = new HashMap<>();
       requestHeaders.put(TE_MAIL, packet.getHeader().getSender());
       requestHeaders.put(PUBLIC_KEY, packet.getHeader().getSenderPK());

@@ -64,7 +64,7 @@ public class PackageDispatcherTest {
       "q1", "v1",
       "q2", "v22");
   private final PackageDispatcher packageDispatcher = new PackageDispatcher(properties, restTemplate,
-      new CommandAwarePacketUtil(new PacketTypeJudge()));
+      new CommandAwarePacketUtil(new PacketTypeJudge(null)));
 
   @BeforeClass
   public static void beforeClass() {

@@ -13,7 +13,6 @@ import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_OCTET_STREAM;
-
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -38,10 +37,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
+//@Ignore
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = RANDOM_PORT,
     properties = {
-        "app.dispatcher.cmd-map.10001.method=POST"})
+        "app.dispatcher.cmd-map.10001.method=POST",
+        "app.dispatcher.valid-strategy.receiverVlalid=0001-0001, 0001-0005, 0001-0006, 0001-1005, 0001-1006, 0001-100B",
+        "app.dispatcher.valid-strategy.skipVlalid=000E-0001, 000E-0002, 000E-0004"
+})
 @ActiveProfiles("dev")
 public class DispatcherApplicationTest {
 

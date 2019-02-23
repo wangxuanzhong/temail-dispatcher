@@ -10,7 +10,7 @@ import org.junit.Test;
 public class CommandAwarePredicateTest {
 
   private final DispatcherProperties properties = new DispatcherProperties();
-  private final CommandAwarePredicate predicate = new CommandAwarePredicate(new PacketTypeJudge());
+  private final CommandAwarePredicate predicate = new CommandAwarePredicate(new PacketTypeJudge(null));
 
   @Test
   public void trueIfPrivateMessage() {

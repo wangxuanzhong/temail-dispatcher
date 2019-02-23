@@ -2,6 +2,7 @@ package com.syswin.temail.dispatcher.request.application;
 
 import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED;
+import com.syswin.temail.dispatcher.codec.PacketTypeJudge;
 import com.syswin.temail.dispatcher.request.controller.Response;
 import com.syswin.temail.ps.common.entity.CDTPHeader;
 import com.syswin.temail.ps.common.entity.CDTPPacket;
@@ -17,6 +18,7 @@ import org.springframework.web.client.RestTemplate;
 
 @Slf4j
 public class AuthService {
+
   static final ResponseEntity<Response<String>> ALWAYS_SUCCESS =
       new ResponseEntity<Response<String>>(Response.ok(HttpStatus.OK,"Success"),HttpStatus.OK);
   static final String TE_MAIL = "TeMail";
@@ -30,11 +32,13 @@ public class AuthService {
   private final HttpHeaders headers = new HttpHeaders();
   private final ParameterizedTypeReference<Response<String>> responseType = responseType();
   private final CommandAwarePacketUtil packetUtil;
+  private final PacketTypeJudge packetTypeJudge;
 
   public AuthService(RestTemplate restTemplate, String authUrl,
-      CommandAwarePacketUtil packetUtil) {
+      CommandAwarePacketUtil packetUtil, PacketTypeJudge packetTypeJudge) {
     this.restTemplate = restTemplate;
     this.packetUtil = packetUtil;
+    this.packetTypeJudge = packetTypeJudge;
     if (authUrl.endsWith("verify")) {
       // 对老配置做一个兼容
       this.authUrl = authUrl;
@@ -53,11 +57,11 @@ public class AuthService {
     CDTPHeader header = packet.getHeader();
     short commandSpace = packet.getCommandSpace();
     short command = packet.getCommand();
-    if(packetUtil.isGroupType(commandSpace)){
+    if(packetTypeJudge.isBizServerValidType(commandSpace)){
       return ALWAYS_SUCCESS;
-    }else if (packetUtil.isToBeVerifySkipped(commandSpace, command)) {
+    }else if (packetTypeJudge.isVerifySkipped(commandSpace, command)) {
       return ALWAYS_SUCCESS;
-    } else if (packetUtil.isToBeVerifyRecieverTemail(commandSpace, command)) {
+    } else if (packetTypeJudge.isVerifyRecieverType(commandSpace, command)) {
       return verifyRecieverTemail(header.getReceiver(), header.getSenderPK(), packetUtil.extractUnsignedData(packet),
           header.getSignature(), String.valueOf(header.getSignatureAlgorithm()));
     } else {

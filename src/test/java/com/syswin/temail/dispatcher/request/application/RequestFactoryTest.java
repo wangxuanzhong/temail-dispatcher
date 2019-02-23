@@ -46,14 +46,14 @@ public class RequestFactoryTest {
   private final Request request = new Request();
   private final String baseUrl = "http://localhost:" + nextInt(1000);
   private final HttpMethod[] methods = {GET, POST, PUT, DELETE};
-  private CommandAwarePacketUtil packetUtil = new CommandAwarePacketUtil(new PacketTypeJudge());
+  private final PacketTypeJudge packetTypeJudge = new PacketTypeJudge(null);
+  private CommandAwarePacketUtil packetUtil = new CommandAwarePacketUtil(packetTypeJudge);
   private final RequestFactory requestFactory = new RequestFactory(properties, packetUtil);
 
-  private final PacketTypeJudge packetTypeJudge = new PacketTypeJudge();
   private final CommandAwarePacketUtil commandAwarePacketUtil = new CommandAwarePacketUtil(packetTypeJudge);
   private final RestTemplate restTemplate = Mockito.mock(RestTemplate.class);
   private final AuthService authService = new AuthService(restTemplate,
-      "http://auth.innermail.com:8081/verify", commandAwarePacketUtil);
+      "http://auth.innermail.com:8081/verify", commandAwarePacketUtil, packetTypeJudge);
 
   private static CDTPPacket initCDTPPacketTrans() {
     CDTPPacket packet = new CDTPPacket();

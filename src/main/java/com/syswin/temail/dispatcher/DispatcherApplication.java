@@ -24,8 +24,8 @@ public class DispatcherApplication {
   }
 
   @Bean
-  PacketTypeJudge packetTypeJudge() {
-    return new PacketTypeJudge();
+  PacketTypeJudge packetTypeJudge(DispatcherProperties properties) {
+    return new PacketTypeJudge(properties);
   }
 
   @Bean
@@ -51,7 +51,7 @@ public class DispatcherApplication {
 
   @Bean
   public AuthService authService(DispatcherProperties properties, RestTemplate restTemplate,
-      CommandAwarePacketUtil packetUtil) {
-    return new AuthService(restTemplate, properties.getAuthVerifyUrl(), packetUtil);
+      CommandAwarePacketUtil packetUtil, PacketTypeJudge packetTypeJudge) {
+    return new AuthService(restTemplate, properties.getAuthVerifyUrl(), packetUtil, packetTypeJudge);
   }
 }

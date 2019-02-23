@@ -25,8 +25,4 @@ public class CommandAwarePredicate implements BiPredicate<Short, Short> {
     return packetTypeJudge.isGroupDecryptType(commandSpace, command);
   }
 
-  private boolean isGroupJoin(short commandSpace, short command) {
-    return packetTypeJudge.isGroupJoin(commandSpace, command);
-  }
-
 }

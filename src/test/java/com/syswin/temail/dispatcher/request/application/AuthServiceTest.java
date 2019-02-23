@@ -9,14 +9,15 @@ import org.springframework.web.client.RestTemplate;
 
 public class AuthServiceTest {
 
-  private final PacketTypeJudge packetTypeJudge = new PacketTypeJudge();
+  //TODO - fixed..
+  private final PacketTypeJudge packetTypeJudge = new PacketTypeJudge(null);
 
   private final CommandAwarePacketUtil commandAwarePacketUtil = new CommandAwarePacketUtil(packetTypeJudge);
 
   private final RestTemplate restTemplate = Mockito.mock(RestTemplate.class);
 
   private final AuthService authService = new AuthService(restTemplate,
-      "http://auth.innermail.com:8081/verify", commandAwarePacketUtil);
+      "http://auth.innermail.com:8081/verify", commandAwarePacketUtil, packetTypeJudge);
 
   @Test
   public void statusAlwaysOkIfGroupType(){
