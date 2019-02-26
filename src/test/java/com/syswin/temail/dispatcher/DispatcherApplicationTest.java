@@ -43,7 +43,13 @@ import org.springframework.test.context.junit4.SpringRunner;
     properties = {
         "app.dispatcher.cmd-map.10001.method=POST",
         "app.dispatcher.valid-strategy.receiverVlalid=0001-0001, 0001-0005, 0001-0006, 0001-1005, 0001-1006, 0001-100B",
-        "app.dispatcher.valid-strategy.skipVlalid=000E-0001, 000E-0002, 000E-0004"
+        "app.dispatcher.valid-strategy.skipVlalid=000E-0001, 000E-0002, 000E-0004",
+
+        "app.dispatcher.valid-strategy.crossSingleSignValid=0001-*",
+        "app.dispatcher.valid-strategy.crossGroupsignValid=0002-*",
+        "app.dispatcher.valid-strategy.crossTopicSignValid=000E-*",
+        "app.dispatcher.valid-strategy.skipSignValid",
+        "app.dispatcher.valid-strategy.commonSignValid=*-*"
 })
 @ActiveProfiles("dev")
 public class DispatcherApplicationTest {
@@ -65,6 +71,7 @@ public class DispatcherApplicationTest {
   @BeforeClass
   public static void setUp() {
     System.setProperty("app.dispatcher.auth-verify-url", "http://localhost:" + wireMockRule.port() + "/verify");
+    System.setProperty("app.dispatcher.auth-base-url", "http://localhost:" + wireMockRule.port() + "");
     System.setProperty("app.dispatcher.cmd-map.10001.url", "http://localhost:" + wireMockRule.port() + "/usermail");
 
     Map<String, Object> msgPayload = new HashMap<>(gson
@@ -75,6 +82,15 @@ public class DispatcherApplicationTest {
     msgPayload.put("msgData", Base64.getUrlEncoder().encodeToString(encoder.encode(cdtpPacket)));
 
     stubFor(post(urlEqualTo("/verifyRecieverTemail"))
+        .withHeader(CONTENT_TYPE, equalTo("application/x-www-form-urlencoded;charset=UTF-8"))
+        .willReturn(
+            aResponse()
+                .withHeader(CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE)
+                .withStatus(OK.value())
+                .withBody(gson.toJson(Response.ok())))
+    );
+
+    stubFor(post(urlEqualTo("/cross/verify/single"))
         .withHeader(CONTENT_TYPE, equalTo("application/x-www-form-urlencoded;charset=UTF-8"))
         .willReturn(
             aResponse()

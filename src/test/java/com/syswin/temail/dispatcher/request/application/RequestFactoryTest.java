@@ -21,6 +21,7 @@ import com.syswin.temail.dispatcher.codec.PacketEncoder;
 import com.syswin.temail.dispatcher.codec.PacketTypeJudge;
 import com.syswin.temail.dispatcher.request.entity.CDTPParams;
 import com.syswin.temail.dispatcher.request.exceptions.DispatchException;
+import com.syswin.temail.dispatcher.valid.PacketValidJudge;
 import com.syswin.temail.ps.common.entity.CDTPHeader;
 import com.syswin.temail.ps.common.entity.CDTPPacket;
 import com.syswin.temail.ps.common.entity.CommandSpaceType;
@@ -53,7 +54,7 @@ public class RequestFactoryTest {
   private final CommandAwarePacketUtil commandAwarePacketUtil = new CommandAwarePacketUtil(packetTypeJudge);
   private final RestTemplate restTemplate = Mockito.mock(RestTemplate.class);
   private final AuthService authService = new AuthService(restTemplate,
-      "http://auth.innermail.com:8081/verify", commandAwarePacketUtil, packetTypeJudge);
+      properties, commandAwarePacketUtil, new PacketValidJudge(properties));
 
   private static CDTPPacket initCDTPPacketTrans() {
     CDTPPacket packet = new CDTPPacket();

@@ -37,47 +37,41 @@ public class DispatchController {
 
   @ApiOperation("CDTP认证服务")
   @PostMapping(value = "/verify", consumes = APPLICATION_OCTET_STREAM_VALUE, produces = APPLICATION_JSON_UTF8_VALUE)
-  public ResponseEntity<Response<String>> verify(@RequestBody byte[] payload) {
+  public ResponseEntity<Response<String>> verify(@RequestBody byte[] payload) throws Exception {
     CDTPPacket packet = packetDecoder.decode(payload);
-    log.info("Received request to verify signature of packet: CommandSpace={},Command={},CDTPHeader={}",
-        Integer.toHexString(packet.getCommandSpace()),
-        Integer.toHexString(packet.getCommand()),
-        packet.getHeader());
+    try {
+      log.info("Dispatcher receive a verify request：{}", packet);
+      ResponseEntity<Response<String>> responseEntity = authService.verify(packet);
+      ResponseEntity<Response<String>> result = repackageResponse(responseEntity);
+      log.info("PacketId: {} verify result: {}-{}", packet.getHeader().getPacketId(),
+          String.valueOf(result.getStatusCode()), result.getBody());
+      return result;
+    } catch (Exception e) {
+      log.error("PacketId: {} verify failed! ", packet.getHeader().getPacketId(), e);
+      throw e;
+    }
 
-    ResponseEntity<Response<String>> responseEntity = authService.verify(packet);
-    ResponseEntity<Response<String>> result = repackageResponse(responseEntity);
-    log.info("Signature verification result：{}", result.getBody());
-    return result;
   }
 
   @ApiOperation("CDTP请求转发")
   @PostMapping(value = "/dispatch", consumes = APPLICATION_OCTET_STREAM_VALUE, produces = APPLICATION_JSON_UTF8_VALUE)
-  public ResponseEntity<?> dispatch(@RequestBody byte[] payload) {
+  public ResponseEntity<?> dispatch(@RequestBody byte[] payload) throws Exception {
     CDTPPacket packet = packetDecoder.decode(payload);
     try {
+      log.info("Dispatcher receive a dispatch request：{}", packet);
       ResponseEntity<Response<String>> verifyResult = authService.verify(packet);
-
+      log.info("PacketId: {} verify result: {}-{}", packet.getHeader().getPacketId(),
+          String.valueOf(verifyResult.getStatusCode()), verifyResult.getBody());
       if (verifyResult.getStatusCode().is2xxSuccessful()) {
-        log.debug("dispatch service receive a request：{}", packet);
         ResponseEntity<String> responseEntity = packageDispatcher.dispatch(packet);
         ResponseEntity<String> result = repackageResponse(responseEntity);
-        log.debug("dispatch result：{}", result);
+        log.info("PacketId: {} dispatch result：{}", packet.getHeader().getPacketId(), result);
         return result;
       }
-
-      log.error("Signature verification failed on dispatch for packet: CommandSpace={},Command={},CDTPHeader={},StatusCode={}",
-          Integer.toHexString(packet.getCommandSpace()),
-          Integer.toHexString(packet.getCommand()),
-          packet.getHeader(),
-          verifyResult.getStatusCode());
-
       return repackageResponse(verifyResult);
-    } catch (DispatchException e) {
-      log.error("dispatch request error : ", e);
-      throw e;
     } catch (Exception e) {
-      log.error("dispatch request error : ", e);
-      throw new DispatchException(e, packet);
+      log.error("PackedId: {} dispatch failed! ", packet.getHeader().getPacketId(), e);
+      throw e;
     }
   }
 

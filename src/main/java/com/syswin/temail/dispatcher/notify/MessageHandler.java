@@ -39,7 +39,7 @@ class MessageHandler {
   }
 
   void onMessageReceived(String msg) throws Exception {
-    log.info("Received message from message queue ：{}", msg);
+    log.info("Dispatcher receive a message from MQ ：{}", msg);
     try {
       MessageBody messageBody = gson.fromJson(msg, MessageBody.class);
       if (messageBody != null) {
@@ -57,7 +57,7 @@ class MessageHandler {
                     mqTags.add(mqTag);
                     msgList.add(new MqMessage(status.getMqTopic(), mqTag, payload));
                   }
-                  log.info("Send message by message queue to gateway server {}", msgList);
+                  log.info("Send message by MQ to gateway server {}", msgList);
                 }
             );
             try {

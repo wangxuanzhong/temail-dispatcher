@@ -2,10 +2,13 @@ package com.syswin.temail.dispatcher.request.application;
 
 import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED;
-import com.syswin.temail.dispatcher.codec.PacketTypeJudge;
+import com.syswin.temail.dispatcher.DispatcherProperties;
 import com.syswin.temail.dispatcher.request.controller.Response;
-import com.syswin.temail.ps.common.entity.CDTPHeader;
+import com.syswin.temail.dispatcher.valid.PacketValidJudge;
+import com.syswin.temail.dispatcher.valid.params.ValidParams;
 import com.syswin.temail.ps.common.entity.CDTPPacket;
+import java.util.Map;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -20,79 +23,44 @@ import org.springframework.web.client.RestTemplate;
 public class AuthService {
 
   static final ResponseEntity<Response<String>> ALWAYS_SUCCESS =
-      new ResponseEntity<Response<String>>(Response.ok(HttpStatus.OK,"Success"),HttpStatus.OK);
-  static final String TE_MAIL = "TeMail";
-  static final String PUBLIC_KEY = "publicKey";
-  static final String UNSIGNED_BYTES = "UNSIGNED_BYTES";
-  static final String SIGNATURE = "SIGNATURE";
-  static final String ALGORITHM = "ALGORITHM";
+      new ResponseEntity<Response<String>>(Response.ok(HttpStatus.OK, "Success"), HttpStatus.OK);
+  static final ValidParams EMPTY_VALID_PARAMS = new ValidParams();
+
   private final RestTemplate restTemplate;
-  private final String authUrl;
-  private final String specialAuthUrl;
   private final HttpHeaders headers = new HttpHeaders();
   private final ParameterizedTypeReference<Response<String>> responseType = responseType();
   private final CommandAwarePacketUtil packetUtil;
-  private final PacketTypeJudge packetTypeJudge;
+  private final PacketValidJudge packetValidJudge;
+  private DispatcherProperties dispatcherProperties;
 
-  public AuthService(RestTemplate restTemplate, String authUrl,
-      CommandAwarePacketUtil packetUtil, PacketTypeJudge packetTypeJudge) {
+  public AuthService(RestTemplate restTemplate, DispatcherProperties dispatcherProperties,
+      CommandAwarePacketUtil packetUtil, PacketValidJudge packetValidJudge) {
     this.restTemplate = restTemplate;
     this.packetUtil = packetUtil;
-    this.packetTypeJudge = packetTypeJudge;
-    if (authUrl.endsWith("verify")) {
-      // 对老配置做一个兼容
-      this.authUrl = authUrl;
-      this.specialAuthUrl = authUrl + "RecieverTemail";
-    } else {
-      if (!authUrl.endsWith("/")) {
-        authUrl += "/";
-      }
-      this.authUrl = authUrl + "verify";
-      this.specialAuthUrl = authUrl + "verifyRecieverTemail";
-    }
+    this.packetValidJudge = packetValidJudge;
+    this.dispatcherProperties = dispatcherProperties;
     this.headers.setContentType(APPLICATION_FORM_URLENCODED);
   }
 
   public ResponseEntity<Response<String>> verify(CDTPPacket packet) {
-    CDTPHeader header = packet.getHeader();
-    short commandSpace = packet.getCommandSpace();
-    short command = packet.getCommand();
-    if(packetTypeJudge.isBizServerValidType(commandSpace)){
+    Optional<ValidParams> validParams = this.packetValidJudge.buildParams(packet, packetUtil::extractUnsignedData);
+    log.info("PackedId: {} verify params is: {} !", validParams.orElse(EMPTY_VALID_PARAMS).toString());
+    if (!validParams.isPresent() || !(validParams.get().isAnValidParam())) {
       return ALWAYS_SUCCESS;
-    }else if (packetTypeJudge.isVerifySkipped(commandSpace, command)) {
-      return ALWAYS_SUCCESS;
-    } else if (packetTypeJudge.isVerifyRecieverType(commandSpace, command)) {
-      return verifyRecieverTemail(header.getReceiver(), header.getSenderPK(), packetUtil.extractUnsignedData(packet),
-          header.getSignature(), String.valueOf(header.getSignatureAlgorithm()));
     } else {
-      return verify(header.getSender(), packetUtil.extractUnsignedData(packet),
-          header.getSignature(), String.valueOf(header.getSignatureAlgorithm()));
+      return verify(validParams);
     }
   }
 
-  public ResponseEntity<Response<String>> verifyRecieverTemail(String temail, String publicKey, String unsignedBytes,
-      String signature, String algorithm) {
-    return verify(specialAuthUrl, temail, publicKey, unsignedBytes, signature, algorithm);
-  }
-
-  public ResponseEntity<Response<String>> verify(String temail, String unsignedBytes,
-      String signature, String algorithm) {
-    return verify(authUrl, temail, null, unsignedBytes, signature, algorithm);
-  }
-
-  private ResponseEntity<Response<String>> verify(String authUrl, String temail, String publicKey, String unsignedBytes,
-      String signature, String algorithm) {
+  private ResponseEntity<Response<String>> verify(Optional<ValidParams> validParams) {
     MultiValueMap<String, String> entityBody = new LinkedMultiValueMap<>();
-    entityBody.add(TE_MAIL, temail);
-    if (publicKey != null) {
-      entityBody.add(PUBLIC_KEY, publicKey);
+    for (Map.Entry<String, String> entry : validParams.get().getParams().entrySet()) {
+      entityBody.add(entry.getKey(), entry.getValue());
     }
-    entityBody.add(UNSIGNED_BYTES, unsignedBytes);
-    entityBody.add(SIGNATURE, signature);
-    entityBody.add(ALGORITHM, algorithm);
     HttpEntity<?> requestEntity = new HttpEntity<>(entityBody, headers);
-    ResponseEntity<Response<String>> result = restTemplate.exchange(authUrl, POST, requestEntity, responseType);
-    log.debug("{}, {}, {}, {} signature verify result ： {} ", temail, unsignedBytes, signature, algorithm, result.getStatusCode());
+    ResponseEntity<Response<String>> result = restTemplate
+        .exchange(dispatcherProperties.getAuthBaseUrl() + validParams.get().getAuthUri(),
+            POST, requestEntity, responseType);
     return result;
   }
 

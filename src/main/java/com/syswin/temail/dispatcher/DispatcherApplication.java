@@ -7,6 +7,7 @@ import com.syswin.temail.dispatcher.codec.RawPacketDecoder;
 import com.syswin.temail.dispatcher.request.application.AuthService;
 import com.syswin.temail.dispatcher.request.application.CommandAwarePacketUtil;
 import com.syswin.temail.dispatcher.request.application.PackageDispatcher;
+import com.syswin.temail.dispatcher.valid.PacketValidJudge;
 import java.util.function.BiPredicate;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -50,8 +51,13 @@ public class DispatcherApplication {
   }
 
   @Bean
+  public PacketValidJudge packetValidJudge(DispatcherProperties properties){
+    return new PacketValidJudge(properties);
+  }
+
+  @Bean
   public AuthService authService(DispatcherProperties properties, RestTemplate restTemplate,
-      CommandAwarePacketUtil packetUtil, PacketTypeJudge packetTypeJudge) {
-    return new AuthService(restTemplate, properties.getAuthVerifyUrl(), packetUtil, packetTypeJudge);
+      CommandAwarePacketUtil packetUtil, PacketValidJudge packetValidJudge) {
+    return new AuthService(restTemplate, properties, packetUtil, packetValidJudge);
   }
 }

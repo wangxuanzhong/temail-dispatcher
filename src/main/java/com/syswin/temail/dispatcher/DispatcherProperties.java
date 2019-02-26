@@ -13,7 +13,10 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "app.dispatcher")
 public class DispatcherProperties {
 
+  //TODO delete after new valid process is ok
   private String authVerifyUrl;
+
+  private String authBaseUrl;
 
   private String temailChannelUrl;
 
@@ -45,7 +48,6 @@ public class DispatcherProperties {
 
   @Data
   public static class Request {
-
     private String url;
     private HttpMethod method;
   }

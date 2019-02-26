@@ -21,7 +21,6 @@ public class GlobaleExceptionHandler {
   @ExceptionHandler(DispatchException.class)
   @ResponseStatus(BAD_REQUEST)
   public Response<String> handleException(DispatchException ex) {
-    log.error("illegal request : {}", ex.getPacket(), ex);
     Map<String, String> map = singletonMap("errorMsg", ex.getMessage());
     return Response.failed(BAD_REQUEST, ex.getMessage(), gson.toJson(map));
   }
@@ -29,7 +28,6 @@ public class GlobaleExceptionHandler {
   @ExceptionHandler(Exception.class)
   @ResponseStatus(INTERNAL_SERVER_ERROR)
   public Response<String> handleResourceOccupiedException(Exception ex) {
-    log.error("server error", ex);
     return Response.failed(INTERNAL_SERVER_ERROR, ex.getMessage());
   }
 
