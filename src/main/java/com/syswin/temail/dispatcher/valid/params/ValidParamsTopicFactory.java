@@ -1,8 +1,9 @@
 package com.syswin.temail.dispatcher.valid.params;
 
-import com.google.common.collect.ImmutableMap;
 import com.syswin.temail.dispatcher.valid.match.PacketValidType;
 import com.syswin.temail.ps.common.entity.CDTPPacket;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -11,11 +12,12 @@ public class ValidParamsTopicFactory implements ValidParamsFactory {
   @Override
   public Optional<ValidParams> buildParams(CDTPPacket cdtpPacket,
       Function<CDTPPacket, String> signExtract) {
-    return Optional.of(new ValidParams(PacketValidType.crossTopicSignValid.getAuthUri(),
-        ImmutableMap.of(unsignedBytes, signExtract.apply(cdtpPacket),
-            signature, cdtpPacket.getHeader().getSignature(),
-            algorithm, String.valueOf(cdtpPacket.getHeader().getSignatureAlgorithm()),
-            senderTemail, cdtpPacket.getHeader().getSender(),
-            senderPublicKey, cdtpPacket.getHeader().getSenderPK())));
+    Map<String, String> params = new HashMap<>();
+    params.put(unsignedBytes, signExtract.apply(cdtpPacket));
+    params.put(signature, cdtpPacket.getHeader().getSignature());
+    params.put(algorithm, String.valueOf(cdtpPacket.getHeader().getSignatureAlgorithm()));
+    params.put(senderTemail, cdtpPacket.getHeader().getSender());
+    params.put(senderPublicKey, cdtpPacket.getHeader().getSenderPK());
+    return Optional.of(new ValidParams(PacketValidType.crossTopicSignValid.getAuthUri(), params));
   }
 }
