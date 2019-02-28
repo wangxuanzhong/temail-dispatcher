@@ -12,6 +12,10 @@ public class ValidParamsTopicFactory implements ValidParamsFactory {
   public Optional<ValidParams> buildParams(CDTPPacket cdtpPacket,
       Function<CDTPPacket, String> signExtract) {
     return Optional.of(new ValidParams(PacketValidType.crossTopicSignValid.getAuthUri(),
-        ImmutableMap.of(receiverTemail, cdtpPacket.getHeader().getReceiver())));
+        ImmutableMap.of(unsignedBytes, signExtract.apply(cdtpPacket),
+            signature, cdtpPacket.getHeader().getSignature(),
+            algorithm, String.valueOf(cdtpPacket.getHeader().getSignatureAlgorithm()),
+            senderTemail, cdtpPacket.getHeader().getSender(),
+            senderPublicKey, cdtpPacket.getHeader().getSenderPK())));
   }
 }
