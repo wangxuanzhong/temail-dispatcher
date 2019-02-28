@@ -65,7 +65,7 @@ public class PacketValidJudgeTest {
     Optional<ValidParams> validParams = packetValidJudge.buildParams(cdtpPacket, t -> "i am singature");
     Assertions.assertThat(validParams).isPresent();
     Assertions.assertThat(validParams.get().getAuthUri()).isEqualTo(PacketValidType.crossTopicSignValid.getAuthUri());
-    Assertions.assertThat(validParams.get().getParams().size()).isEqualTo(1);
+    Assertions.assertThat(validParams.get().getParams().size()).isEqualTo(5);
   }
 
   @Test

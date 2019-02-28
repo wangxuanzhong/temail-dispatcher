@@ -53,7 +53,7 @@ public class ValidParamsFactoryTest {
     Assertions.assertThat(validParams).isPresent();
     Assertions.assertThat(validParams.get().getAuthUri()).isNotNull();
     Assertions.assertThat(validParams.get().getParams()).isNotEmpty();
-    Assertions.assertThat(validParams.get().getParams().size()).isEqualTo(1);
+    Assertions.assertThat(validParams.get().getParams().size()).isEqualTo(5);
   }
 
 
