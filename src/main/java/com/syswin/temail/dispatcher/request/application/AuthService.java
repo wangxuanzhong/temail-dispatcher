@@ -44,7 +44,8 @@ public class AuthService {
 
   public ResponseEntity<Response<String>> verify(CDTPPacket packet) {
     Optional<ValidParams> validParams = this.packetValidJudge.buildParams(packet, packetUtil::extractUnsignedData);
-    log.info("PackedId: {} verify params is: {} !", validParams.orElse(EMPTY_VALID_PARAMS).toString());
+    log.info("PackedId: {} verify params is: {} !", packet.getHeader().getPacketId(),
+        validParams.orElse(EMPTY_VALID_PARAMS).toString());
     if (!validParams.isPresent() || !(validParams.get().isAnValidParam())) {
       return ALWAYS_SUCCESS;
     } else {

@@ -71,7 +71,6 @@ class RequestFactory {
       throw new DispatchException("unsupported request type：" + request.getMethod(), packet);
     }
 
-
     String url = composeUrl(request, params.getPath(), params.getQuery());
     log.info("dispatch request info ：URL={}, method={}, entity={}", url, request.getMethod(), entity);
     return new TemailRequest(url, request.getMethod(), entity);

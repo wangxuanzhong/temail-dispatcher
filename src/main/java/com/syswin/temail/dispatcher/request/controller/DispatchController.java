@@ -2,11 +2,9 @@ package com.syswin.temail.dispatcher.request.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_OCTET_STREAM_VALUE;
-
 import com.syswin.temail.dispatcher.codec.RawPacketDecoder;
 import com.syswin.temail.dispatcher.request.application.AuthService;
 import com.syswin.temail.dispatcher.request.application.PackageDispatcher;
-import com.syswin.temail.dispatcher.request.exceptions.DispatchException;
 import com.syswin.temail.ps.common.entity.CDTPPacket;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -40,11 +38,11 @@ public class DispatchController {
   public ResponseEntity<Response<String>> verify(@RequestBody byte[] payload) throws Exception {
     CDTPPacket packet = packetDecoder.decode(payload);
     try {
-      log.info("Dispatcher receive a verify request：{}", packet);
+      log.info("Dispatcher receive a login verify request：{}", packet);
       ResponseEntity<Response<String>> responseEntity = authService.verify(packet);
       ResponseEntity<Response<String>> result = repackageResponse(responseEntity);
-      log.info("PacketId: {} verify result: {}-{}", packet.getHeader().getPacketId(),
-          String.valueOf(result.getStatusCode()), result.getBody());
+      log.info("Login request packetId: {}, sender: {} verify result: {}-{}", packet.getHeader().getPacketId(),
+          packet.getHeader().getSender(), String.valueOf(result.getStatusCode()), result.getBody());
       return result;
     } catch (Exception e) {
       log.error("PacketId: {} verify failed! ", packet.getHeader().getPacketId(), e);
@@ -60,8 +58,8 @@ public class DispatchController {
     try {
       log.info("Dispatcher receive a dispatch request：{}", packet);
       ResponseEntity<Response<String>> verifyResult = authService.verify(packet);
-      log.info("PacketId: {} verify result: {}-{}", packet.getHeader().getPacketId(),
-          String.valueOf(verifyResult.getStatusCode()), verifyResult.getBody());
+      log.info("Dispatch request packetId: {}, sender: {} verify result: {}-{}", packet.getHeader().getPacketId(),
+          packet.getHeader().getSender(), String.valueOf(verifyResult.getStatusCode()), verifyResult.getBody());
       if (verifyResult.getStatusCode().is2xxSuccessful()) {
         ResponseEntity<String> responseEntity = packageDispatcher.dispatch(packet);
         ResponseEntity<String> result = repackageResponse(responseEntity);
