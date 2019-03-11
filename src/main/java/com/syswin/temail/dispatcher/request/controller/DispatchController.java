@@ -40,8 +40,8 @@ public class DispatchController {
     try {
       ResponseEntity<Response<String>> responseEntity = authService.verify(packet);
       ResponseEntity<Response<String>> result = repackageResponse(responseEntity);
-      log.info("Login request by sender: {} with packetId: {} verify result: {}-{}", packet.getHeader().getPacketId(),
-          packet.getHeader().getSender(), String.valueOf(result.getStatusCode()), result.getBody());
+      log.info("Login request by sender: {} with packetId: {} verify result: {}-{}", packet.getHeader().getSender(),
+          packet.getHeader().getPacketId(), String.valueOf(result.getStatusCode()), result.getBody());
       return result;
     } catch (Exception e) {
       log.error("PacketId: {} verify failed! ", packet.getHeader().getPacketId(), e);
