@@ -38,7 +38,6 @@ public class DispatchController {
   public ResponseEntity<Response<String>> verify(@RequestBody byte[] payload) throws Exception {
     CDTPPacket packet = packetDecoder.decode(payload);
     try {
-      log.info("Dispatcher receive a login verify request：{}", packet);
       ResponseEntity<Response<String>> responseEntity = authService.verify(packet);
       ResponseEntity<Response<String>> result = repackageResponse(responseEntity);
       log.info("Login request by sender: {} with packetId: {} verify result: {}-{}", packet.getHeader().getPacketId(),
@@ -56,7 +55,6 @@ public class DispatchController {
   public ResponseEntity<?> dispatch(@RequestBody byte[] payload) throws Exception {
     CDTPPacket packet = packetDecoder.decode(payload);
     try {
-      log.info("Dispatcher receive a dispatch request：{}", packet);
       ResponseEntity<Response<String>> verifyResult = authService.verify(packet);
       log.info("Dispatch request packetId: {}, sender: {} verify result: {}-{}", packet.getHeader().getPacketId(),
           packet.getHeader().getSender(), String.valueOf(verifyResult.getStatusCode()), verifyResult.getBody());
