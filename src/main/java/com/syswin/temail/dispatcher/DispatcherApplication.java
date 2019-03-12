@@ -11,13 +11,11 @@ import com.syswin.temail.dispatcher.valid.PacketValidJudge;
 import java.util.function.BiPredicate;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.client.RestTemplate;
 
 @EnableSwagger2Doc
 @SpringBootApplication
-@EnableConfigurationProperties({DispatcherProperties.class})
 public class DispatcherApplication {
 
   public static void main(String[] args) {
