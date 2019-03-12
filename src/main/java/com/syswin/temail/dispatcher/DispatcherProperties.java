@@ -29,7 +29,7 @@ public class DispatcherProperties {
 
   @Data
   @Component
-  @ConfigurationProperties(prefix = "spring.rocketmq")
+  @ConfigurationProperties(prefix = "app.dispatcher.rocketmq")
   public static class RocketMQ {
 
     private String namesrvAddr;
