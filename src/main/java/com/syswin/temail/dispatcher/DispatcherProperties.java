@@ -6,7 +6,6 @@ import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
@@ -20,17 +19,13 @@ public class DispatcherProperties {
 
   private String temailChannelUrl;
 
-  @Autowired
-  private RocketMQ rocketmq;
+  private RocketMQ rocketmq = new RocketMQ();
 
   private Map<String, Request> cmdMap = new HashMap<>();
 
   private Map<String, List<String>> validStrategy = new HashMap<>();
 
   @Data
-  @Component
-  @AllArgsConstructor
-  @NoArgsConstructor
   @ConfigurationProperties(prefix = "app.dispatcher.rocketmq")
   public static class RocketMQ {
     private String namesrvAddr;
@@ -39,7 +34,6 @@ public class DispatcherProperties {
     private String consumerTopic;
     private String pushTopic = "";
     private String pushTag = "";
-
   }
 
   @Data
