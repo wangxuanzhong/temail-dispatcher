@@ -2,10 +2,7 @@ package com.syswin.temail.dispatcher.request.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_OCTET_STREAM_VALUE;
-import com.syswin.temail.dispatcher.codec.RawPacketDecoder;
-import com.syswin.temail.dispatcher.request.application.AuthService;
-import com.syswin.temail.dispatcher.request.application.PackageDispatcher;
-import com.syswin.temail.ps.common.entity.CDTPPacket;
+import com.syswin.temail.dispatcher.request.service.DispatcherService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -20,55 +17,23 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class DispatchController {
 
-  private final PackageDispatcher packageDispatcher;
-  private final AuthService authService;
-  private final RawPacketDecoder packetDecoder;
+  private final DispatcherService dispatcherService;
 
   @Autowired
-  public DispatchController(PackageDispatcher packageDispatcher,
-      AuthService authService,
-      RawPacketDecoder packetDecoder) {
-    this.packageDispatcher = packageDispatcher;
-    this.authService = authService;
-    this.packetDecoder = packetDecoder;
+  public DispatchController(DispatcherService dispatcherService) {
+    this.dispatcherService = dispatcherService;
   }
 
   @ApiOperation("CDTP认证服务")
   @PostMapping(value = "/verify", consumes = APPLICATION_OCTET_STREAM_VALUE, produces = APPLICATION_JSON_UTF8_VALUE)
   public ResponseEntity<Response<String>> verify(@RequestBody byte[] payload) throws Exception {
-    CDTPPacket packet = packetDecoder.decode(payload);
-    try {
-      ResponseEntity<Response<String>> responseEntity = authService.verify(packet);
-      ResponseEntity<Response<String>> result = repackageResponse(responseEntity);
-      log.info("Login request by sender: {} with packetId: {} verify result: {}-{}", packet.getHeader().getSender(),
-          packet.getHeader().getPacketId(), String.valueOf(result.getStatusCode()), result.getBody());
-      return result;
-    } catch (Exception e) {
-      log.error("PacketId: {} verify failed! ", packet.getHeader().getPacketId(), e);
-      throw e;
-    }
-
+    return this.dispatcherService.verify(payload);
   }
 
   @ApiOperation("CDTP请求转发")
   @PostMapping(value = "/dispatch", consumes = APPLICATION_OCTET_STREAM_VALUE, produces = APPLICATION_JSON_UTF8_VALUE)
   public ResponseEntity<?> dispatch(@RequestBody byte[] payload) throws Exception {
-    CDTPPacket packet = packetDecoder.decode(payload);
-    try {
-      ResponseEntity<Response<String>> verifyResult = authService.verify(packet);
-      log.info("Dispatch request packetId: {}, sender: {} verify result: {}-{}", packet.getHeader().getPacketId(),
-          packet.getHeader().getSender(), String.valueOf(verifyResult.getStatusCode()), verifyResult.getBody());
-      if (verifyResult.getStatusCode().is2xxSuccessful()) {
-        ResponseEntity<String> responseEntity = packageDispatcher.dispatch(packet);
-        ResponseEntity<String> result = repackageResponse(responseEntity);
-        log.info("PacketId: {} dispatch result：{}", packet.getHeader().getPacketId(), result);
-        return result;
-      }
-      return repackageResponse(verifyResult);
-    } catch (Exception e) {
-      log.error("PackedId: {} dispatch failed! ", packet.getHeader().getPacketId(), e);
-      throw e;
-    }
+    return this.dispatcherService.dispatch(payload);
   }
 
   private <T> ResponseEntity<T> repackageResponse(ResponseEntity<T> responseEntity) {

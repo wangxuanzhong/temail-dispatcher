@@ -53,7 +53,7 @@ public class RequestFactoryTest {
 
   private final CommandAwarePacketUtil commandAwarePacketUtil = new CommandAwarePacketUtil(packetTypeJudge);
   private final RestTemplate restTemplate = Mockito.mock(RestTemplate.class);
-  private final AuthService authService = new AuthService(restTemplate,
+  private final DispAuthService dispAuthService = new DispAuthService(restTemplate,
       properties, commandAwarePacketUtil, new PacketValidJudge(properties));
 
   private static CDTPPacket initCDTPPacketTrans() {

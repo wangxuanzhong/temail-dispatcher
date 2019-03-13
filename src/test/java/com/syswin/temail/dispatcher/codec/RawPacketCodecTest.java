@@ -19,7 +19,7 @@ public class RawPacketCodecTest {
   private final String deviceId = uniquify("deviceId");
 
   private final PacketEncoder encoder = new PacketEncoder();
-  private final RawPacketDecoder decoder = new RawPacketDecoder(commandAwarePredicate);
+  private final DispRawPacketDecoder decoder = new DispRawPacketDecoder(commandAwarePredicate);
   private final CDTPPacket packet = PacketMaker.privateMsgPacket(sender, "recipient", "hello world", deviceId);
 
   @Test

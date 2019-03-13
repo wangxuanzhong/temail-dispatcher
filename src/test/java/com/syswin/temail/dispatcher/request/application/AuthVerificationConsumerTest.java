@@ -165,7 +165,7 @@ public class AuthVerificationConsumerTest extends ConsumerPactTestMk2 {
     //String url = mockServer.getUrl();
     //PacketTypeJudge packetTypeJudge = new PacketTypeJudge(null);
     //CommandAwarePacketUtil packetUtil = new CommandAwarePacketUtil(packetTypeJudge);
-    //AuthService authService = new AuthService(restTemplate, url, packetUtil,packetTypeJudge);
+    //DispAuthService authService = new DispAuthService(restTemplate, url, packetUtil,packetTypeJudge);
     //
     //// verify
     //ResponseEntity<Response<String>> response;

@@ -20,7 +20,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 @Slf4j
-public class AuthService {
+public class DispAuthService {
 
   static final ResponseEntity<Response<String>> ALWAYS_SUCCESS =
       new ResponseEntity<Response<String>>(Response.ok(HttpStatus.OK, "Success"), HttpStatus.OK);
@@ -33,7 +33,7 @@ public class AuthService {
   private final PacketValidJudge packetValidJudge;
   private DispatcherProperties dispatcherProperties;
 
-  public AuthService(RestTemplate restTemplate, DispatcherProperties dispatcherProperties,
+  public DispAuthService(RestTemplate restTemplate, DispatcherProperties dispatcherProperties,
       CommandAwarePacketUtil packetUtil, PacketValidJudge packetValidJudge) {
     this.restTemplate = restTemplate;
     this.packetUtil = packetUtil;

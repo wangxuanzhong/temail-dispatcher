@@ -1,6 +1,6 @@
 package com.syswin.temail.dispatcher.request;
 
-import com.syswin.temail.dispatcher.codec.RawPacketDecoder;
+import com.syswin.temail.dispatcher.codec.DispRawPacketDecoder;
 import com.syswin.temail.ps.common.entity.CDTPPacket;
 import java.util.Base64;
 import java.util.function.BiPredicate;
@@ -15,8 +15,8 @@ class PacketDecoderConfig {
 
   @Primary
   @Bean
-  RawPacketDecoder decoder(BiPredicate<Short, Short> predicate) {
-    return new RawPacketDecoder(predicate) {
+  DispRawPacketDecoder decoder(BiPredicate<Short, Short> predicate) {
+    return new DispRawPacketDecoder(predicate) {
       @Override
       public CDTPPacket decode(byte[] encodedBytes) {
         return super.decode(Base64.getUrlDecoder().decode(encodedBytes));

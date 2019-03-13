@@ -15,7 +15,7 @@ import au.com.dius.pact.provider.junit.target.TestTarget;
 import au.com.dius.pact.provider.spring.SpringRestPactRunner;
 import com.google.gson.Gson;
 import com.syswin.temail.dispatcher.codec.PacketEncoder;
-import com.syswin.temail.dispatcher.request.application.AuthService;
+import com.syswin.temail.dispatcher.request.application.DispAuthService;
 import com.syswin.temail.dispatcher.request.application.PackageDispatcher;
 import com.syswin.temail.dispatcher.request.controller.Response;
 import com.syswin.temail.ps.common.entity.CDTPHeader;
@@ -50,7 +50,7 @@ public class DispatcherProviderTest {
 
 
   @MockBean
-  private AuthService authService;
+  private DispAuthService dispAuthService;
 
   @MockBean
   private PackageDispatcher packageDispatcher;
@@ -58,26 +58,26 @@ public class DispatcherProviderTest {
   @State("User sean is registered")
   public void userIsRegistered() {
     authPacket.getHeader().setSender("sean@t.email");
-    when(authService.verify(authPacket))
+    when(dispAuthService.verify(authPacket))
         .thenReturn(ResponseEntity.ok(Response.ok("Success")));
   }
 
   @State("User jack is not registered")
   public void userNotRegistered() {
     authPacket.getHeader().setSender("jack@t.email");
-    when(authService.verify(authPacket))
+    when(dispAuthService.verify(authPacket))
         .thenReturn(new ResponseEntity<>(Response.failed(FORBIDDEN), FORBIDDEN));
   }
 
   @State("User mike is registered, but server is out of work")
   public void serverOutOfWork() {
     authPacket.getHeader().setSender("mike@t.email");
-    when(authService.verify(authPacket)).thenThrow(RestClientException.class);
+    when(dispAuthService.verify(authPacket)).thenThrow(RestClientException.class);
   }
 
   @State("dispatch user request")
   public void dispatchUserRequest() {
-    when(authService.verify(cdtpPacket))
+    when(dispAuthService.verify(cdtpPacket))
         .thenReturn(ResponseEntity.ok(Response.ok("Success")));
 
     when(packageDispatcher.dispatch(cdtpPacket))

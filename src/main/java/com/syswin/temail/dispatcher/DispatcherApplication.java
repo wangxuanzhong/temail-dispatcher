@@ -2,11 +2,13 @@ package com.syswin.temail.dispatcher;
 
 import com.systoon.ocm.framework.swagger.EnableSwagger2Doc;
 import com.syswin.temail.dispatcher.codec.CommandAwarePredicate;
+import com.syswin.temail.dispatcher.codec.DispRawPacketDecoder;
 import com.syswin.temail.dispatcher.codec.PacketTypeJudge;
-import com.syswin.temail.dispatcher.codec.RawPacketDecoder;
-import com.syswin.temail.dispatcher.request.application.AuthService;
+import com.syswin.temail.dispatcher.request.application.DispAuthService;
 import com.syswin.temail.dispatcher.request.application.CommandAwarePacketUtil;
 import com.syswin.temail.dispatcher.request.application.PackageDispatcher;
+import com.syswin.temail.dispatcher.request.service.DispatcherService;
+import com.syswin.temail.dispatcher.request.service.DispatcherServiceImpl;
 import com.syswin.temail.dispatcher.valid.PacketValidJudge;
 import java.util.function.BiPredicate;
 import org.springframework.boot.SpringApplication;
@@ -33,8 +35,8 @@ public class DispatcherApplication {
   }
 
   @Bean
-  RawPacketDecoder packetDecoder(BiPredicate<Short, Short> predicate) {
-    return new RawPacketDecoder(predicate);
+  DispRawPacketDecoder packetDecoder(BiPredicate<Short, Short> predicate) {
+    return new DispRawPacketDecoder(predicate);
   }
 
   @Bean
@@ -49,13 +51,19 @@ public class DispatcherApplication {
   }
 
   @Bean
-  public PacketValidJudge packetValidJudge(DispatcherProperties properties){
+  public PacketValidJudge packetValidJudge(DispatcherProperties properties) {
     return new PacketValidJudge(properties);
   }
 
   @Bean
-  public AuthService authService(DispatcherProperties properties, RestTemplate restTemplate,
+  public DispAuthService authService(DispatcherProperties properties, RestTemplate restTemplate,
       CommandAwarePacketUtil packetUtil, PacketValidJudge packetValidJudge) {
-    return new AuthService(restTemplate, properties, packetUtil, packetValidJudge);
+    return new DispAuthService(restTemplate, properties, packetUtil, packetValidJudge);
+  }
+
+  @Bean
+  public DispatcherService getDispatService(PackageDispatcher packageDispatcher, DispAuthService dispAuthService,
+      DispRawPacketDecoder dispRawPacketDecoder) {
+    return new DispatcherServiceImpl(packageDispatcher, dispAuthService, dispRawPacketDecoder);
   }
 }

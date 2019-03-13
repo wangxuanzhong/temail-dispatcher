@@ -11,11 +11,11 @@ import java.util.function.BiPredicate;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class RawPacketDecoder {
+public class DispRawPacketDecoder {
 
   private final BiPredicate<Short, Short> commandAwarePredicate;
 
-  public RawPacketDecoder(BiPredicate<Short, Short> commandAwarePredicate) {
+  public DispRawPacketDecoder(BiPredicate<Short, Short> commandAwarePredicate) {
     this.commandAwarePredicate = commandAwarePredicate;
   }
 

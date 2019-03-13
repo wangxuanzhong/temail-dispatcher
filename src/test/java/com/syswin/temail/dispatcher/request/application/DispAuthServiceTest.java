@@ -15,7 +15,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.web.client.RestTemplate;
 
-public class AuthServiceTest {
+public class DispAuthServiceTest {
 
   private final DispatcherProperties dispatcherProperties = new DispatcherProperties();
 
@@ -25,7 +25,7 @@ public class AuthServiceTest {
 
   private final RestTemplate restTemplate = Mockito.mock(RestTemplate.class);
 
-  private final AuthService authService = new AuthService(restTemplate,
+  private final DispAuthService dispAuthService = new DispAuthService(restTemplate,
       dispatcherProperties, commandAwarePacketUtil, new PacketValidJudge(dispatcherProperties));
 
   private static final CDTPPacket cdtpPacket = PacketMaker
@@ -47,7 +47,7 @@ public class AuthServiceTest {
     cdtpPacket.setCommandSpace((short) 2);
     cdtpPacket.setCommand((short) 1);
     cdtpPacket.setData(new PacketEncoder().encode(cdtpPacket));
-    Assertions.assertThat(authService.verify(cdtpPacket)
+    Assertions.assertThat(dispAuthService.verify(cdtpPacket)
         .getStatusCode().is2xxSuccessful()).isTrue();
   }
 
