@@ -7,8 +7,8 @@ import com.syswin.temail.dispatcher.codec.PacketTypeJudge;
 import com.syswin.temail.dispatcher.request.application.DispAuthService;
 import com.syswin.temail.dispatcher.request.application.CommandAwarePacketUtil;
 import com.syswin.temail.dispatcher.request.application.PackageDispatcher;
-import com.syswin.temail.dispatcher.request.service.DispatcherService;
-import com.syswin.temail.dispatcher.request.service.DispatcherServiceImpl;
+import com.syswin.temail.dispatcher.request.service.DispDispatcherService;
+import com.syswin.temail.dispatcher.request.service.DispDispatcherServiceImpl;
 import com.syswin.temail.dispatcher.valid.PacketValidJudge;
 import java.util.function.BiPredicate;
 import org.springframework.boot.SpringApplication;
@@ -62,8 +62,8 @@ public class DispatcherApplication {
   }
 
   @Bean
-  public DispatcherService getDispatService(PackageDispatcher packageDispatcher, DispAuthService dispAuthService,
+  public DispDispatcherService getDispatService(PackageDispatcher packageDispatcher, DispAuthService dispAuthService,
       DispRawPacketDecoder dispRawPacketDecoder) {
-    return new DispatcherServiceImpl(packageDispatcher, dispAuthService, dispRawPacketDecoder);
+    return new DispDispatcherServiceImpl(packageDispatcher, dispAuthService, dispRawPacketDecoder);
   }
 }

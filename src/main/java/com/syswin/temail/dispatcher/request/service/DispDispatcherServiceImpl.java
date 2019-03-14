@@ -9,7 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 
 @Slf4j
-public class DispatcherServiceImpl implements DispatcherService {
+public class DispDispatcherServiceImpl implements DispDispatcherService {
 
   private final PackageDispatcher packageDispatcher;
 
@@ -17,7 +17,7 @@ public class DispatcherServiceImpl implements DispatcherService {
 
   private final DispRawPacketDecoder packetDecoder;
 
-  public DispatcherServiceImpl(PackageDispatcher packageDispatcher,
+  public DispDispatcherServiceImpl(PackageDispatcher packageDispatcher,
       DispAuthService dispAuthService, DispRawPacketDecoder packetDecoder) {
     this.packageDispatcher = packageDispatcher;
     this.dispAuthService = dispAuthService;
