@@ -25,7 +25,7 @@ public class CommandAwarePredicateTest {
   @Test
   public void falseIfAnyOtherPrivateMessage() {
     for (short i = Short.MIN_VALUE; i < Short.MAX_VALUE; i++) {
-      if (i != 1 && i != 0x1005) {
+      if (i != 1 && i != 0x1005 && i != 0x3000) {
         Assertions.assertThat(predicate.test(SINGLE_MESSAGE_CODE, i)).isFalse();
       }
     }
