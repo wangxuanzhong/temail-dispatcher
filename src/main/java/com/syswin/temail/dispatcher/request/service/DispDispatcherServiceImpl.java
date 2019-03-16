@@ -1,5 +1,6 @@
 package com.syswin.temail.dispatcher.request.service;
 
+import com.google.gson.Gson;
 import com.syswin.temail.dispatcher.codec.DispRawPacketDecoder;
 import com.syswin.temail.dispatcher.request.application.DispAuthService;
 import com.syswin.temail.dispatcher.request.application.PackageDispatcher;
@@ -10,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 
 @Slf4j
 public class DispDispatcherServiceImpl implements DispDispatcherService {
+
+  private final Gson gson = new Gson();
 
   private final PackageDispatcher packageDispatcher;
 
@@ -29,7 +32,7 @@ public class DispDispatcherServiceImpl implements DispDispatcherService {
     CDTPPacket packet = packetDecoder.decode(payload);
     try {
       ResponseEntity<Response<String>> responseEntity = dispAuthService.verify(packet);
-      ResponseEntity<Response<String>> result = repackageResponse(responseEntity);
+      ResponseEntity<Response<String>> result = repackageResponsetoStr(responseEntity);
       log.info("Login request by sender: {} with packetId: {} verify result: {}-{}", packet.getHeader().getSender(),
           packet.getHeader().getPacketId(), String.valueOf(result.getStatusCode()), result.getBody());
       return result;
@@ -41,7 +44,7 @@ public class DispDispatcherServiceImpl implements DispDispatcherService {
   }
 
   @Override
-  public ResponseEntity<?> dispatch(byte[] payload) throws Exception {
+  public ResponseEntity<String> dispatch(byte[] payload) throws Exception {
     CDTPPacket packet = packetDecoder.decode(payload);
     try {
       ResponseEntity<Response<String>> verifyResult = dispAuthService.verify(packet);
@@ -49,7 +52,7 @@ public class DispDispatcherServiceImpl implements DispDispatcherService {
           packet.getHeader().getSender(), String.valueOf(verifyResult.getStatusCode()), verifyResult.getBody());
       if (verifyResult.getStatusCode().is2xxSuccessful()) {
         ResponseEntity<String> responseEntity = packageDispatcher.dispatch(packet);
-        ResponseEntity<String> result = repackageResponse(responseEntity);
+        ResponseEntity<String> result = repackageResponsetoStr(responseEntity);
         log.info("PacketId: {} dispatch result：{}", packet.getHeader().getPacketId(), result);
         return result;
       }
@@ -60,7 +63,13 @@ public class DispDispatcherServiceImpl implements DispDispatcherService {
     }
   }
 
-  private <T> ResponseEntity<T> repackageResponse(ResponseEntity<T> responseEntity) {
+  private ResponseEntity<String> repackageResponse(ResponseEntity<Response<String>> verifyResult) {
+    //return new ResponseEntity<>()
+    return new ResponseEntity<>(gson.toJson(verifyResult.getBody()), verifyResult.getStatusCode());
+  }
+
+
+  private <T> ResponseEntity<T> repackageResponsetoStr(ResponseEntity<T> responseEntity) {
     return new ResponseEntity<>(responseEntity.getBody(), responseEntity.getStatusCode());
   }
 }
