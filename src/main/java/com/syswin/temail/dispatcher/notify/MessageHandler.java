@@ -65,7 +65,6 @@ public class MessageHandler {
             } catch (Exception ex) {
               log.error("Fail to send message : {}", msgList, ex);
             }
-
           } else if (judger.isToBePushedMsg(messageBody.getEventType())
               && !isSenderEqualsToRecevier(header)) {
             Optional<String> pushMessage = notificationMsgFactory
