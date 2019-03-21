@@ -15,18 +15,18 @@ import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-class MessageHandler {
+public class MessageHandler {
 
   private final Gson gson = new Gson();
   private final GatewayLocator gatewayLocator;
   private final NotificationMessageFactory notificationMsgFactory = new NotificationMessageFactory();
-  private final MQProducer producer;
+  private final MQMsgSender producer;
   private final String pushTopic;
   private final String pushTag;
   private final PacketTypeJudge judger;
 
 
-  public MessageHandler(MQProducer producer,
+  public MessageHandler(MQMsgSender producer,
       GatewayLocator gatewayLocator,
       String pushTopic,
       String pushTag,
@@ -38,7 +38,7 @@ class MessageHandler {
     this.judger = judger;
   }
 
-  void onMessageReceived(String msg) throws Exception {
+  public void onMessageReceived(String msg) throws Exception {
     log.info("Dispatcher receive a message from MQ ：{}", msg);
     try {
       MessageBody messageBody = gson.fromJson(msg, MessageBody.class);

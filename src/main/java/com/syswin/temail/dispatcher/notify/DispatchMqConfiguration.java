@@ -14,16 +14,15 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.web.client.RestTemplate;
 
 @Configuration
-@Slf4j
 @Profile("!dev")
-class RocketMqConfiguration {
+@Slf4j
+class DispatchMqConfiguration {
 
   private static final String MQ_TOPIC_TAG = "*";
 
   @Bean
   MQConsumer consumer(DispatcherProperties properties, RestTemplate restTemplate, MQProducer producer,
-      PacketTypeJudge packetTypeJudge)
-      throws Exception {
+      PacketTypeJudge packetTypeJudge) throws Exception {
     RocketMQ rocketMQ = properties.getRocketmq();
     DefaultMQPushConsumer consumer = new DefaultMQPushConsumer(rocketMQ.getConsumerGroup());
     consumer.setNamesrvAddr(rocketMQ.getNamesrvAddr());
@@ -42,4 +41,5 @@ class RocketMqConfiguration {
     producer.start();
     return producer;
   }
+
 }

@@ -4,8 +4,8 @@ import com.systoon.ocm.framework.swagger.EnableSwagger2Doc;
 import com.syswin.temail.dispatcher.codec.CommandAwarePredicate;
 import com.syswin.temail.dispatcher.codec.DispRawPacketDecoder;
 import com.syswin.temail.dispatcher.codec.PacketTypeJudge;
-import com.syswin.temail.dispatcher.request.application.DispAuthService;
 import com.syswin.temail.dispatcher.request.application.CommandAwarePacketUtil;
+import com.syswin.temail.dispatcher.request.application.DispAuthService;
 import com.syswin.temail.dispatcher.request.application.PackageDispatcher;
 import com.syswin.temail.dispatcher.request.service.DispDispatcherService;
 import com.syswin.temail.dispatcher.request.service.DispDispatcherServiceImpl;
@@ -67,4 +67,5 @@ public class DispatcherApplication extends SpringBootServletInitializer {
       DispRawPacketDecoder dispRawPacketDecoder) {
     return new DispDispatcherServiceImpl(packageDispatcher, dispAuthService, dispRawPacketDecoder);
   }
+
 }

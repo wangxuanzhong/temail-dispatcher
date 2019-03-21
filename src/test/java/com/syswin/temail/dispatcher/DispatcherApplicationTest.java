@@ -42,9 +42,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 @SpringBootTest(webEnvironment = RANDOM_PORT,
     properties = {
         "app.dispatcher.cmd-map.10001.method=POST",
-        "app.dispatcher.valid-strategy.receiverVlalid=0001-0001, 0001-0005, 0001-0006, 0001-1005, 0001-1006, 0001-100B",
-        "app.dispatcher.valid-strategy.skipVlalid=000E-0001, 000E-0002, 000E-0004",
-
         "app.dispatcher.valid-strategy.crossSingleSignValid=0001-*",
         "app.dispatcher.valid-strategy.crossGroupsignValid=0002-*",
         "app.dispatcher.valid-strategy.crossTopicSignValid=000E-*",

@@ -15,15 +15,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 
 @Slf4j
-class NotificationMessageFactory {
+public class NotificationMessageFactory {
 
   private final Gson gson;
 
-  NotificationMessageFactory() {
+  public NotificationMessageFactory() {
     gson = new Gson();
   }
 
-  String notificationOf(String receiver, CDTPHeader header, String body) {
+  public String notificationOf(String receiver, CDTPHeader header, String body) {
     CDTPPacketTrans packet = new CDTPPacketTrans();
     packet.setCommandSpace(NOTIFY_COMMAND_SPACE);
     packet.setCommand(NOTIFY_COMMAND);
@@ -34,7 +34,7 @@ class NotificationMessageFactory {
     return gson.toJson(packet);
   }
 
-  Optional<String> getPushMessage(String receiver, CDTPHeader header, String body) {
+  public Optional<String> getPushMessage(String receiver, CDTPHeader header, String body) {
     try {
       PushData pushData = gson.fromJson(body, PushData.class);
       PushMessage pushMsg = new PushMessage();
@@ -49,7 +49,7 @@ class NotificationMessageFactory {
     }
   }
 
-  Map<String, String> extractPushOptions(CDTPHeader header) {
+  public Map<String, String> extractPushOptions(CDTPHeader header) {
     try {
       Map extraOption = Optional.ofNullable(gson.fromJson(header.getExtraData(), Map.class)).orElse(emptyMap());
       Map result = (Map) extraOption.getOrDefault("push", emptyMap());

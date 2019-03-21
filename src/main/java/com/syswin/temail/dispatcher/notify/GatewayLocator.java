@@ -16,7 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
 @Slf4j
-class GatewayLocator {
+public class GatewayLocator {
 
   private final ParameterizedTypeReference<Response<TemailAccountLocations>> responseType = new ParameterizedTypeReference<Response<TemailAccountLocations>>() {
   };
@@ -25,7 +25,7 @@ class GatewayLocator {
   private final RestTemplate restTemplate;
   private final String discoveryUrl;
 
-  GatewayLocator(RestTemplate restTemplate, String discoveryUrl) {
+  public GatewayLocator(RestTemplate restTemplate, String discoveryUrl) {
     this.restTemplate = restTemplate;
     this.discoveryUrl = discoveryUrl;
 
@@ -34,7 +34,7 @@ class GatewayLocator {
     this.httpEntity = new HttpEntity<>(headers);
   }
 
-  List<TemailAccountLocation> locate(String temail) {
+  public List<TemailAccountLocation> locate(String temail) {
     try {
       ResponseEntity<Response<TemailAccountLocations>> responseEntity = restTemplate.exchange(
           discoveryUrl,

@@ -9,7 +9,7 @@ import org.apache.rocketmq.common.message.Message;
  * @author 姚华成
  * @date 2018-9-5
  */
-class RocketMQProducer implements MQProducer {
+public class RocketMQProducer implements MQMsgSender {
 
   private org.apache.rocketmq.client.producer.MQProducer producer;
 

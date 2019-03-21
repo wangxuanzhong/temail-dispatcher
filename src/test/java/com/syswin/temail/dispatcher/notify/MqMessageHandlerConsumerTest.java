@@ -34,7 +34,7 @@ public class MqMessageHandlerConsumerTest {
   private final static Gson gson = new Gson();
   @Rule
   public final MessagePactProviderRule mockProvider = new MessagePactProviderRule(this);
-  private final MQProducer producer = Mockito.mock(MQProducer.class);
+  private final MQMsgSender producer = Mockito.mock(MQMsgSender.class);
   private final GatewayLocator gatewayLocator = Mockito.mock(GatewayLocator.class);
 
   private final String recipient = "sean@t.email";

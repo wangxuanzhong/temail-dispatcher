@@ -10,11 +10,11 @@ import org.apache.rocketmq.client.consumer.listener.MessageListenerConcurrently;
 import org.apache.rocketmq.common.message.MessageExt;
 
 @Slf4j
-class RocketDispatchListener implements MessageListenerConcurrently {
+public class RocketDispatchListener implements MessageListenerConcurrently {
 
   private final MessageHandler messageHandler;
 
-  public RocketDispatchListener(MQProducer producer, GatewayLocator gatewayLocator, DispatcherProperties properties,
+  public RocketDispatchListener(MQMsgSender producer, GatewayLocator gatewayLocator, DispatcherProperties properties,
       PacketTypeJudge packetTypeJudge) {
     messageHandler = new MessageHandler(producer, gatewayLocator, properties.getRocketmq().getPushTopic(),
         properties.getRocketmq().getPushTag(), packetTypeJudge);

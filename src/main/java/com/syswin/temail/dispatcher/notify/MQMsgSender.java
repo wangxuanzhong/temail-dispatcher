@@ -7,7 +7,7 @@ import java.util.List;
  * @author 姚华成
  * @date 2018-9-5
  */
-public interface MQProducer {
+public interface MQMsgSender {
 
   void send(List<MqMessage> mqMessages) throws Exception;
 }
