@@ -37,11 +37,10 @@ public class PacketTypeJudge {
     return this.isGroupMessage(commandSpace, command)
         || this.isGroupMessageReply(commandSpace, command)
         || this.isAssignedUserMessageBuild(commandSpace, command)
-        || this.isSendAssignedUserReplyMessage(commandSpace, command)
-        || this.isNewGroupMessage(commandSpace, command);
+        || this.isSendAssignedUserReplyMessage(commandSpace, command);
   }
 
-  private boolean isNewGroupMessage(short commandSpace, short command) {
+  public boolean isNewGroupMessage(short commandSpace, short command) {
     return (commandSpace == SINGLE_MESSAGE_CODE && command == 0x3000);
   }
 

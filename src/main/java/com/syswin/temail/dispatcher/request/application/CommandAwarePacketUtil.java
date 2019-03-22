@@ -90,15 +90,33 @@ public class CommandAwarePacketUtil extends PacketUtil {
     try {
       if (isSendSingleMsg(commandSpace, command)) {
         return buildSendSingleMsgParams(packet);
+
       } else if (isSendGroupMsg(commandSpace, command)) {
         return buildSendGroupMsgParams(packet);
+
+      } else if (isSendNewGroupMsg(commandSpace, command)) {
+        return buildSendNewGroupMsgParams(packet);
+
       } else {
         return gson.fromJson(new String(packet.getData(), UTF_8), CDTPParams.class);
+
       }
     } catch (JsonSyntaxException e) {
       log.error("fail to parse json format data of Body, param：{}", packet);
       throw new DispatchException(e, packet);
     }
+  }
+
+  private boolean isSendNewGroupMsg(short commandSpace, short command) {
+    return packetTypeJudge.isNewGroupMessage(commandSpace, command);
+  }
+
+  private CDTPParams buildSendNewGroupMsgParams(CDTPPacket packet) {
+    CDTPPacket originalPacket = unpack(packet.getData());
+    CDTPParams params = new CDTPParams(new HashMap<>());
+    params.getBody().put("meta", originalPacket.getHeader());
+    params.getBody().put("packet", encode(packet.getData()));
+    return params;
   }
 
   boolean isBizServerValidType(short commandSpace) {
