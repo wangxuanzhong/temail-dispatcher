@@ -14,7 +14,8 @@ public class CommandAwarePredicate implements BiPredicate<Short, Short> {
   @Override
   public boolean test(Short commandSpace, Short command) {
     return isPrivateMessage(commandSpace, command)
-        || isGroupMessage(commandSpace, command);
+        || isGroupMessage(commandSpace, command)
+        || isNewGroupMessage(commandSpace, command);
   }
 
   private boolean isPrivateMessage(short commandSpace, short command) {
@@ -23,6 +24,10 @@ public class CommandAwarePredicate implements BiPredicate<Short, Short> {
 
   private boolean isGroupMessage(short commandSpace, short command) {
     return packetTypeJudge.isGroupDecryptType(commandSpace, command);
+  }
+
+  private boolean isNewGroupMessage(short commandSpace, short command) {
+    return packetTypeJudge.isNewGroupMessage(commandSpace, command);
   }
 
 }

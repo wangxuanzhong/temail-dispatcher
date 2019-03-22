@@ -107,16 +107,16 @@ public class CommandAwarePacketUtil extends PacketUtil {
     }
   }
 
-  private boolean isSendNewGroupMsg(short commandSpace, short command) {
-    return packetTypeJudge.isNewGroupMessage(commandSpace, command);
-  }
-
   private CDTPParams buildSendNewGroupMsgParams(CDTPPacket packet) {
     CDTPPacket originalPacket = unpack(packet.getData());
     CDTPParams params = new CDTPParams(new HashMap<>());
     params.getBody().put("meta", originalPacket.getHeader());
     params.getBody().put("packet", encode(packet.getData()));
     return params;
+  }
+
+  private boolean isSendNewGroupMsg(short commandSpace, short command) {
+    return packetTypeJudge.isNewGroupMessage(commandSpace, command);
   }
 
   boolean isBizServerValidType(short commandSpace) {
