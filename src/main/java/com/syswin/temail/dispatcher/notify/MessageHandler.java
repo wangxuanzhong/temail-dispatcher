@@ -25,7 +25,6 @@ public class MessageHandler {
   private final String pushTag;
   private final PacketTypeJudge judger;
 
-
   public MessageHandler(MQMsgSender producer,
       ChannelStsLocator gatewayLocator,
       String pushTopic,
@@ -85,7 +84,6 @@ public class MessageHandler {
             log.warn(
                 "No registered channel status was found, and the MQmsg is not private or although it is private but sender is same to receiver, skip pushing the msg : {}",
                 msg);
-
           }
         }
       }
