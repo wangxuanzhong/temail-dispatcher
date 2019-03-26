@@ -16,7 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
 @Slf4j
-public class GatewayLocator {
+public class RemoteChannelStsLocator implements ChannelStsLocator {
 
   private final ParameterizedTypeReference<Response<TemailAccountLocations>> responseType = new ParameterizedTypeReference<Response<TemailAccountLocations>>() {
   };
@@ -25,7 +25,7 @@ public class GatewayLocator {
   private final RestTemplate restTemplate;
   private final String discoveryUrl;
 
-  public GatewayLocator(RestTemplate restTemplate, String discoveryUrl) {
+  public RemoteChannelStsLocator(RestTemplate restTemplate, String discoveryUrl) {
     this.restTemplate = restTemplate;
     this.discoveryUrl = discoveryUrl;
 

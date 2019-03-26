@@ -35,7 +35,7 @@ public class MqOffLineMessageHandlerConsummerTest {
   @Rule
   public final MessagePactProviderRule mockProvider = new MessagePactProviderRule(this);
   private final MQMsgSender producer = Mockito.mock(MQMsgSender.class);
-  private final GatewayLocator gatewayLocator = Mockito.mock(GatewayLocator.class);
+  private final RemoteChannelStsLocator gatewayLocator = Mockito.mock(RemoteChannelStsLocator.class);
 
   private final String recipient = "sean@t.email";
 

@@ -14,7 +14,7 @@ public class RocketDispatchListener implements MessageListenerConcurrently {
 
   private final MessageHandler messageHandler;
 
-  public RocketDispatchListener(MQMsgSender producer, GatewayLocator gatewayLocator, DispatcherProperties properties,
+  public RocketDispatchListener(MQMsgSender producer, ChannelStsLocator gatewayLocator, DispatcherProperties properties,
       PacketTypeJudge packetTypeJudge) {
     messageHandler = new MessageHandler(producer, gatewayLocator, properties.getRocketmq().getPushTopic(),
         properties.getRocketmq().getPushTag(), packetTypeJudge);

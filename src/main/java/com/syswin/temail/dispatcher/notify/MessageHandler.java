@@ -18,7 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 public class MessageHandler {
 
   private final Gson gson = new Gson();
-  private final GatewayLocator gatewayLocator;
+  private final ChannelStsLocator gatewayLocator;
   private final NotificationMessageFactory notificationMsgFactory = new NotificationMessageFactory();
   private final MQMsgSender producer;
   private final String pushTopic;
@@ -27,7 +27,7 @@ public class MessageHandler {
 
 
   public MessageHandler(MQMsgSender producer,
-      GatewayLocator gatewayLocator,
+      ChannelStsLocator gatewayLocator,
       String pushTopic,
       String pushTag,
       PacketTypeJudge judger) {
@@ -66,7 +66,7 @@ public class MessageHandler {
               log.error("Fail to send message : {}", msgList, ex);
             }
           } else if (judger.isToBePushedMsg(messageBody.getEventType())
-              && !isSenderEqualsToRecevier(header)) {
+              && !judger.isSenderEqualsToRecevier(header)) {
             Optional<String> pushMessage = notificationMsgFactory
                 .getPushMessage(receiver, header, messageBody.getData());
             pushMessage.ifPresent(message -> {
@@ -93,11 +93,6 @@ public class MessageHandler {
       // 数据格式错误，记录错误，直接跳过
       log.error("Invalid message format：{}", msg, e);
     }
-  }
-
-  private boolean isSenderEqualsToRecevier(CDTPHeader cdtpHeader) {
-    return cdtpHeader.getSender() != null &&
-        cdtpHeader.getSender().equals(cdtpHeader.getReceiver());
   }
 
 }

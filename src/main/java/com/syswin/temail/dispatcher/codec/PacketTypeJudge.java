@@ -4,6 +4,7 @@ import static com.syswin.temail.ps.common.entity.CommandSpaceType.GROUP_MESSAGE_
 import static com.syswin.temail.ps.common.entity.CommandSpaceType.SINGLE_MESSAGE_CODE;
 import com.syswin.temail.dispatcher.Constants;
 import com.syswin.temail.dispatcher.DispatcherProperties;
+import com.syswin.temail.ps.common.entity.CDTPHeader;
 import lombok.Data;
 
 @Data
@@ -63,6 +64,11 @@ public class PacketTypeJudge {
   public boolean isToBePushedMsg(Integer eventType) {
     return eventType.equals(Constants.COMMON_MSG_EVENT_TYPE)
         || eventType.equals(Constants.NOTRACE_MSG_EVENT_TYPE);
+  }
+
+  public boolean isSenderEqualsToRecevier(CDTPHeader cdtpHeader) {
+    return cdtpHeader.getSender() != null &&
+        cdtpHeader.getSender().equals(cdtpHeader.getReceiver());
   }
 
   public boolean isBizServerValidType(short commandSpace) {

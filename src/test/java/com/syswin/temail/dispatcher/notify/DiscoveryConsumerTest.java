@@ -69,7 +69,7 @@ public class DiscoveryConsumerTest extends ConsumerPactTestMk2 {
   public void runTest(MockServer mockServer) {
     String url = mockServer.getUrl() + path + "/{temail}";
 
-    GatewayLocator gatewayLocator = new GatewayLocator(restTemplate, url);
+    RemoteChannelStsLocator gatewayLocator = new RemoteChannelStsLocator(restTemplate, url);
 
     List<TemailAccountLocation> locations = gatewayLocator.locate(sean);
 
@@ -81,7 +81,7 @@ public class DiscoveryConsumerTest extends ConsumerPactTestMk2 {
     assertThat(locations).isEmpty();
 
 
-    gatewayLocator = new GatewayLocator(restTemplate, "http://localhost:99");
+    gatewayLocator = new RemoteChannelStsLocator(restTemplate, "http://localhost:99");
     locations = gatewayLocator.locate(sean);
 
     assertThat(locations).isEmpty();
