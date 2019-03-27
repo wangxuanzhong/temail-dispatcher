@@ -21,31 +21,6 @@ class DispatchMqConfiguration {
 
   private static final String MQ_TOPIC_TAG = "*";
 
-//  @Bean
-//  MqProducerConfig mqProducerConfig(DispatcherProperties properties, RestTemplate restTemplate) {
-//    return new MqProducerConfig(properties.getRocketmq().getProducerGroup(), MqImplementation.ROCKET_MQ);
-//  }
-//
-//  @Bean
-//  MqConsumerConfig mqConsumerConfig(DispatcherProperties properties, RestTemplate restTemplate, PacketTypeJudge packetTypeJudge,
-//      Map<String, RocketMqProducer> mqProducers) {
-//    MQMsgSender mqMsgSender = new CommonMQMsgSender(mqProducers.get(properties.getRocketmq().getProducerGroup()));
-//    ChannelStsLocator gatewayLocator = new RemoteChannelStsLocator(restTemplate, properties.getTemailChannelUrl());
-//    final MessageHandler messageHandler = new MessageHandler(mqMsgSender, gatewayLocator,
-//        properties.getRocketmq().getPushTopic(),
-//        properties.getRocketmq().getPushTag(), packetTypeJudge);
-//    return  MqConsumerConfig.create().implementation(MqImplementation.ROCKET_MQ).listener(str->{
-//      try {
-//        messageHandler.onMessageReceived(str);
-//      } catch (Exception e) {
-//        e.printStackTrace();
-//      }
-//    }).tag(MQ_TOPIC_TAG)
-//        .topic(properties.getRocketmq().getConsumerTopic())
-//        .group(properties.getRocketmq().getConsumerGroup())
-//        .concurrent().type(MqConsumerType.CLUSTER).build();
-//  }
-
   @Bean
   MQConsumer consumer(DispatcherProperties properties, RestTemplate restTemplate, MQProducer producer,
                       PacketTypeJudge packetTypeJudge) throws Exception {

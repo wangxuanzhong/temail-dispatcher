@@ -113,11 +113,6 @@
         </exclusion>
       </exclusions>
     </dependency>
-    <dependency>
-      <groupId>com.syswin.library</groupId>
-      <artifactId>messaging-all-spring</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
-    </dependency>
 
     <dependency>
       <groupId>org.springframework.amqp</groupId>
