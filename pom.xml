@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.syswin.temail</groupId>
   <artifactId>temail-dispatcher</artifactId>
-  <version>1.1.32-SNAPSHOT</version>
+  <version>1.1.32</version>
   <packaging>${packaging.type}</packaging>
   <parent>
     <groupId>org.springframework.boot</groupId>
@@ -28,7 +28,7 @@
     <connection>scm:git:git@172.28.4.12:java_temail/temail-dispatcher.git</connection>
     <developerConnection>scm:git:git@172.28.4.12:java_temail/temail-dispatcher.git</developerConnection>
     <url>http://172.28.4.12/java_temail/temail-dispatcher</url>
-    <tag>${project.version}</tag>
+    <tag>temail-dispatcher-1.1.32</tag>
   </scm>
 
   <dependencies>
