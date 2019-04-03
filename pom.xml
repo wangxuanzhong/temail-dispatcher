@@ -26,6 +26,13 @@
     <awaitility.version>3.0.0</awaitility.version>
   </properties>
 
+  <scm>
+    <connection>scm:git:${project.git.url}/temail-dispatcher.git</connection>
+    <developerConnection>scm:git:${project.git.url}/temail-dispatcher.git</developerConnection>
+    <url>${project.git.url}/temail-dispatcher</url>
+    <tag>${project.version}</tag>
+  </scm>
+
   <dependencies>
     <dependency>
       <groupId>com.syswin.temail</groupId>
@@ -322,7 +329,17 @@
           </excludes>
         </configuration>
       </plugin>
-
+       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-release-plugin</artifactId>
+        <dependencies>
+          <dependency>
+            <groupId>org.apache.maven.scm</groupId>
+            <artifactId>maven-scm-provider-gitexe</artifactId>
+            <version>1.8.1</version>
+          </dependency>
+        </dependencies>
+      </plugin>
       <plugin>
         <groupId>au.com.dius</groupId>
         <artifactId>pact-jvm-provider-maven_2.12</artifactId>
@@ -349,4 +366,16 @@
       <url>http://maven.systoon.com/repository/public/</url>
     </repository>
   </repositories>
+  <distributionManagement>
+    <repository>
+      <id>nexus-releases</id>
+      <name>Nexus Releases Repository</name>
+      <url>http://maven.systoon.com/repository/releases/</url>
+    </repository>
+    <snapshotRepository>
+      <id>nexus-snapshots</id>
+      <name>Nexus Snapshots Repository</name>
+      <url>http://maven.systoon.com/repository/snapshots/</url>
+    </snapshotRepository>
+  </distributionManagement>
 </project>
