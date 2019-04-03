@@ -3,10 +3,6 @@ package com.syswin.temail.dispatcher.request.utils;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-/**
- * @author 姚华成
- * @date 2018-03-23
- */
 public class DigestUtil {
 
   private static final String ALGORITHM_MD5 = "MD5";

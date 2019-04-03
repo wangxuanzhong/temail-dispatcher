@@ -5,10 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import org.apache.rocketmq.common.message.Message;
 
-/**
- * @author 姚华成
- * @date 2018-9-5
- */
 public class RocketMQProducer implements MQMsgSender {
 
   private org.apache.rocketmq.client.producer.MQProducer producer;

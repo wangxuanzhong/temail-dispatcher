@@ -23,10 +23,6 @@ import java.util.HashMap;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 
-/**
- * @author 姚华成
- * @date 2018-11-05
- */
 @Slf4j
 public class CommandAwarePacketUtil extends PacketUtil {
 
