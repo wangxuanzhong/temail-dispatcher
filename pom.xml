@@ -27,9 +27,9 @@
   </properties>
 
   <scm>
-    <connection>scm:git:${project.git.url}/temail-dispatcher.git</connection>
-    <developerConnection>scm:git:${project.git.url}/temail-dispatcher.git</developerConnection>
-    <url>${project.git.url}/temail-dispatcher</url>
+    <connection>scm:git:git@172.28.4.12:java_temail/temail-dispatcher.git</connection>
+    <developerConnection>scm:git:git@172.28.4.12:java_temail/temail-dispatcher.git</developerConnection>
+    <url>http://172.28.4.12/java_temail/temail-dispatcher</url>
     <tag>${project.version}</tag>
   </scm>
 
@@ -329,17 +329,6 @@
           </excludes>
         </configuration>
       </plugin>
-       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-release-plugin</artifactId>
-        <dependencies>
-          <dependency>
-            <groupId>org.apache.maven.scm</groupId>
-            <artifactId>maven-scm-provider-gitexe</artifactId>
-            <version>1.8.1</version>
-          </dependency>
-        </dependencies>
-      </plugin>
       <plugin>
         <groupId>au.com.dius</groupId>
         <artifactId>pact-jvm-provider-maven_2.12</artifactId>
@@ -356,6 +345,16 @@
             </goals>
           </execution>
         </executions>
+      </plugin>
+      <plugin>
+        <artifactId>maven-release-plugin</artifactId>
+        <dependencies>
+          <dependency>
+            <groupId>org.apache.maven.scm</groupId>
+            <artifactId>maven-scm-provider-gitexe</artifactId>
+            <version>1.8.1</version>
+          </dependency>
+        </dependencies>
       </plugin>
     </plugins>
   </build>
