@@ -45,6 +45,11 @@
       <version>4.5.6</version>
     </dependency>
 
+    <!--<dependency>-->
+      <!--<groupId>com.systoon.integration</groupId>-->
+      <!--<artifactId>disconf-spring-boot-starter</artifactId>-->
+      <!--<version>${syswin-disconf.version}</version>-->
+    <!--</dependency>-->
 
     <!--apollo-->
     <dependency>

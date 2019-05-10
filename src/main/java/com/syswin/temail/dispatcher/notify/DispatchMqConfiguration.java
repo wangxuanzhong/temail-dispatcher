@@ -21,7 +21,7 @@ class DispatchMqConfiguration {
 
   private static final String MQ_TOPIC_TAG = "*";
 
-//  @Bean
+  @Bean
   MQConsumer consumer(DispatcherProperties properties, RestTemplate restTemplate, MQProducer producer,
                       PacketTypeJudge packetTypeJudge) throws Exception {
     DispatcherProperties.RocketMQ rocketMQ = properties.getRocketmq();
@@ -37,6 +37,7 @@ class DispatchMqConfiguration {
 
   @Bean
   MQProducer producer(DispatcherProperties properties) throws Exception {
+    log.info("get rocket group is {}.",properties.getRocketmq().getProducerGroup());
     DefaultMQProducer producer = new DefaultMQProducer(properties.getRocketmq().getProducerGroup());
     producer.setNamesrvAddr(properties.getRocketmq().getNamesrvAddr());
     producer.start();
