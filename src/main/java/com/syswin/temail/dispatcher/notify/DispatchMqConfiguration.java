@@ -21,7 +21,7 @@ class DispatchMqConfiguration {
 
   private static final String MQ_TOPIC_TAG = "*";
 
-  @Bean
+//  @Bean
   MQConsumer consumer(DispatcherProperties properties, RestTemplate restTemplate, MQProducer producer,
                       PacketTypeJudge packetTypeJudge) throws Exception {
     DispatcherProperties.RocketMQ rocketMQ = properties.getRocketmq();

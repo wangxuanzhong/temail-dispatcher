@@ -38,11 +38,26 @@
       <version>${ps.version}</version>
     </dependency>
 
+    <!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient -->
     <dependency>
-      <groupId>com.systoon.integration</groupId>
-      <artifactId>disconf-spring-boot-starter</artifactId>
-      <version>${syswin-disconf.version}</version>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpclient</artifactId>
+      <version>4.5.6</version>
     </dependency>
+
+
+    <!--apollo-->
+    <dependency>
+      <groupId>com.syswin.framework</groupId>
+      <artifactId>syswin-apollo-client</artifactId>
+      <version>1.0.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-context</artifactId>
+      <version>2.0.2.RELEASE</version>
+    </dependency>
+
     <dependency>
       <!-- disconfig只能使用这个版本，高版本有错误 -->
       <groupId>org.reflections</groupId>
