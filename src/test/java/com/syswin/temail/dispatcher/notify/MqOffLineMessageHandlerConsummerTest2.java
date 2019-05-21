@@ -1,6 +1,7 @@
 package com.syswin.temail.dispatcher.notify;
 
 import static org.mockito.Mockito.when;
+
 import au.com.dius.pact.consumer.MessagePactBuilder;
 import au.com.dius.pact.consumer.MessagePactProviderRule;
 import au.com.dius.pact.consumer.Pact;
@@ -34,7 +35,8 @@ public class MqOffLineMessageHandlerConsummerTest2 {
   @Rule
   public final MessagePactProviderRule mockProvider = new MessagePactProviderRule(this);
   //private final MQMsgSender producer = Mockito.mock(MQMsgSender.class);
-  private final RemoteChannelStsLocator gatewayLocator = Mockito.mock(RemoteChannelStsLocator.class);
+  private final RemoteChannelStsLocator gatewayLocator = Mockito
+      .mock(RemoteChannelStsLocator.class);
 
   private final String recipient = "sean@t.email";
 
@@ -109,11 +111,13 @@ public class MqOffLineMessageHandlerConsummerTest2 {
 
     NotificationMessageFactory notificationMsgFactory = new NotificationMessageFactory();
     Optional<String> body = notificationMsgFactory
-        .getPushMessage(pushDatapayload.getReceiver(), gson.fromJson(pushDatapayload.getHeader(), CDTPHeader.class),
+        .getPushMessage(pushDatapayload.getReceiver(),
+            gson.fromJson(pushDatapayload.getHeader(), CDTPHeader.class),
             pushDatapayload.getData());
 
     MessageHandler messageHandler = new MessageHandler(rocketMQProducer, gatewayLocator,
-        "temail-message", "*", new PacketTypeJudge(null));
+        "temail-message", "*", new PacketTypeJudge(null), t -> {
+    }, new NotificationMessageFactory());
 
     for (int i = 0; i < 5; i++) {
       messageHandler.onMessageReceived(gson.toJson(pushDatapayload));

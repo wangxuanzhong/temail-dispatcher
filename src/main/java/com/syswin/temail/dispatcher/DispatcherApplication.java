@@ -4,6 +4,9 @@ import com.systoon.ocm.framework.swagger.EnableSwagger2Doc;
 import com.syswin.temail.dispatcher.codec.CommandAwarePredicate;
 import com.syswin.temail.dispatcher.codec.DispRawPacketDecoder;
 import com.syswin.temail.dispatcher.codec.PacketTypeJudge;
+import com.syswin.temail.dispatcher.notify.NotificationMessageFactory;
+import com.syswin.temail.dispatcher.notify.suspicious.SuspiciousExtractTaskRunner;
+import com.syswin.temail.dispatcher.notify.suspicious.TaskExecutor;
 import com.syswin.temail.dispatcher.request.application.CommandAwarePacketUtil;
 import com.syswin.temail.dispatcher.request.application.DispAuthService;
 import com.syswin.temail.dispatcher.request.application.PackageDispatcher;
@@ -23,6 +26,17 @@ public class DispatcherApplication extends SpringBootServletInitializer {
 
   public static void main(String[] args) {
     SpringApplication.run(DispatcherApplication.class, args);
+  }
+
+  @Bean
+  public NotificationMessageFactory geneNotificationMessageFactory() {
+    return new NotificationMessageFactory();
+  }
+
+  @Bean
+  public TaskExecutor geneTaskExecutor(DispatcherProperties properties,RestTemplate restTemplat,
+      NotificationMessageFactory notificationMessageFactory) {
+    return new SuspiciousExtractTaskRunner(restTemplat, notificationMessageFactory, properties, t->{});
   }
 
   @Bean

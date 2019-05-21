@@ -12,38 +12,42 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Consumer;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class MessageHandler {
 
   private final Gson gson = new Gson();
-  private final ChannelStsLocator gatewayLocator;
-  private final NotificationMessageFactory notificationMsgFactory = new NotificationMessageFactory();
-  private final MQMsgSender producer;
-  private final String pushTopic;
   private final String pushTag;
+  private final String pushTopic;
+  private final MQMsgSender producer;
   private final PacketTypeJudge judger;
+  private final Consumer<CDTPHeader> taskExecutor;
+  private final ChannelStsLocator gatewayLocator;
+  private final NotificationMessageFactory notificationMsgFactory;
 
-  public MessageHandler(MQMsgSender producer,
-      ChannelStsLocator gatewayLocator,
-      String pushTopic,
-      String pushTag,
-      PacketTypeJudge judger) {
+
+  MessageHandler(MQMsgSender producer, ChannelStsLocator gatewayLocator, String pushTopic,
+      String pushTag, PacketTypeJudge judger, Consumer<CDTPHeader> taskExecutor, NotificationMessageFactory
+      notificationMsgFactory) {
     this.producer = producer;
     this.gatewayLocator = gatewayLocator;
     this.pushTopic = pushTopic;
     this.pushTag = pushTag;
     this.judger = judger;
+    this.taskExecutor = taskExecutor;
+    this.notificationMsgFactory = notificationMsgFactory;
   }
 
-  public void onMessageReceived(String msg) throws Exception {
+  void onMessageReceived(String msg) throws Exception {
     log.info("Dispatcher receive a message from MQ ：{}", msg);
     try {
       MessageBody messageBody = gson.fromJson(msg, MessageBody.class);
       if (messageBody != null) {
         CDTPHeader header = gson.fromJson(messageBody.getHeader(), CDTPHeader.class);
         if (header != null) {
+          this.taskExecutor.accept(header);
           String receiver = messageBody.getReceiver();
           List<TemailAccountLocation> statusList = gatewayLocator.locate(receiver);
           if (!statusList.isEmpty()) {

@@ -109,7 +109,8 @@ public class MqOffLineMessageHandlerConsummerTest {
 
     MessageHandler messageHandler = new MessageHandler(producer, gatewayLocator,
         properties.getRocketmq().getPushTopic(), properties.getRocketmq().getPushTag(),
-        new PacketTypeJudge(null));
+        new PacketTypeJudge(null), t -> {
+    }, new NotificationMessageFactory());
     messageHandler.onMessageReceived(new String(currentMessage));
     verify(producer).send(argThat(matchesPayload(msgList)));
   }

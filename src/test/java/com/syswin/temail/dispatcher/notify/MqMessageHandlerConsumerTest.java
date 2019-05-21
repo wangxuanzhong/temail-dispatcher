@@ -3,6 +3,7 @@ package com.syswin.temail.dispatcher.notify;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 import au.com.dius.pact.consumer.MessagePactBuilder;
 import au.com.dius.pact.consumer.MessagePactProviderRule;
 import au.com.dius.pact.consumer.Pact;
@@ -35,7 +36,8 @@ public class MqMessageHandlerConsumerTest {
   @Rule
   public final MessagePactProviderRule mockProvider = new MessagePactProviderRule(this);
   private final MQMsgSender producer = Mockito.mock(MQMsgSender.class);
-  private final RemoteChannelStsLocator gatewayLocator = Mockito.mock(RemoteChannelStsLocator.class);
+  private final RemoteChannelStsLocator gatewayLocator = Mockito
+      .mock(RemoteChannelStsLocator.class);
 
   private final String recipient = "sean@t.email";
   private final MessageBody payload = mqMsgPayload(recipient, "bonjour");
@@ -92,10 +94,14 @@ public class MqMessageHandlerConsumerTest {
     List<MqMessage> msgList = new ArrayList<>();
     NotificationMessageFactory notificationMsgFactory = new NotificationMessageFactory();
     String body = notificationMsgFactory
-        .notificationOf(payload.getReceiver(), gson.fromJson(payload.getHeader(), CDTPHeader.class), payload.getData());
+        .notificationOf(payload.getReceiver(), gson.fromJson(payload.getHeader(), CDTPHeader.class),
+            payload.getData());
     msgList.add(new MqMessage(mqTopic, mqTag, body));
 
-    MessageHandler messageHandler = new MessageHandler(producer, gatewayLocator, properties.getRocketmq().getPushTopic(), properties.getRocketmq().getPushTag(),new PacketTypeJudge(null));
+    MessageHandler messageHandler = new MessageHandler(producer, gatewayLocator,
+        properties.getRocketmq().getPushTopic(), properties.getRocketmq().getPushTag(),
+        new PacketTypeJudge(null), t -> {
+    }, new NotificationMessageFactory());
     messageHandler.onMessageReceived(new String(currentMessage));
     verify(producer).send(argThat(matchesPayload(msgList)));
   }

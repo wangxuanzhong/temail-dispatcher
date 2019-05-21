@@ -19,6 +19,8 @@ public class DispatcherProperties {
 
   private String authBaseUrl;
 
+  private String relationBaseUrl;
+
   private String temailChannelUrl;
 
   private RocketMQ rocketmq = new RocketMQ();

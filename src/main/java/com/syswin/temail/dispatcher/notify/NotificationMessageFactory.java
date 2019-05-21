@@ -4,6 +4,7 @@ import static com.syswin.temail.dispatcher.Constants.CDTP_VERSION;
 import static com.syswin.temail.dispatcher.Constants.NOTIFY_COMMAND;
 import static com.syswin.temail.dispatcher.Constants.NOTIFY_COMMAND_SPACE;
 import static java.util.Collections.emptyMap;
+
 import com.google.gson.Gson;
 import com.syswin.temail.dispatcher.notify.entity.PushData;
 import com.syswin.temail.dispatcher.notify.entity.PushMessage;
@@ -23,7 +24,7 @@ public class NotificationMessageFactory {
     gson = new Gson();
   }
 
-  public String notificationOf(String receiver, CDTPHeader header, String body) {
+  String notificationOf(String receiver, CDTPHeader header, String body) {
     CDTPPacketTrans packet = new CDTPPacketTrans();
     packet.setCommandSpace(NOTIFY_COMMAND_SPACE);
     packet.setCommand(NOTIFY_COMMAND);
@@ -34,14 +35,14 @@ public class NotificationMessageFactory {
     return gson.toJson(packet);
   }
 
-  public Optional<String> getPushMessage(String receiver, CDTPHeader header, String body) {
+  Optional<String> getPushMessage(String receiver, CDTPHeader header, String body) {
     try {
       PushData pushData = gson.fromJson(body, PushData.class);
       PushMessage pushMsg = new PushMessage();
       BeanUtils.copyProperties(pushData, pushMsg);
-      Map<String, String> pushOptions = this.extractPushOptions(header);
-      pushMsg.setCmd(pushOptions.get("cmd"));
-      pushMsg.setType(pushOptions.get("type"));
+      Map pushOptions = this.extractPushOptions(header);
+      pushMsg.setCmd(String.valueOf(pushOptions.get("cmd")));
+      pushMsg.setType(String.valueOf(pushOptions.get("type")));
       return Optional.ofNullable(gson.toJson(pushMsg));
     } catch (Exception e) {
       log.error("failed to extract push data", e);
@@ -49,15 +50,21 @@ public class NotificationMessageFactory {
     }
   }
 
-  public Map<String, String> extractPushOptions(CDTPHeader header) {
+  public Map extractPushOptions(CDTPHeader header) {
     try {
-      Map extraOption = Optional.ofNullable(gson.fromJson(header.getExtraData(), Map.class)).orElse(emptyMap());
-      Map result = (Map) extraOption.getOrDefault("push", emptyMap());
-      return result;
+      Map extraOption = getExtraData(header);
+      return (Map) (extraOption.getOrDefault("push", emptyMap()));
     } catch (Exception e) {
       log.error("fail to extract cmd and type from CDTPHeader, extraData : {}", header.getExtraData(), e);
       return emptyMap();
     }
   }
+
+  public Map getExtraData(CDTPHeader header) {
+    return Optional.ofNullable(gson.fromJson(
+        header.getExtraData(), Map.class)).orElse(emptyMap());
+  }
+
+
 }
 
