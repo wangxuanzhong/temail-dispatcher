@@ -24,7 +24,7 @@ public class NotificationMessageFactory {
     gson = new Gson();
   }
 
-  String notificationOf(String receiver, CDTPHeader header, String body) {
+  public String notificationOf(String receiver, CDTPHeader header, String body) {
     CDTPPacketTrans packet = new CDTPPacketTrans();
     packet.setCommandSpace(NOTIFY_COMMAND_SPACE);
     packet.setCommand(NOTIFY_COMMAND);
@@ -35,7 +35,7 @@ public class NotificationMessageFactory {
     return gson.toJson(packet);
   }
 
-  Optional<String> getPushMessage(String receiver, CDTPHeader header, String body) {
+  public Optional<String> getPushMessage(String receiver, CDTPHeader header, String body) {
     try {
       PushData pushData = gson.fromJson(body, PushData.class);
       PushMessage pushMsg = new PushMessage();
