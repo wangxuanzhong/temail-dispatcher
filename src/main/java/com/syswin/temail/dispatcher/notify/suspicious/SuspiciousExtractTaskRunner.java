@@ -32,7 +32,7 @@ public class SuspiciousExtractTaskRunner implements TaskExecutor<CDTPHeader>, Co
   private final DispatcherProperties dispatcherProperties;
   private final String suspiciousKeyInMsg = "suspicious";
   private final Consumer<Boolean> resultConsumer;
-  private final String suspiciousValInMsg = "1";
+  private final String suspiciousValInMsg = "1.0";
   private final RestTemplate restTemplate;
   private final String suspiciousRegisterUri = "/relation/suspicious";
 

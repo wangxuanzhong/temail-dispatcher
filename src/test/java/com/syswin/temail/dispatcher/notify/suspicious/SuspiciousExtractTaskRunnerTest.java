@@ -110,7 +110,7 @@ public class SuspiciousExtractTaskRunnerTest {
         + "         \"msgId\":\"d0fe0dee-1dcb-49ab-bbef-a9aa2734591a\",\n"
         + "         \"storeType\":1,\"to\":\"zhangweiliang@syswin.com\",\n"
         + "         \"type\":0, \n"
-        + "         \"suspicious\":\"1\""
+        + "         \"suspicious\":1"
         + "    }");
     return cdtpHeader;
   }
