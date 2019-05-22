@@ -72,7 +72,7 @@ public class SuspiciousExtractTaskRunner implements TaskExecutor<CDTPHeader>, Co
   public boolean handleTask(CDTPHeader cdtpHeader) {
     Optional<RelationBind> relationBind = this.extract(cdtpHeader);
     if (!relationBind.isPresent()) {
-      log.warn("Fail to extract ");
+      log.warn("Fail to extract suspicious info from :{}", cdtpHeader.toString());
       return false;
     }
 
