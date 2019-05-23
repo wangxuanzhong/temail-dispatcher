@@ -41,8 +41,8 @@ public class NotificationMessageFactory {
       PushMessage pushMsg = new PushMessage();
       BeanUtils.copyProperties(pushData, pushMsg);
       Map pushOptions = this.extractPushOptions(header);
-      pushMsg.setCmd(String.valueOf(pushOptions.get("cmd")));
-      pushMsg.setType(String.valueOf(pushOptions.get("type")));
+      pushMsg.setCmd(pushOptions.get("cmd") == null ? null : pushOptions.get("cmd").toString());
+      pushMsg.setType(pushOptions.get("type") == null ? null : pushOptions.get("type").toString());
       return Optional.ofNullable(gson.toJson(pushMsg));
     } catch (Exception e) {
       log.error("failed to extract push data", e);
