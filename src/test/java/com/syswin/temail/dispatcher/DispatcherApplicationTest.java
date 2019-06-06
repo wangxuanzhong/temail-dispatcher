@@ -13,22 +13,27 @@ import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_OCTET_STREAM;
+
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.syswin.temail.dispatcher.codec.PacketEncoder;
+import com.syswin.temail.dispatcher.notify.RemoteChannelStsLocator;
+import com.syswin.temail.dispatcher.notify.entity.TemailAccountLocation;
 import com.syswin.temail.dispatcher.request.PacketMaker;
 import com.syswin.temail.dispatcher.request.controller.Response;
 import com.syswin.temail.ps.common.entity.CDTPPacket;
 import java.util.Base64;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpEntity;
@@ -36,6 +41,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.web.client.RestTemplate;
 
 //@Ignore
 @RunWith(SpringRunner.class)
@@ -47,7 +53,7 @@ import org.springframework.test.context.junit4.SpringRunner;
         "app.dispatcher.valid-strategy.crossTopicSignValid=000E-*",
         "app.dispatcher.valid-strategy.skipSignValid",
         "app.dispatcher.valid-strategy.commonSignValid=*-*"
-})
+    })
 @ActiveProfiles("dev")
 public class DispatcherApplicationTest {
 
@@ -118,5 +124,22 @@ public class DispatcherApplicationTest {
     ResponseEntity<Response> responseEntity = restTemplate.postForEntity("/dispatch", httpEntity, Response.class);
     assertThat(responseEntity.getStatusCode()).isEqualTo(OK);
     assertThat(responseEntity.getBody().getData()).isEqualTo(ackMessage);
+  }
+
+
+  @Value("${app.dispatcher.temail-channel-url}")
+  private String discoveryUrl;
+  @Autowired
+  private RestTemplate template;
+
+  @Test
+  public void offlineTest() {
+
+    RemoteChannelStsLocator remoteChannelStsLocator = new RemoteChannelStsLocator(template,
+        discoveryUrl);
+
+    List<TemailAccountLocation> locate = remoteChannelStsLocator.locate("liuxing");
+
+    System.out.println(locate.size());
   }
 }

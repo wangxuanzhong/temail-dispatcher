@@ -102,6 +102,7 @@ public class DiscoveryConsumerTest extends ConsumerPactTestMk2 {
     TemailAccountLocation status = new TemailAccountLocation(
         sean,
         deviceId,
+        "",
         gatewayHost,
         processId,
         mqTopic,
