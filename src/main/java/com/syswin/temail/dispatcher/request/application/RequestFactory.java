@@ -2,6 +2,7 @@ package com.syswin.temail.dispatcher.request.application;
 
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
+
 import com.google.gson.Gson;
 import com.syswin.temail.dispatcher.DispatcherProperties;
 import com.syswin.temail.dispatcher.DispatcherProperties.Request;
@@ -19,8 +20,9 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.util.UriComponentsBuilder;
 
 @Slf4j
-class RequestFactory {
+public class RequestFactory {
 
+  public static final String UNSUPPORTED_CMD_PREfIX = "unsupported command type";
   static final String CDTP_HEADER = "CDTP-header";
   static final String X_PACKET_ID = "X-PACKET-ID";
 
@@ -30,35 +32,36 @@ class RequestFactory {
   static final String SIGNATURE = "SIGNATURE";
   static final String ALGORITHM = "ALGORITHM";
 
+
   private Gson gson = new Gson();
   private DispatcherProperties properties;
   private CommandAwarePacketUtil packetUtil;
 
-  RequestFactory(DispatcherProperties properties, CommandAwarePacketUtil packetUtil) {
+  public RequestFactory(DispatcherProperties properties, CommandAwarePacketUtil packetUtil) {
     this.properties = properties;
     this.packetUtil = packetUtil;
   }
 
-  TemailRequest toRequest(CDTPPacket packet) {
+  public TemailRequest toRequest(CDTPPacket packet) {
     int combinedCommand = (packet.getCommandSpace() << 16) + packet.getCommand();
     String cmdHex = Integer.toHexString(combinedCommand).toUpperCase();
     Request request = properties.getCmdMap().get(cmdHex);
     if (request == null) {
-      log.error("unsupported command type：{}, request param：{}", cmdHex, packet);
-      throw new DispatchException("unsupported command type：" + combinedCommand, packet);
+      log.error(UNSUPPORTED_CMD_PREfIX + "：{}, request param：{}", cmdHex, packet);
+      throw new DispatchException(UNSUPPORTED_CMD_PREfIX + "：" + combinedCommand, packet);
     }
 
     CDTPParams params = packetUtil.buildParams(packet);
-    if(packetUtil.isBizServerValidType(packet.getCommandSpace())){
+    if (packetUtil.isBizServerValidType(packet.getCommandSpace())) {
       Map<String, String> requestHeaders = new HashMap<>();
       requestHeaders.put(TE_MAIL, packet.getHeader().getSender());
       requestHeaders.put(PUBLIC_KEY, packet.getHeader().getSenderPK());
       requestHeaders.put(UNSIGNED_BYTES, packetUtil.extractUnsignedData(packet));
       requestHeaders.put(SIGNATURE, packet.getHeader().getSignature());
       requestHeaders.put(ALGORITHM, String.valueOf(packet.getHeader().getSignatureAlgorithm()));
-      if(params.getHeader() == null){
+      if (params.getHeader() == null) {
         params.setHeader(requestHeaders);
-      }else {
+      } else {
         //in case that the params.header is unmodifable.
         requestHeaders.putAll(params.getHeader());
         params.setHeader(requestHeaders);
@@ -72,11 +75,13 @@ class RequestFactory {
     }
 
     String url = composeUrl(request, params.getPath(), params.getQuery());
-    log.info("dispatch request info ：URL={}, method={}, entity={}", url, request.getMethod(), entity);
+    log.info("dispatch request info ：URL={}, method={}, entity={}", url, request.getMethod(),
+        entity);
     return new TemailRequest(url, request.getMethod(), entity);
   }
 
-  private HttpEntity<Map<String, Object>> composeHttpEntity(Request request, CDTPHeader cdtpHeader, CDTPParams params) {
+  private HttpEntity<Map<String, Object>> composeHttpEntity(Request request, CDTPHeader cdtpHeader,
+      CDTPParams params) {
     MultiValueMap<String, String> headers = addHeaders(cdtpHeader, params);
 
     switch (request.getMethod()) {
@@ -98,7 +103,8 @@ class RequestFactory {
     }
   }
 
-  private String composeUrl(Request request, Map<String, Object> path, Map<String, String> queries) {
+  private String composeUrl(Request request, Map<String, Object> path,
+      Map<String, String> queries) {
     String url = request.getUrl();
     UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(url);
     if (queries != null && !queries.isEmpty()) {

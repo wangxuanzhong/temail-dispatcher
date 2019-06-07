@@ -10,6 +10,7 @@ import com.syswin.temail.dispatcher.notify.suspicious.TaskExecutor;
 import com.syswin.temail.dispatcher.request.application.CommandAwarePacketUtil;
 import com.syswin.temail.dispatcher.request.application.DispAuthService;
 import com.syswin.temail.dispatcher.request.application.PackageDispatcher;
+import com.syswin.temail.dispatcher.request.application.RequestFactory;
 import com.syswin.temail.dispatcher.request.service.DispDispatcherService;
 import com.syswin.temail.dispatcher.request.service.DispDispatcherServiceImpl;
 import com.syswin.temail.dispatcher.valid.PacketValidJudge;
@@ -60,9 +61,10 @@ public class DispatcherApplication extends SpringBootServletInitializer {
   }
 
   @Bean
-  public PackageDispatcher packageDispatcher(DispatcherProperties properties, RestTemplate restTemplate,
-      CommandAwarePacketUtil packetUtil) {
-    return new PackageDispatcher(properties, restTemplate, packetUtil);
+  public PackageDispatcher packageDispatcher(DispatcherProperties properties,
+      RestTemplate restTemplate, CommandAwarePacketUtil packetUtil) {
+    return new PackageDispatcher(properties, restTemplate,
+        new RequestFactory(properties,packetUtil));
   }
 
   @Bean
