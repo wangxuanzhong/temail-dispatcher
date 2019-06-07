@@ -6,6 +6,7 @@ import static org.springframework.http.MediaType.APPLICATION_OCTET_STREAM_VALUE;
 import com.syswin.temail.dispatcher.DispatcherProperties;
 import com.syswin.temail.dispatcher.request.exceptions.DispatchException;
 import com.syswin.temail.ps.common.entity.CDTPPacket;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpEntity;
@@ -20,6 +21,7 @@ public class PackageDispatcher {
 
   private final RestTemplate restTemplate;
   private RequestFactory requestFactory;
+  @Getter
   private DispatcherProperties dispatcherProperties;
 
   public PackageDispatcher(DispatcherProperties properties,

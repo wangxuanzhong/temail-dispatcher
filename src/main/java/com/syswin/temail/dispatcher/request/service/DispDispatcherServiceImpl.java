@@ -9,6 +9,7 @@ import com.syswin.temail.dispatcher.request.controller.Response;
 import com.syswin.temail.dispatcher.request.exceptions.DispatchException;
 import com.syswin.temail.ps.common.entity.CDTPPacket;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.ResponseEntity;
 
 @Slf4j
@@ -64,8 +65,8 @@ public class DispDispatcherServiceImpl implements DispDispatcherService {
       }
       return repackageResponse(verifyResult);
     } catch (DispatchException e) {
-      if (e.getMessage() != null && e.getMessage()
-          .startsWith(RequestFactory.UNSUPPORTED_CMD_PREfIX)) {
+      if (e.getMessage() != null && e.getMessage().startsWith(RequestFactory.UNSUPPORTED_CMD_PREfIX)
+          && !StringUtils.isEmpty(packageDispatcher.getDispatcherProperties().getMockUrl())) {
         return packageDispatcher.forwardToMockApi(payload, e);
       } else {
         throw e;
