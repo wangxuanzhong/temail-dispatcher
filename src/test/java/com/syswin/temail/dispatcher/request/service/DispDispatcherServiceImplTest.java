@@ -149,10 +149,10 @@ public class DispDispatcherServiceImplTest {
     when(dispatchException.getMessage())
         .thenReturn(RequestFactory.UNSUPPORTED_CMD_PREfIX + "any error");
     when(requestFactory.toRequest(any())).thenThrow(dispatchException);
-    //when(dispatcherProperties.getMockUrl())
-    //    .thenReturn("http://localhost:" + WIRE_MOCK_RULE.port() + "/postPacket");
     when(dispatcherProperties.getMockUrl())
-        .thenReturn("http://temail-mock-api-manager.service.innertools.com/api/mock/match");
+        .thenReturn("http://localhost:" + WIRE_MOCK_RULE.port() + "/postPacket");
+    //when(dispatcherProperties.getMockUrl())
+    //    .thenReturn("http://temail-mock-api-manager.service.innertools.com/api/mock/match");
     //when(dispatcherProperties.getMockUrl())
     //    .thenReturn("http://172.31.240.202:8081/api/mock/match");
     //when(dispatcherProperties.getMockUrl())
