@@ -88,7 +88,9 @@ public class MqMessageHandlerConsumerTest {
     String mqTag = "mqTag";
 
     List<TemailAccountLocation> locations = new ArrayList<>();
-    locations.add(new TemailAccountLocation(recipient, "", "", "", mqTopic, mqTag));
+    locations.add(new TemailAccountLocation(recipient, "", "pc","","", mqTopic, mqTag));
+    locations.add(new TemailAccountLocation(recipient, "", "android","","", mqTopic, mqTag));
+    locations.add(new TemailAccountLocation(recipient, "", "ios","","", mqTopic, mqTag));
     when(gatewayLocator.locate(recipient)).thenReturn(locations);
 
     List<MqMessage> msgList = new ArrayList<>();

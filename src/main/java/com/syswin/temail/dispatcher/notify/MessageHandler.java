@@ -14,6 +14,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
 @Slf4j
 public class MessageHandler {
@@ -50,50 +51,86 @@ public class MessageHandler {
           this.taskExecutor.accept(header);
           String receiver = messageBody.getReceiver();
           List<TemailAccountLocation> statusList = gatewayLocator.locate(receiver);
-          if (!statusList.isEmpty()) {
-            String payload = notificationMsgFactory.notificationOf(receiver, header, messageBody.getData());
-            List<MqMessage> msgList = new ArrayList<>();
-            Set<String> mqTags = new HashSet<>();
-            statusList.forEach(status -> {
-                  String mqTag = status.getMqTag();
-                  if (!mqTags.contains(mqTag)) {
-                    mqTags.add(mqTag);
-                    msgList.add(new MqMessage(status.getMqTopic(), mqTag, payload));
-                  }
-                  log.info("Send message by MQ to gateway server {}", msgList);
-                }
-            );
-            try {
-              producer.send(msgList);
-            } catch (Exception ex) {
-              log.error("Fail to send message : {}", msgList, ex);
-            }
-          } else if (judger.isToBePushedMsg(messageBody.getEventType())
-              && !judger.isSenderEqualsToRecevier(header)) {
-            Optional<String> pushMessage = notificationMsgFactory
-                .getPushMessage(receiver, header, messageBody.getData());
-            pushMessage.ifPresent(message -> {
-              List<MqMessage> msgList = new ArrayList<>();
-              MqMessage mqMessage = new MqMessage(pushTopic, pushTag, pushMessage.get());
-              msgList.add(mqMessage);
-              try {
-                producer.send(msgList);
-              } catch (Exception ex) {
-                log.error("Failed to push offLine message : {}", mqMessage, ex);
-              }
-              log.info("succeed to push offLine message : {}", pushMessage.get());
-            });
 
+          List<TemailAccountLocation> pcList = new ArrayList<>();
+          List<TemailAccountLocation> mobileList = new ArrayList<>();
+          List<TemailAccountLocation> oldList = new ArrayList<>();
+
+          statusList.forEach(status -> {
+            String platform = status.getPlatform();
+            if (StringUtils.isEmpty(platform)) {
+              oldList.add(status);
+            } else if (StringUtils.equalsIgnoreCase(platform, "ios")
+                || StringUtils.equalsIgnoreCase(platform, "android")) {
+              mobileList.add(status);
+            } else {
+              pcList.add(status);
+            }
+          });
+
+          if (!oldList.isEmpty()) {
+            sendOnLineMessage(messageBody, header, receiver, oldList);
+          }
+          if (mobileList.isEmpty()) {
+            if (judger.isToBePushedMsg(messageBody.getEventType())
+                && !judger.isSenderEqualsToRecevier(header)) {
+              sendOfflineMessage(messageBody, header, receiver);
+            } else {
+              log.warn(
+                  "No registered channel status was found, and the MQmsg is not private or although it is private but sender is same to receiver, skip pushing the msg : {}",
+                  msg);
+            }
+            if (!pcList.isEmpty()) {
+              sendOnLineMessage(messageBody, header, receiver, pcList);
+            }
           } else {
-            log.warn(
-                "No registered channel status was found, and the MQmsg is not private or although it is private but sender is same to receiver, skip pushing the msg : {}",
-                msg);
+            if (!oldList.isEmpty()) {
+              statusList.removeAll(oldList);
+            }
+            sendOnLineMessage(messageBody, header, receiver, statusList);
           }
         }
       }
     } catch (JsonSyntaxException e) {
       // 数据格式错误，记录错误，直接跳过
       log.error("Invalid message format：{}", msg, e);
+    }
+  }
+
+  private void sendOfflineMessage(MessageBody messageBody, CDTPHeader header, String receiver) {
+    Optional<String> pushMessage = notificationMsgFactory
+        .getPushMessage(receiver, header, messageBody.getData());
+    pushMessage.ifPresent(message -> {
+      List<MqMessage> msgList = new ArrayList<>();
+      MqMessage mqMessage = new MqMessage(pushTopic, pushTag, pushMessage.get());
+      msgList.add(mqMessage);
+      try {
+        producer.send(msgList);
+      } catch (Exception ex) {
+        log.error("Failed to push offLine message : {}", mqMessage, ex);
+      }
+      log.info("succeed to push offLine message : {}", pushMessage.get());
+    });
+  }
+
+  private void sendOnLineMessage(MessageBody messageBody, CDTPHeader header, String receiver,
+      List<TemailAccountLocation> statusList) {
+    String payload = notificationMsgFactory.notificationOf(receiver, header, messageBody.getData());
+    List<MqMessage> msgList = new ArrayList<>();
+    Set<String> mqTags = new HashSet<>();
+    statusList.forEach(status -> {
+          String mqTag = status.getMqTag();
+          if (!mqTags.contains(mqTag)) {
+            mqTags.add(mqTag);
+            msgList.add(new MqMessage(status.getMqTopic(), mqTag, payload));
+          }
+          log.info("Send message by MQ to gateway server {}", msgList);
+        }
+    );
+    try {
+      producer.send(msgList);
+    } catch (Exception ex) {
+      log.error("Fail to send message : {}", msgList, ex);
     }
   }
 
