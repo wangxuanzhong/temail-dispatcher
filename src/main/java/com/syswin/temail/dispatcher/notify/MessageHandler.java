@@ -51,26 +51,20 @@ public class MessageHandler {
           this.taskExecutor.accept(header);
           String receiver = messageBody.getReceiver();
           List<TemailAccountLocation> statusList = gatewayLocator.locate(receiver);
-
           List<TemailAccountLocation> pcList = new ArrayList<>();
           List<TemailAccountLocation> mobileList = new ArrayList<>();
           List<TemailAccountLocation> oldList = new ArrayList<>();
+          setUpLocations(statusList, pcList, mobileList, oldList);
 
-          statusList.forEach(status -> {
-            String platform = status.getPlatform();
-            if (StringUtils.isEmpty(platform)) {
-              oldList.add(status);
-            } else if (StringUtils.equalsIgnoreCase(platform, "ios")
-                || StringUtils.equalsIgnoreCase(platform, "android")) {
-              mobileList.add(status);
-            } else {
-              pcList.add(status);
-            }
-          });
-
-          if (!oldList.isEmpty()) {
+          //for old locations datas with no platform info ...
+          if (!oldList.isEmpty() ) {
             sendOnLineMessage(messageBody, header, receiver, oldList);
+            if(oldList.size() == statusList.size()){
+              return;
+            }
           }
+
+          //if mobileList is null
           if (mobileList.isEmpty()) {
             if (judger.isToBePushedMsg(messageBody.getEventType())
                 && !judger.isSenderEqualsToRecevier(header)) {
@@ -91,10 +85,30 @@ public class MessageHandler {
           }
         }
       }
+
+
+
+
     } catch (JsonSyntaxException e) {
       // 数据格式错误，记录错误，直接跳过
       log.error("Invalid message format：{}", msg, e);
     }
+  }
+
+  private void setUpLocations(List<TemailAccountLocation> statusList,
+      List<TemailAccountLocation> pcList, List<TemailAccountLocation> mobileList,
+      List<TemailAccountLocation> oldList) {
+    statusList.forEach(status -> {
+      String platform = status.getPlatform();
+      if (StringUtils.isEmpty(platform)) {
+        oldList.add(status);
+      } else if (StringUtils.equalsIgnoreCase(platform, "ios")
+          || StringUtils.equalsIgnoreCase(platform, "android")) {
+        mobileList.add(status);
+      } else {
+        pcList.add(status);
+      }
+    });
   }
 
   private void sendOfflineMessage(MessageBody messageBody, CDTPHeader header, String receiver) {
