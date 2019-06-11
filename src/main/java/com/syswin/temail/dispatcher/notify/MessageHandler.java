@@ -54,26 +54,40 @@ public class MessageHandler {
 
           List<TemailAccountLocation> pcList = new ArrayList<>();
           List<TemailAccountLocation> mobileList = new ArrayList<>();
+          List<TemailAccountLocation> oldList = new ArrayList<>();
+
           statusList.forEach(status -> {
-            if (StringUtils.equalsIgnoreCase(status.getPlatform(), "ios")
-                || StringUtils.equalsIgnoreCase(status.getPlatform(), "android")) {
+            String platform = status.getPlatform();
+            if (StringUtils.isEmpty(platform)) {
+              oldList.add(status);
+            } else if (StringUtils.equalsIgnoreCase(platform, "ios")
+                || StringUtils.equalsIgnoreCase(platform, "android")) {
               mobileList.add(status);
             } else {
               pcList.add(status);
             }
           });
 
+          if (!oldList.isEmpty()) {
+            sendOnLineMessage(messageBody, header, receiver, oldList);
+          }
           if (mobileList.isEmpty()) {
-            sendOfflineMessage(messageBody, header, receiver);
+            if (judger.isToBePushedMsg(messageBody.getEventType())
+                && !judger.isSenderEqualsToRecevier(header)) {
+              sendOfflineMessage(messageBody, header, receiver);
+            } else {
+              log.warn(
+                  "No registered channel status was found, and the MQmsg is not private or although it is private but sender is same to receiver, skip pushing the msg : {}",
+                  msg);
+            }
             if (!pcList.isEmpty()) {
               sendOnLineMessage(messageBody, header, receiver, pcList);
             }
-          } else if (!statusList.isEmpty()) {
-            sendOnLineMessage(messageBody, header, receiver, statusList);
           } else {
-            log.warn(
-                "No registered channel status was found, and the MQmsg is not private or although it is private but sender is same to receiver, skip pushing the msg : {}",
-                msg);
+            if (!oldList.isEmpty()) {
+              statusList.removeAll(oldList);
+            }
+            sendOnLineMessage(messageBody, header, receiver, statusList);
           }
         }
       }
