@@ -55,8 +55,8 @@ public class MessageHandler {
           List<TemailAccountLocation> pcList = new ArrayList<>();
           List<TemailAccountLocation> mobileList = new ArrayList<>();
           statusList.forEach(status -> {
-            if (StringUtils.equals(status.getPlatform(), "ios")
-                || StringUtils.equals(status.getPlatform(), "android")) {
+            if (StringUtils.equalsIgnoreCase(status.getPlatform(), "ios")
+                || StringUtils.equalsIgnoreCase(status.getPlatform(), "android")) {
               mobileList.add(status);
             } else {
               pcList.add(status);
