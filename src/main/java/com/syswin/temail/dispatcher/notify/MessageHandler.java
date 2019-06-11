@@ -67,34 +67,45 @@ public class MessageHandler {
               pcList.add(status);
             }
           });
-
+          boolean needLog = true; //当没有发送在线消息也没有发送离线消息的时候，需要打印日志
           if (!oldList.isEmpty()) {
+            needLog = false;
             sendOnLineMessage(messageBody, header, receiver, oldList);
+            if (oldList.size() == statusList.size()) {
+              return;
+            }
           }
-          if (mobileList.isEmpty()) {
-            if (judger.isToBePushedMsg(messageBody.getEventType())
-                && !judger.isSenderEqualsToRecevier(header)) {
-              sendOfflineMessage(messageBody, header, receiver);
-            } else {
-              log.warn(
-                  "No registered channel status was found, and the MQmsg is not private or although it is private but sender is same to receiver, skip pushing the msg : {}",
-                  msg);
-            }
-            if (!pcList.isEmpty()) {
-              sendOnLineMessage(messageBody, header, receiver, pcList);
-            }
-          } else {
+          if (!mobileList.isEmpty()) {
             if (!oldList.isEmpty()) {
               statusList.removeAll(oldList);
             }
+            needLog = false;
             sendOnLineMessage(messageBody, header, receiver, statusList);
+          } else {
+            if (judger.isToBePushedMsg(messageBody.getEventType())
+                && !judger.isSenderEqualsToRecevier(header)) {
+              needLog = false;
+              sendOfflineMessage(messageBody, header, receiver);
+            }
+            if (!pcList.isEmpty()) {
+              needLog = false;
+              sendOnLineMessage(messageBody, header, receiver, pcList);
+            }
+          }
+
+          if (needLog) {
+            log.warn(
+                "No registered channel status was found, and the MQmsg is not private or although it is private but sender is same to receiver, skip pushing the msg : {}",
+                msg);
           }
         }
       }
-    } catch (JsonSyntaxException e) {
+    } catch (
+        JsonSyntaxException e) {
       // 数据格式错误，记录错误，直接跳过
       log.error("Invalid message format：{}", msg, e);
     }
+
   }
 
   private void sendOfflineMessage(MessageBody messageBody, CDTPHeader header, String receiver) {
