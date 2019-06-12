@@ -31,8 +31,9 @@ public class MessageHandler {
 
 
   MessageHandler(MQMsgSender producer, ChannelStsLocator gatewayLocator, String pushTopic,
-      String pushTag, PacketTypeJudge judger, Consumer<CDTPHeader> taskExecutor, NotificationMessageFactory
-      notificationMsgFactory) {
+      String pushTag, PacketTypeJudge judger, Consumer<CDTPHeader> taskExecutor,
+      NotificationMessageFactory
+          notificationMsgFactory) {
     this.producer = producer;
     this.gatewayLocator = gatewayLocator;
     this.pushTopic = pushTopic;
@@ -53,19 +54,19 @@ public class MessageHandler {
           String receiver = messageBody.getReceiver();
           List<TemailAccountLocation> statusList = gatewayLocator.locate(receiver);
           final AtomicReference<Boolean> containsMobile = new AtomicReference<>(false);
-          statusList.forEach(status->{
-            if(StringUtils.equalsIgnoreCase(status.getPlatform(), "ios")
-                || StringUtils.equalsIgnoreCase(status.getPlatform(), "android")){
+          statusList.forEach(status -> {
+            if (StringUtils.equalsIgnoreCase(status.getPlatform(), "ios")
+                || StringUtils.equalsIgnoreCase(status.getPlatform(), "android")) {
               containsMobile.set(true);
             }
           });
           sendOnLineMessage(messageBody, header, receiver, statusList);
-          if(!containsMobile.get() && judger.isToBePushedMsg(messageBody.getEventType())
-              && !judger.isSenderEqualsToRecevier(header)){
+          if (!containsMobile.get() && judger.isToBePushedMsg(messageBody.getEventType())
+              && !judger.isSenderEqualsToRecevier(header)) {
             sendOfflineMessage(messageBody, header, receiver);
             return;
           }
-          if(statusList.isEmpty()){
+          if (statusList.isEmpty()) {
             log.warn(
                 "No registered channel status was found, and the MQmsg is not private or although "
                     + "it is private but sender is same to receiver, skip pushing the msg : {}",
@@ -99,7 +100,9 @@ public class MessageHandler {
 
   private void sendOnLineMessage(MessageBody messageBody, CDTPHeader header,
       String receiver, List<TemailAccountLocation> statusList) {
-    if(statusList.isEmpty()){return;}
+    if (statusList.isEmpty()) {
+      return;
+    }
     String payload = notificationMsgFactory.notificationOf(receiver, header, messageBody.getData());
     List<MqMessage> msgList = new ArrayList<>();
     Set<String> mqTags = new HashSet<>();
