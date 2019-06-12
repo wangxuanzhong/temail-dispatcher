@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -51,38 +52,20 @@ public class MessageHandler {
           this.taskExecutor.accept(header);
           String receiver = messageBody.getReceiver();
           List<TemailAccountLocation> statusList = gatewayLocator.locate(receiver);
-          List<TemailAccountLocation> pcList = new ArrayList<>();
-          List<TemailAccountLocation> mobileList = new ArrayList<>();
-          List<TemailAccountLocation> oldList = new ArrayList<>();
-          setupLists(statusList, pcList, mobileList, oldList);
-
-          boolean needLog = true;
-          if (!oldList.isEmpty()) {
-            needLog = false;
-            sendOnLineMessage(messageBody, header, receiver, oldList);
-            if (oldList.size() == statusList.size()) {
-              return;
+          final AtomicReference<Boolean> containsMobile = new AtomicReference<>(false);
+          statusList.forEach(status->{
+            if(StringUtils.equalsIgnoreCase(status.getPlatform(), "ios")
+                || StringUtils.equalsIgnoreCase(status.getPlatform(), "android")){
+              containsMobile.set(true);
             }
+          });
+          sendOnLineMessage(messageBody, header, receiver, statusList);
+          if(!containsMobile.get() && judger.isToBePushedMsg(messageBody.getEventType())
+              && !judger.isSenderEqualsToRecevier(header)){
+            sendOfflineMessage(messageBody, header, receiver);
+            return;
           }
-          if (!mobileList.isEmpty()) {
-            if (!oldList.isEmpty()) {
-              statusList.removeAll(oldList);
-            }
-            needLog = false;
-            sendOnLineMessage(messageBody, header, receiver, statusList);
-          } else {
-            if (judger.isToBePushedMsg(messageBody.getEventType())
-                && !judger.isSenderEqualsToRecevier(header)) {
-              needLog = false;
-              sendOfflineMessage(messageBody, header, receiver);
-            }
-            if (!pcList.isEmpty()) {
-              needLog = false;
-              sendOnLineMessage(messageBody, header, receiver, pcList);
-            }
-          }
-
-          if (needLog) {
+          if(statusList.isEmpty()){
             log.warn(
                 "No registered channel status was found, and the MQmsg is not private or although "
                     + "it is private but sender is same to receiver, skip pushing the msg : {}",
@@ -96,21 +79,6 @@ public class MessageHandler {
       log.error("Invalid message format：{}", msg, e);
     }
 
-  }
-
-  private void setupLists(List<TemailAccountLocation> statusList, List<TemailAccountLocation> pcList,
-      List<TemailAccountLocation> mobileList, List<TemailAccountLocation> oldList) {
-    statusList.forEach(status -> {
-      String platform = status.getPlatform();
-      if (StringUtils.isEmpty(platform)) {
-        oldList.add(status);
-      } else if (StringUtils.equalsIgnoreCase(platform, "ios")
-          || StringUtils.equalsIgnoreCase(platform, "android")) {
-        mobileList.add(status);
-      } else {
-        pcList.add(status);
-      }
-    });
   }
 
   private void sendOfflineMessage(MessageBody messageBody, CDTPHeader header, String receiver) {
@@ -129,8 +97,9 @@ public class MessageHandler {
     });
   }
 
-  private void sendOnLineMessage(MessageBody messageBody, CDTPHeader header, String receiver,
-      List<TemailAccountLocation> statusList) {
+  private void sendOnLineMessage(MessageBody messageBody, CDTPHeader header,
+      String receiver, List<TemailAccountLocation> statusList) {
+    if(statusList.isEmpty()){return;}
     String payload = notificationMsgFactory.notificationOf(receiver, header, messageBody.getData());
     List<MqMessage> msgList = new ArrayList<>();
     Set<String> mqTags = new HashSet<>();
