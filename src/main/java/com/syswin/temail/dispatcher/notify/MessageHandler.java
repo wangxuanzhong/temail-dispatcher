@@ -66,7 +66,8 @@ public class MessageHandler {
             sendOfflineMessage(messageBody, header, receiver);
             return;
           }
-          if (statusList.isEmpty()) {
+          if (statusList.isEmpty() && !(judger.isToBePushedMsg(messageBody.getEventType())
+              && !judger.isSenderEqualsToRecevier(header))) {
             log.warn(
                 "No registered channel status was found, and the MQmsg is not private or although "
                     + "it is private but sender is same to receiver, skip pushing the msg : {}",
