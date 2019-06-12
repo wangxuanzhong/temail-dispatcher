@@ -7,7 +7,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 
@@ -21,6 +20,8 @@ public class DispatcherProperties {
   private String relationBaseUrl;
 
   private String temailChannelUrl;
+
+  private String mockUrl;
 
   private RocketMQ rocketmq = new RocketMQ();
 
@@ -46,5 +47,6 @@ public class DispatcherProperties {
     private String url;
     private HttpMethod method;
   }
+
 
 }

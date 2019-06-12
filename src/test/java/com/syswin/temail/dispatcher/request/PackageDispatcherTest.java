@@ -1,12 +1,6 @@
 package com.syswin.temail.dispatcher.request;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.any;
-import static com.github.tomakehurst.wiremock.client.WireMock.containing;
-import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
-import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
-import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static com.seanyinx.github.unit.scaffolding.Randomness.uniquify;
 import static org.apache.http.HttpHeaders.CONTENT_TYPE;
@@ -18,6 +12,7 @@ import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.HttpMethod.PUT;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
+
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
@@ -26,6 +21,7 @@ import com.syswin.temail.dispatcher.DispatcherProperties.Request;
 import com.syswin.temail.dispatcher.codec.PacketTypeJudge;
 import com.syswin.temail.dispatcher.request.application.CommandAwarePacketUtil;
 import com.syswin.temail.dispatcher.request.application.PackageDispatcher;
+import com.syswin.temail.dispatcher.request.application.RequestFactory;
 import com.syswin.temail.dispatcher.request.entity.CDTPParams;
 import com.syswin.temail.ps.common.entity.CDTPHeader;
 import com.syswin.temail.ps.common.entity.CDTPPacket;
@@ -64,7 +60,7 @@ public class PackageDispatcherTest {
       "q1", "v1",
       "q2", "v22");
   private final PackageDispatcher packageDispatcher = new PackageDispatcher(properties, restTemplate,
-      new CommandAwarePacketUtil(new PacketTypeJudge(null)));
+      new RequestFactory(properties,new CommandAwarePacketUtil(new PacketTypeJudge(null))));
 
   @BeforeClass
   public static void beforeClass() {

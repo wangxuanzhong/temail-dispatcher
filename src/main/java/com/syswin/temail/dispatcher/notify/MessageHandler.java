@@ -74,7 +74,8 @@ public class MessageHandler {
           }
           if (needLog) {
             log.warn(
-                "No registered channel status was found, and the MQmsg is not private or although it is private but sender is same to receiver, skip pushing the msg : {}",
+                "No registered channel status was found, and the MQmsg is not private or although "
+                    + "it is private but sender is same to receiver, skip pushing the msg : {}",
                 msg);
           }
         }
@@ -85,6 +86,21 @@ public class MessageHandler {
       log.error("Invalid message format：{}", msg, e);
     }
 
+  }
+
+  private void setupLists(List<TemailAccountLocation> statusList, List<TemailAccountLocation> pcList,
+      List<TemailAccountLocation> mobileList, List<TemailAccountLocation> oldList) {
+    statusList.forEach(status -> {
+      String platform = status.getPlatform();
+      if (StringUtils.isEmpty(platform)) {
+        oldList.add(status);
+      } else if (StringUtils.equalsIgnoreCase(platform, "ios")
+          || StringUtils.equalsIgnoreCase(platform, "android")) {
+        mobileList.add(status);
+      } else {
+        pcList.add(status);
+      }
+    });
   }
 
   private void sendOfflineMessage(MessageBody messageBody, CDTPHeader header, String receiver) {
