@@ -51,48 +51,27 @@ public class MessageHandler {
           this.taskExecutor.accept(header);
           String receiver = messageBody.getReceiver();
           List<TemailAccountLocation> statusList = gatewayLocator.locate(receiver);
-
-          List<TemailAccountLocation> pcList = new ArrayList<>();
           List<TemailAccountLocation> mobileList = new ArrayList<>();
-          List<TemailAccountLocation> oldList = new ArrayList<>();
-
+          log.info("all devices is {}", statusList);
           statusList.forEach(status -> {
             String platform = status.getPlatform();
-            if (StringUtils.isEmpty(platform)) {
-              oldList.add(status);
-            } else if (StringUtils.equalsIgnoreCase(platform, "ios")
+            if (StringUtils.equalsIgnoreCase(platform, "ios")
                 || StringUtils.equalsIgnoreCase(platform, "android")) {
               mobileList.add(status);
-            } else {
-              pcList.add(status);
             }
           });
-          boolean needLog = true; //当没有发送在线消息也没有发送离线消息的时候，需要打印日志
-          if (!oldList.isEmpty()) {
-            needLog = false;
-            sendOnLineMessage(messageBody, header, receiver, oldList);
-            if (oldList.size() == statusList.size()) {
-              return;
-            }
-          }
-          if (!mobileList.isEmpty()) {
-            if (!oldList.isEmpty()) {
-              statusList.removeAll(oldList);
-            }
+          boolean needLog = true;
+          if (!statusList.isEmpty()) {//只要有设备在线，就走在线
             needLog = false;
             sendOnLineMessage(messageBody, header, receiver, statusList);
-          } else {
+          }
+          if (mobileList.isEmpty()) { //如果没有手机，那么可能需要走离线push
             if (judger.isToBePushedMsg(messageBody.getEventType())
                 && !judger.isSenderEqualsToRecevier(header)) {
               needLog = false;
               sendOfflineMessage(messageBody, header, receiver);
             }
-            if (!pcList.isEmpty()) {
-              needLog = false;
-              sendOnLineMessage(messageBody, header, receiver, pcList);
-            }
           }
-
           if (needLog) {
             log.warn(
                 "No registered channel status was found, and the MQmsg is not private or although it is private but sender is same to receiver, skip pushing the msg : {}",
