@@ -216,6 +216,11 @@
       <version>2.19.0</version>
       <scope>test</scope>
     </dependency>
+    <!--healthcheck-->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-actuator</artifactId>
+    </dependency>
   </dependencies>
   <profiles>
     <profile>
