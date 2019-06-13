@@ -61,13 +61,13 @@ public class MessageHandler {
             }
           });
           sendOnLineMessage(messageBody, header, receiver, statusList);
-          if (!containsMobile.get() && judger.isToBePushedMsg(messageBody.getEventType())
-              && !judger.isSenderEqualsToRecevier(header)) {
+          boolean needOfflnePush = judger.isToBePushedMsg(messageBody.getEventType())
+              && !judger.isSenderEqualsToRecevier(header);
+          if (!containsMobile.get() && needOfflnePush) {
             sendOfflineMessage(messageBody, header, receiver);
             return;
           }
-          if (statusList.isEmpty() && !(judger.isToBePushedMsg(messageBody.getEventType())
-              && !judger.isSenderEqualsToRecevier(header))) {
+          if (statusList.isEmpty() && !(needOfflnePush)) {
             log.warn(
                 "No registered channel status was found, and the MQmsg is not private or although "
                     + "it is private but sender is same to receiver, skip pushing the msg : {}",
