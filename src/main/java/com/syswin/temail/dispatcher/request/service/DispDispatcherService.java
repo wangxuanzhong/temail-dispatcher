@@ -5,8 +5,8 @@ import org.springframework.http.ResponseEntity;
 
 public interface DispDispatcherService {
 
-  public ResponseEntity<Response<String>> verify( byte[] payload) throws Exception ;
+  ResponseEntity<Response<String>> verify( byte[] payload) throws Exception ;
 
-  public ResponseEntity<String> dispatch( byte[] payload) throws Exception ;
+  ResponseEntity<String> dispatch( byte[] payload) throws Exception ;
 
 }

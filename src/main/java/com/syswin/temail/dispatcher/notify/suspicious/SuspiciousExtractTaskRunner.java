@@ -92,7 +92,7 @@ public class SuspiciousExtractTaskRunner implements TaskExecutor<CDTPHeader>, Co
           relation.toString(), String.valueOf(result.getBody().getMessage()));
       return false;
     } else {
-      log.warn("Succeed to register: {} to relation server.",
+      log.info("Succeed to register: {} to relation server.",
           relation.toString());
       return true;
     }

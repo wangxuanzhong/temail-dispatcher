@@ -5,7 +5,6 @@ import java.util.List;
 
 public interface ChannelStsLocator {
 
-
-  public List<TemailAccountLocation> locate(String temail) ;
+  List<TemailAccountLocation> locate(String temail);
 
 }

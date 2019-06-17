@@ -6,13 +6,13 @@ import java.util.function.Function;
 
 public interface ValidParamsFactory {
 
-  final String unsignedBytes = "UNSIGNED_BYTES";
-  final String signature = "SIGNATURE";
-  final String algorithm = "algorithm";
-  final String senderTemail = "SenderTeMail";
-  final String receiverTemail = "RecieverTeMail";
-  final String senderPublicKey = "SenderPublicKey";
-  final String temail="TeMail";
+  String unsignedBytes = "UNSIGNED_BYTES";
+  String signature = "SIGNATURE";
+  String algorithm = "algorithm";
+  String senderTemail = "SenderTeMail";
+  String receiverTemail = "RecieverTeMail";
+  String senderPublicKey = "SenderPublicKey";
+  String temail="TeMail";
 
   Optional<ValidParams> buildParams(CDTPPacket cdtpPacket,
       Function<CDTPPacket, String> signExtract);

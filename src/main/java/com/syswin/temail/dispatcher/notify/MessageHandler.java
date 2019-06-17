@@ -77,7 +77,6 @@ public class MessageHandler {
       }
     } catch (
         JsonSyntaxException e) {
-      // 数据格式错误，记录错误，直接跳过
       log.error("Invalid message format：{}", msg, e);
     }
 
@@ -92,10 +91,10 @@ public class MessageHandler {
       msgList.add(mqMessage);
       try {
         producer.send(msgList);
+        log.info("succeed to push offLine message : {}", pushMessage.get());
       } catch (Exception ex) {
         log.error("Failed to push offLine message : {}", mqMessage, ex);
       }
-      log.info("succeed to push offLine message : {}", pushMessage.get());
     });
   }
 

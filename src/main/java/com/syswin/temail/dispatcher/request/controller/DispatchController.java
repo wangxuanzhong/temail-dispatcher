@@ -35,8 +35,4 @@ public class DispatchController {
   public ResponseEntity<?> dispatch(@RequestBody byte[] payload) throws Exception {
     return this.dispDispatcherService.dispatch(payload);
   }
-
-  private <T> ResponseEntity<T> repackageResponse(ResponseEntity<T> responseEntity) {
-    return new ResponseEntity<>(responseEntity.getBody(), responseEntity.getStatusCode());
-  }
 }
