@@ -5,6 +5,7 @@ import static org.springframework.http.MediaType.APPLICATION_OCTET_STREAM_VALUE;
 
 import com.syswin.temail.dispatcher.DispatcherProperties;
 import com.syswin.temail.dispatcher.request.exceptions.DispatchException;
+import com.syswin.temail.dispatcher.request.exceptions.HttpAccessException;
 import com.syswin.temail.ps.common.entity.CDTPPacket;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +15,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 @Slf4j
@@ -33,8 +35,12 @@ public class PackageDispatcher {
 
   public ResponseEntity<String> dispatch(CDTPPacket packet) {
     TemailRequest request = requestFactory.toRequest(packet);
-    return restTemplate.exchange(request.url(),
-        request.method(), request.entity(), String.class);
+    try {
+      return restTemplate.exchange(request.url(),
+          request.method(), request.entity(), String.class);
+    } catch (RestClientException e) {
+      throw new HttpAccessException(e, request);
+    }
   }
 
   public ResponseEntity<String> forwardToMockApi(byte[] bytes, DispatchException e) {

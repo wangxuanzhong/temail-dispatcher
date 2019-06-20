@@ -5,6 +5,7 @@ import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_OCTET_STREAM_VALUE;
@@ -20,8 +21,10 @@ import com.syswin.temail.dispatcher.request.PacketMaker;
 import com.syswin.temail.dispatcher.request.application.DispAuthService;
 import com.syswin.temail.dispatcher.request.application.PackageDispatcher;
 import com.syswin.temail.dispatcher.request.application.RequestFactory;
+import com.syswin.temail.dispatcher.request.application.TemailRequest;
 import com.syswin.temail.dispatcher.request.controller.Response;
 import com.syswin.temail.dispatcher.request.exceptions.DispatchException;
+import com.syswin.temail.dispatcher.request.exceptions.HttpAccessException;
 import com.syswin.temail.ps.common.entity.CDTPPacket;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
@@ -29,8 +32,11 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 @Slf4j
@@ -142,29 +148,53 @@ public class DispDispatcherServiceImplTest {
             .withBody(gson.toJson(Response.ok(ImmutableMap.of(
                 "code", "200"
             ))))));
+    stubFor(post(urlEqualTo("/nonExist"))
+        .withHeader(CONTENT_TYPE, equalTo(APPLICATION_OCTET_STREAM_VALUE))
+        .willReturn(aResponse().withHeader(CONTENT_TYPE, APPLICATION_JSON_UTF8_VALUE)
+            .withStatus(NOT_FOUND.value())
+            .withBody(gson.toJson(Response.ok(ImmutableMap.of(
+                "code", "404"
+            ))))));
   }
 
   @Before
   public void init() {
-    when(dispatchException.getMessage())
-        .thenReturn(RequestFactory.UNSUPPORTED_CMD_PREfIX + "any error");
-    when(requestFactory.toRequest(any())).thenThrow(dispatchException);
-    when(dispatcherProperties.getMockUrl())
-        .thenReturn("http://localhost:" + WIRE_MOCK_RULE.port() + "/postPacket");
-    //when(dispatcherProperties.getMockUrl())
-    //    .thenReturn("http://temail-mock-api-manager.service.innertools.com/api/mock/match");
-    //when(dispatcherProperties.getMockUrl())
-    //    .thenReturn("http://172.31.240.202:8081/api/mock/match");
-    //when(dispatcherProperties.getMockUrl())
-    //    .thenReturn("http://localhost:8081/dispatch");
     when(dispAuthService.verify(any())).thenReturn(success);
     when(dispRawPacketDecoder.decode(any())).thenReturn(cdtpPacket);
   }
 
   @Test
   public void forwardRequest() throws Exception {
+    when(dispatchException.getMessage())
+        .thenReturn(RequestFactory.UNSUPPORTED_CMD_PREfIX + "any error");
+    when(requestFactory.toRequest(any()))
+        .thenThrow(dispatchException);
+    when(dispatcherProperties.getMockUrl())
+        .thenReturn("http://localhost:" + WIRE_MOCK_RULE.port() + "/postPacket");
+    //when(dispatcherProperties.getMockUrl())
+    //    .thenReturn("http://temail-mock-api-manager.service.innertools.com/api/mock/match");
+    //when(dispatcherProperties.getMockUrl())
+    //    .thenReturn("http://172.31.240.202:8081/api/mock/match");
     ResponseEntity<String> responseEntity = dispDispatcherService.dispatch(data);
     Assertions.assertThat(responseEntity.getStatusCode().is2xxSuccessful()).isTrue();
   }
 
+  @Test
+  public void willPrintHttpError(){
+    String url = "http://localhost:" + WIRE_MOCK_RULE.port() + "/nonExist";
+    TemailRequest temailRequest = new TemailRequest(
+        url,
+        HttpMethod.POST,
+        new HttpEntity(data, new LinkedMultiValueMap<>()));
+    when(requestFactory.toRequest(any()))
+        .thenReturn(temailRequest);
+    when(dispatcherProperties.getMockUrl())
+        .thenReturn(url);
+    try {
+      dispDispatcherService.dispatch(data);
+    } catch (Exception e) {
+      Assertions.assertThat(e instanceof HttpAccessException);
+      e.printStackTrace();
+    }
+  }
 }

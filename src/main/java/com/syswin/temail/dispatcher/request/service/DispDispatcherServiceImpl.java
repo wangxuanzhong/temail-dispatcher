@@ -7,6 +7,7 @@ import com.syswin.temail.dispatcher.request.application.PackageDispatcher;
 import com.syswin.temail.dispatcher.request.application.RequestFactory;
 import com.syswin.temail.dispatcher.request.controller.Response;
 import com.syswin.temail.dispatcher.request.exceptions.DispatchException;
+import com.syswin.temail.dispatcher.request.exceptions.HttpAccessException;
 import com.syswin.temail.ps.common.entity.CDTPPacket;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -72,8 +73,13 @@ public class DispDispatcherServiceImpl implements DispDispatcherService {
         throw e;
       }
     } catch (Exception e) {
-      log.error("PackedId: {} dispatch failed! ",
-          packet.getHeader().getPacketId(), e);
+      if (e instanceof HttpAccessException) {
+        log.error("PacketId: {} dispatch failed, request info: {}",
+            packet.getHeader().getPacketId(), ((HttpAccessException) e).getTemailRequest(), e);
+      } else {
+        log.error("PackedId: {} dispatch failed! ",
+            packet.getHeader().getPacketId(), e);
+      }
       throw e;
     }
   }
