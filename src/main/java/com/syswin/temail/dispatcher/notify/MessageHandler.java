@@ -54,7 +54,7 @@ public class MessageHandler {
   private final NotificationMessageFactory notificationMsgFactory;
 
 
-  MessageHandler(MQMsgSender producer, ChannelStsLocator gatewayLocator, String pushTopic,
+  public MessageHandler(MQMsgSender producer, ChannelStsLocator gatewayLocator, String pushTopic,
       String pushTag, PacketTypeJudge judger, Consumer<CDTPHeader> taskExecutor,
       NotificationMessageFactory
           notificationMsgFactory) {
@@ -67,7 +67,7 @@ public class MessageHandler {
     this.notificationMsgFactory = notificationMsgFactory;
   }
 
-  void onMessageReceived(String msg) throws Exception {
+  public  void onMessageReceived(String msg) throws Exception {
     log.info("Dispatcher receive a message from MQ ：{}", msg);
     try {
       MessageBody messageBody = gson.fromJson(msg, MessageBody.class);
@@ -106,7 +106,7 @@ public class MessageHandler {
 
   }
 
-  private void sendOfflineMessage(MessageBody messageBody, CDTPHeader header, String receiver) {
+  public void sendOfflineMessage(MessageBody messageBody, CDTPHeader header, String receiver) {
     Optional<String> pushMessage = notificationMsgFactory
         .getPushMessage(receiver, header, messageBody.getData());
     pushMessage.ifPresent(message -> {
@@ -122,7 +122,7 @@ public class MessageHandler {
     });
   }
 
-  private void sendOnLineMessage(MessageBody messageBody, CDTPHeader header,
+  public void sendOnLineMessage(MessageBody messageBody, CDTPHeader header,
       String receiver, List<TemailAccountLocation> statusList) {
     if (statusList.isEmpty()) {
       return;
