@@ -30,7 +30,7 @@ import lombok.Getter;
 public enum PacketValidType {
 
   crossSingleSignValid("crossSingleSignValid","/cross/verify/single"),
-  crossGroupsignValid("crossGroupsignValid",""),
+  crossGroupsignValid("crossGroupsignValid","/verify/domain"),
   crossTopicSignValid("crossTopicSignValid","/cross/verify/Topic"),
   commonSignValid("commonSignValid","/verify"),
   skipSignValid("skipSignValid","");

@@ -24,7 +24,10 @@
 
 package com.syswin.temail.dispatcher.valid.params;
 
+import com.syswin.temail.dispatcher.valid.match.PacketValidType;
 import com.syswin.temail.ps.common.entity.CDTPPacket;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -33,6 +36,8 @@ public class ValidParamsCrossGroupFactory implements ValidParamsFactory {
   @Override
   public Optional<ValidParams> buildParams(CDTPPacket cdtpPacket,
       Function<CDTPPacket, String> signExtract) {
-    return Optional.empty();
+    Map<String, String> params = new HashMap<>();
+    params.put(temail, cdtpPacket.getHeader().getSender());
+    return Optional.of(new ValidParams(PacketValidType.crossGroupsignValid.getAuthUri(),params));
   }
 }
