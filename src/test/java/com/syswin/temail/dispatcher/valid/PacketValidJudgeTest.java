@@ -77,7 +77,7 @@ public class PacketValidJudgeTest {
     cdtpPacket.setCommand((short) 1);
     cdtpPacket.setData(new PacketEncoder().encode(cdtpPacket));
     Optional<ValidParams> validParams = packetValidJudge.buildParams(cdtpPacket, t -> "i am singature");
-    Assertions.assertThat(validParams.isPresent()).isFalse();
+    Assertions.assertThat(validParams.isPresent()).isTrue();
 
   }
 

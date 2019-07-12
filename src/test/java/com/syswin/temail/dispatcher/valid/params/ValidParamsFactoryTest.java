@@ -57,7 +57,7 @@ public class ValidParamsFactoryTest {
   public void testGroup() {
     Optional<ValidParams> validParams = new ValidParamsCrossGroupFactory()
         .buildParams(cdtpPacket, t -> t.getHeader().getSender());
-    Assertions.assertThat(validParams.isPresent()).isFalse();
+    Assertions.assertThat(validParams.isPresent()).isTrue();
   }
 
   @Test
