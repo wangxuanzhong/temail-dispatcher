@@ -110,7 +110,7 @@ public class SuspiciousExtractTaskRunnerTest {
     Optional<RelationBind> relationBind = this.suspiciousExtractTaskRunner.extract(cdtpHeader);
     Assertions.assertThat(relationBind.isPresent()).isTrue();
     Assertions.assertThat(relationBind.get().getReceiver()).isEqualTo("zhangweiliang@syswin.com");
-    Assertions.assertThat(relationBind.get().getSender()).isEqualTo("mail_gateway@msgseal.com");
+    Assertions.assertThat(relationBind.get().getSender()).isEqualTo("es_alert@syswin.com");
     Assertions.assertThat(relationBind.get().getContactType())
         .isEqualTo(RelationType.suspicious.getCode());
 
