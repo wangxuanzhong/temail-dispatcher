@@ -37,6 +37,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.function.Consumer;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -128,8 +129,12 @@ public class SuspiciousExtractTaskRunner implements TaskExecutor<CDTPHeader>, Co
         suspiciousValInMsg.equals(String.valueOf(map.get(suspiciousKeyInMsg))))) {
       return Optional.empty();
     } else {
-      return Optional.of(new RelationBind(cdtpHeader.getReceiver(),
-          cdtpHeader.getSender(), RelationType.suspicious.getCode()));
+      String to = (String) map.get("to");
+      String from = (String) map.get("from");
+      if (StringUtils.isEmpty(from) || StringUtils.isEmpty(to)) {
+        return Optional.empty();
+      }
+      return Optional.of(new RelationBind(to, from, RelationType.suspicious.getCode()));
     }
   }
 
