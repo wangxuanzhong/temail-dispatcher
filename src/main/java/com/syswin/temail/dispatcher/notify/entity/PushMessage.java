@@ -46,4 +46,9 @@ public class PushMessage implements Serializable {
 
   private String cmd;
 
+  private String fromNickName;
+
+  private String fromGroupName;
+
+
 }
