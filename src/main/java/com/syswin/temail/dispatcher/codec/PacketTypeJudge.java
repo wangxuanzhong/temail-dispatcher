@@ -26,6 +26,7 @@ package com.syswin.temail.dispatcher.codec;
 
 import static com.syswin.temail.ps.common.entity.CommandSpaceType.GROUP_MESSAGE_CODE;
 import static com.syswin.temail.ps.common.entity.CommandSpaceType.SINGLE_MESSAGE_CODE;
+
 import com.syswin.temail.dispatcher.Constants;
 import com.syswin.temail.dispatcher.DispatcherProperties;
 import com.syswin.temail.ps.common.entity.CDTPHeader;
@@ -99,4 +100,7 @@ public class PacketTypeJudge {
     return (commandSpace == GROUP_MESSAGE_CODE);
   }
 
+  public boolean isCrowdMsg(short commandSpace, short command) {
+    return commandSpace == 0x000F && command == 0x0001;
+  }
 }

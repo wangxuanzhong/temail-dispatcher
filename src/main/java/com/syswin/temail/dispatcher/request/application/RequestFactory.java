@@ -76,7 +76,7 @@ public class RequestFactory {
     }
 
     CDTPParams params = packetUtil.buildParams(packet);
-    if (packetUtil.isBizServerValidType(packet.getCommandSpace())) {
+    if (packetUtil.isBizServerValidType(packet.getCommandSpace()) || packetUtil.isCrowMsg(packet.getCommandSpace(),packet.getCommand())) {
       Map<String, String> requestHeaders = new HashMap<>();
       requestHeaders.put(TE_MAIL, packet.getHeader().getSender());
       requestHeaders.put(PUBLIC_KEY, packet.getHeader().getSenderPK());

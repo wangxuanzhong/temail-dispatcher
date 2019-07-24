@@ -26,6 +26,7 @@ package com.syswin.temail.dispatcher.request.application;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.apache.commons.lang3.StringUtils.defaultString;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
@@ -91,6 +92,7 @@ public class CommandAwarePacketUtil extends PacketUtil {
     short command = packet.getCommand();
     if (isSendSingleMsg(commandSpace, command) ||
         isSendGroupMsg(commandSpace, command) ||
+        isCrowMsg(commandSpace,command) ||
         isSendNewGroupMsg(commandSpace, command)) {
       CDTPPacket originalPacket = unpack(data);
       data = originalPacket.getData();
@@ -112,12 +114,10 @@ public class CommandAwarePacketUtil extends PacketUtil {
       if (isSendSingleMsg(commandSpace, command)) {
         return buildSendSingleMsgParams(packet);
 
-      } else if (isSendGroupMsg(commandSpace, command)) {
+      } else if (isSendGroupMsg(commandSpace, command) || isSendCrowdMsg(commandSpace, command)) {
         return buildSendGroupMsgParams(packet);
-
       } else if (isSendNewGroupMsg(commandSpace, command)) {
         return buildSendNewGroupMsgParams(packet);
-
       } else {
         return gson.fromJson(new String(packet.getData(), UTF_8), CDTPParams.class);
 
@@ -126,6 +126,10 @@ public class CommandAwarePacketUtil extends PacketUtil {
       log.error("fail to parse json format data of Body, param：{}", packet);
       throw new DispatchException(e, packet);
     }
+  }
+
+  private boolean isSendCrowdMsg(short commandSpace, short command) {
+    return packetTypeJudge.isCrowdMsg(commandSpace, command);
   }
 
   private boolean isSendNewGroupMsg(short commandSpace, short command) {
@@ -190,5 +194,9 @@ public class CommandAwarePacketUtil extends PacketUtil {
         + targetAddress
         + String.valueOf(header.getTimestamp())
         + dataSha256;
+  }
+
+  public boolean isCrowMsg(short commandSpace, short command) {
+    return packetTypeJudge.isCrowdMsg(commandSpace, command);
   }
 }
