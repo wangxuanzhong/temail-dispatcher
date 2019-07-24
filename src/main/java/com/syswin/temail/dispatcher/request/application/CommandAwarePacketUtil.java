@@ -92,7 +92,6 @@ public class CommandAwarePacketUtil extends PacketUtil {
     short command = packet.getCommand();
     if (isSendSingleMsg(commandSpace, command) ||
         isSendGroupMsg(commandSpace, command) ||
-        isCrowMsg(commandSpace,command) ||
         isSendNewGroupMsg(commandSpace, command)) {
       CDTPPacket originalPacket = unpack(data);
       data = originalPacket.getData();

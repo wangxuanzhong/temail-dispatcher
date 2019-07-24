@@ -63,6 +63,7 @@ public class PacketTypeJudge {
     return this.isGroupMessage(commandSpace, command)
         || this.isGroupMessageReply(commandSpace, command)
         || this.isAssignedUserMessageBuild(commandSpace, command)
+        || this.isCrowdMsg(commandSpace,command)
         || this.isSendAssignedUserReplyMessage(commandSpace, command);
   }
 
