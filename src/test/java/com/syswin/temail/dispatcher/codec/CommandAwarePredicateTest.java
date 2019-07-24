@@ -26,6 +26,7 @@ package com.syswin.temail.dispatcher.codec;
 
 import static com.syswin.temail.ps.common.entity.CommandSpaceType.GROUP_MESSAGE_CODE;
 import static com.syswin.temail.ps.common.entity.CommandSpaceType.SINGLE_MESSAGE_CODE;
+
 import com.syswin.temail.dispatcher.DispatcherProperties;
 import java.util.Random;
 import org.assertj.core.api.Assertions;
@@ -69,7 +70,7 @@ public class CommandAwarePredicateTest {
   public void falseIfAnythingElse() {
     final Random random = new Random();
     for (short i = Short.MIN_VALUE; i < Short.MAX_VALUE; i++) {
-      if (i != SINGLE_MESSAGE_CODE && i != GROUP_MESSAGE_CODE) {
+      if (i != SINGLE_MESSAGE_CODE && i != GROUP_MESSAGE_CODE && i != 0x000F) {
         Assertions.assertThat(predicate.test(i, (short) random.nextInt())).isFalse();
       }
     }
