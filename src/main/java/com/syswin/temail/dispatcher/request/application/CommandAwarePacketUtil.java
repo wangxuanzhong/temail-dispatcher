@@ -165,8 +165,10 @@ public class CommandAwarePacketUtil extends PacketUtil {
   }
 
   private CDTPParams buildSendGroupMsgParams(CDTPPacket packet) {
+    log.info("build data {} ",packet);
     CDTPPacket originalPacket = unpack(packet.getData());
     CDTPParams params = gson.fromJson(new String(originalPacket.getData()), CDTPParams.class);
+    log.info("build data param {} ",params);
     params.getBody().put("meta", originalPacket.getHeader());
     params.getBody().put("packet", encode(packet.getData()));
     return params;
