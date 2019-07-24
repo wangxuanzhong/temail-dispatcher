@@ -113,7 +113,7 @@ public class CommandAwarePacketUtil extends PacketUtil {
       if (isSendSingleMsg(commandSpace, command)) {
         return buildSendSingleMsgParams(packet);
 
-      } else if (isSendGroupMsg(commandSpace, command) || isSendCrowdMsg(commandSpace, command)) {
+      } else if (isSendGroupMsg(commandSpace, command)) {
         return buildSendGroupMsgParams(packet);
       } else if (isSendNewGroupMsg(commandSpace, command)) {
         return buildSendNewGroupMsgParams(packet);
@@ -125,10 +125,6 @@ public class CommandAwarePacketUtil extends PacketUtil {
       log.error("fail to parse json format data of Body, param：{}", packet);
       throw new DispatchException(e, packet);
     }
-  }
-
-  private boolean isSendCrowdMsg(short commandSpace, short command) {
-    return packetTypeJudge.isCrowdMsg(commandSpace, command);
   }
 
   private boolean isSendNewGroupMsg(short commandSpace, short command) {
@@ -196,6 +192,6 @@ public class CommandAwarePacketUtil extends PacketUtil {
   }
 
   public boolean isCrowMsg(short commandSpace, short command) {
-    return packetTypeJudge.isCrowdMsg(commandSpace, command);
+    return packetTypeJudge.isCrowdMsg(commandSpace,command);
   }
 }
