@@ -102,6 +102,6 @@ public class PacketTypeJudge {
   }
 
   public boolean isCrowdMsg(short commandSpace, short command) {
-    return commandSpace == 0x000F && command == 0x0001;
+    return commandSpace == 0x000F;
   }
 }
