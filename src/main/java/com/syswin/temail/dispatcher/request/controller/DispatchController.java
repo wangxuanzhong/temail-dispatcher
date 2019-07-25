@@ -57,6 +57,7 @@ public class DispatchController {
   @ApiOperation("CDTP请求转发")
   @PostMapping(value = "/dispatch", consumes = APPLICATION_OCTET_STREAM_VALUE, produces = APPLICATION_JSON_UTF8_VALUE)
   public ResponseEntity<?> dispatch(@RequestBody byte[] payload) throws Exception {
+    log.info("dispatcher payload , {} ",payload);
     return this.dispDispatcherService.dispatch(payload);
   }
 }

@@ -192,8 +192,4 @@ public class CommandAwarePacketUtil extends PacketUtil {
         + String.valueOf(header.getTimestamp())
         + dataSha256;
   }
-
-  public boolean isCrowMsg(short commandSpace, short command) {
-    return packetTypeJudge.isCrowdMsg(commandSpace,command);
-  }
 }

@@ -63,8 +63,8 @@ public class PacketTypeJudge {
     return this.isGroupMessage(commandSpace, command)
         || this.isGroupMessageReply(commandSpace, command)
         || this.isAssignedUserMessageBuild(commandSpace, command)
-        || this.isCrowdMsg(commandSpace,command)
-        || this.isSendAssignedUserReplyMessage(commandSpace, command);
+        || this.isSendAssignedUserReplyMessage(commandSpace, command)
+        || this.isCrowdMsg(commandSpace, command);
   }
 
   public boolean isNewGroupMessage(short commandSpace, short command) {
@@ -98,10 +98,10 @@ public class PacketTypeJudge {
   }
 
   public boolean isBizServerValidType(short commandSpace) {
-    return (commandSpace == GROUP_MESSAGE_CODE);
+    return (commandSpace == GROUP_MESSAGE_CODE) || (commandSpace == 0x000F);
   }
 
   public boolean isCrowdMsg(short commandSpace, short command) {
-    return commandSpace == 0x000F;
+    return commandSpace == 0x000F && (command == 1 || command == 0x010E || command == 0x011A || command == 0x011E);
   }
 }
