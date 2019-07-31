@@ -37,4 +37,6 @@ public class PushData extends PushMessage {
 
   private Integer eventType;
 
+  private String groupTemail;
+
 }

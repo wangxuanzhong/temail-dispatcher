@@ -33,5 +33,7 @@ public class Constants {
   public static final int COMMON_MSG_EVENT_TYPE = 0;
   //MSG_EVENT_TYPE=17,无痕消息
   public static final int NOTRACE_MSG_EVENT_TYPE = 17;
+  //MSG_EVENT_TYPE=100, 群消息
+  public static final int GROUP_MSG_EVENT_TYPE = 100;
 
 }

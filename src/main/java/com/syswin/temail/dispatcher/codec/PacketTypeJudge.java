@@ -89,7 +89,8 @@ public class PacketTypeJudge {
 
   public boolean isToBePushedMsg(Integer eventType) {
     return eventType.equals(Constants.COMMON_MSG_EVENT_TYPE)
-        || eventType.equals(Constants.NOTRACE_MSG_EVENT_TYPE);
+        || eventType.equals(Constants.NOTRACE_MSG_EVENT_TYPE)
+        || eventType.equals(Constants.GROUP_MSG_EVENT_TYPE);
   }
 
   public boolean isSenderEqualsToRecevier(CDTPHeader cdtpHeader) {

@@ -103,12 +103,11 @@ public class MessageHandler {
         JsonSyntaxException e) {
       log.error("Invalid message format：{}", msg, e);
     }
-
   }
 
   public void sendOfflineMessage(MessageBody messageBody, CDTPHeader header, String receiver) {
-    Optional<String> pushMessage = notificationMsgFactory
-        .getPushMessage(receiver, header, messageBody.getData());
+    Optional<String> pushMessage =
+        notificationMsgFactory.getPushMessage(receiver, header, messageBody.getData());
     pushMessage.ifPresent(message -> {
       List<MqMessage> msgList = new ArrayList<>();
       MqMessage mqMessage = new MqMessage(pushTopic, pushTag, pushMessage.get());
