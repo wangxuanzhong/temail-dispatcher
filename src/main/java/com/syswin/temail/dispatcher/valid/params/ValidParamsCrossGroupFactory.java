@@ -37,7 +37,7 @@ public class ValidParamsCrossGroupFactory implements ValidParamsFactory {
   public Optional<ValidParams> buildParams(CDTPPacket cdtpPacket,
       Function<CDTPPacket, String> signExtract) {
     Map<String, String> params = new HashMap<>();
-    params.put(temail, cdtpPacket.getHeader().getSender());
+    params.put(senderTemail, cdtpPacket.getHeader().getSender());
     params.put(receiverTemail,cdtpPacket.getHeader().getReceiver());
     return Optional.of(new ValidParams(PacketValidType.crossGroupsignValid.getAuthUri(),params));
   }
