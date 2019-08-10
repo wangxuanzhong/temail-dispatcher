@@ -31,16 +31,11 @@ import static java.util.Collections.emptyMap;
 
 import com.google.gson.Gson;
 import com.syswin.temail.dispatcher.Constants;
-import com.syswin.temail.dispatcher.notify.entity.PushData;
-import com.syswin.temail.dispatcher.notify.entity.PushMessage;
 import com.syswin.temail.ps.common.entity.CDTPHeader;
 import com.syswin.temail.ps.common.entity.CDTPPacketTrans;
 import java.util.Map;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.rocketmq.common.admin.ConsumeStats;
-import org.apache.zookeeper.Op.Delete;
-import org.springframework.beans.BeanUtils;
 
 @Slf4j
 public class NotificationMessageFactory {
@@ -64,16 +59,29 @@ public class NotificationMessageFactory {
 
   public Optional<String> getPushMessage(String receiver, CDTPHeader header, String body) {
     try {
-      PushData pushData = gson.fromJson(body, PushData.class);
-      PushMessage pushMsg = new PushMessage();
-      BeanUtils.copyProperties(pushData, pushMsg);
-      if(pushData.getEventType() == Constants.GROUP_MSG_EVENT_TYPE){
-        pushMsg.setFrom(pushData.getGroupTemail());
+      Map pushMsgMap = gson.fromJson(body, Map.class);
+      int eventType = 0;
+      if (pushMsgMap.get("eventType") != null) {
+        eventType = (int) Double.parseDouble(pushMsgMap.get("eventType").toString()); //some data is like 0.0
       }
-      Map pushOptions = this.extractPushOptions(header);
-      pushMsg.setCmd(pushOptions.get("cmd") == null ? null : pushOptions.get("cmd").toString());
-      pushMsg.setType(pushOptions.get("type") == null ? null : pushOptions.get("type").toString());
-      return Optional.ofNullable(gson.toJson(pushMsg));
+      if (eventType == Constants.GROUP_MSG_EVENT_TYPE) {
+        pushMsgMap.put("from", pushMsgMap.get("groupTemail"));
+      }
+      Map pushOptionsMap = this.extractPushOptions(header);
+      pushMsgMap.put("cmd", pushOptionsMap.get("cmd") == null ? null : pushOptionsMap.get("cmd").toString());
+      pushMsgMap.put("type", pushOptionsMap.get("type") == null ? null : pushOptionsMap.get("type").toString());
+      return Optional.ofNullable(gson.toJson(pushMsgMap));
+
+//      PushData pushData = gson.fromJson(body, PushData.class);
+//      PushMessage pushMsg = new PushMessage();
+//      BeanUtils.copyProperties(pushData, pushMsg);
+//      if (pushData.getEventType() == Constants.GROUP_MSG_EVENT_TYPE) {
+//        pushMsg.setFrom(pushData.getGroupTemail());
+//      }
+//      Map pushOptions = this.extractPushOptions(header);
+//      pushMsg.setCmd(pushOptions.get("cmd") == null ? null : pushOptions.get("cmd").toString());
+//      pushMsg.setType(pushOptions.get("type") == null ? null : pushOptions.get("type").toString());
+//      return Optional.ofNullable(gson.toJson(pushMsg));
     } catch (Exception e) {
       log.error("failed to extract push data", e);
       return Optional.empty();
