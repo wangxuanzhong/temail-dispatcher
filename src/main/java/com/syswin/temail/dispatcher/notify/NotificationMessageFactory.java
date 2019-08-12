@@ -72,16 +72,6 @@ public class NotificationMessageFactory {
       pushMsgMap.put("type", pushOptionsMap.get("type") == null ? null : pushOptionsMap.get("type").toString());
       return Optional.ofNullable(gson.toJson(pushMsgMap));
 
-//      PushData pushData = gson.fromJson(body, PushData.class);
-//      PushMessage pushMsg = new PushMessage();
-//      BeanUtils.copyProperties(pushData, pushMsg);
-//      if (pushData.getEventType() == Constants.GROUP_MSG_EVENT_TYPE) {
-//        pushMsg.setFrom(pushData.getGroupTemail());
-//      }
-//      Map pushOptions = this.extractPushOptions(header);
-//      pushMsg.setCmd(pushOptions.get("cmd") == null ? null : pushOptions.get("cmd").toString());
-//      pushMsg.setType(pushOptions.get("type") == null ? null : pushOptions.get("type").toString());
-//      return Optional.ofNullable(gson.toJson(pushMsg));
     } catch (Exception e) {
       log.error("failed to extract push data", e);
       return Optional.empty();
