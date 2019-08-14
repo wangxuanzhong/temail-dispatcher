@@ -1,6 +1,8 @@
 package com.syswin.temail.dispatcher.codec;
 
 import com.syswin.temail.dispatcher.DispatcherProperties;
+import java.lang.reflect.Array;
+import java.util.Arrays;
 import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Rule;
@@ -20,7 +22,7 @@ public class PacketTypeJudgeTest {
 
   @Before
   public void setUp() {
-    dispatcherProperties.setOffPushType("0,17");
+    dispatcherProperties.setOffPushType(Arrays.asList("0,17".split(",")));
     packetTypeJudge = new PacketTypeJudge(dispatcherProperties);
   }
 

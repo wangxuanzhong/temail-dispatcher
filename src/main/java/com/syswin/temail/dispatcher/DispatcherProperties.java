@@ -30,6 +30,7 @@ import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
@@ -53,7 +54,7 @@ public class DispatcherProperties {
 
   private Map<String, List<String>> validStrategy = new HashMap<>();
 
-  private String offPushType;
+  private List<String> offPushType;
 
   @Data
   @ConfigurationProperties(prefix = "app.dispatcher.rocketmq")

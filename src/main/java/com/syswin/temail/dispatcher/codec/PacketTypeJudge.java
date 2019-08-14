@@ -90,9 +90,10 @@ public class PacketTypeJudge {
   }
 
   public boolean isToBePushedMsg(Integer eventType) {
-    String offPushType = dispatcherProperties.getOffPushType();
-    return !StringUtils.isEmpty(offPushType) &&
-        Arrays.asList(offPushType.split(",")).contains(eventType.toString());
+    return dispatcherProperties.getOffPushType().contains(eventType.toString());
+//    String offPushType = dispatcherProperties.getOffPushType();
+//    return !StringUtils.isEmpty(offPushType) &&
+//        Arrays.asList(offPushType.split(",")).contains(eventType.toString());
   }
 
   public boolean isSenderEqualsToRecevier(CDTPHeader cdtpHeader) {
