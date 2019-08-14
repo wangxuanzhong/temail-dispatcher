@@ -30,7 +30,9 @@ import static com.syswin.temail.ps.common.entity.CommandSpaceType.SINGLE_MESSAGE
 import com.syswin.temail.dispatcher.Constants;
 import com.syswin.temail.dispatcher.DispatcherProperties;
 import com.syswin.temail.ps.common.entity.CDTPHeader;
+import java.util.Arrays;
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 
 @Data
 public class PacketTypeJudge {
@@ -88,9 +90,9 @@ public class PacketTypeJudge {
   }
 
   public boolean isToBePushedMsg(Integer eventType) {
-    return eventType.equals(Constants.COMMON_MSG_EVENT_TYPE)
-        || eventType.equals(Constants.NOTRACE_MSG_EVENT_TYPE)
-        || eventType.equals(Constants.GROUP_MSG_EVENT_TYPE);
+    String offPushType = dispatcherProperties.getOffPushType();
+    return !StringUtils.isEmpty(offPushType) &&
+        Arrays.asList(offPushType.split(",")).contains(eventType.toString());
   }
 
   public boolean isSenderEqualsToRecevier(CDTPHeader cdtpHeader) {

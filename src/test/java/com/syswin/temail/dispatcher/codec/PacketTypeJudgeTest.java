@@ -14,19 +14,20 @@ public class PacketTypeJudgeTest {
   @Rule
   public MockitoRule rule = MockitoJUnit.rule();
 
-  @Mock
-  private DispatcherProperties dispatcherProperties;
+  private DispatcherProperties dispatcherProperties = new DispatcherProperties();
 
   private PacketTypeJudge packetTypeJudge;
 
   @Before
-  public void setUp(){
+  public void setUp() {
+    dispatcherProperties.setOffPushType("0,17");
     packetTypeJudge = new PacketTypeJudge(dispatcherProperties);
   }
 
   @Test
-  public void grpMsgWillBePushed(){
-    Assertions.assertThat(packetTypeJudge.isToBePushedMsg(100)).isTrue();
+  public void grpMsgWillBePushed() {
+    Assertions.assertThat(packetTypeJudge.isToBePushedMsg(0)).isTrue();
+    Assertions.assertThat(packetTypeJudge.isToBePushedMsg(17)).isTrue();
   }
 
 }

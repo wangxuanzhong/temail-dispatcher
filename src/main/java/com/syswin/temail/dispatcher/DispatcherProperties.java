@@ -53,6 +53,8 @@ public class DispatcherProperties {
 
   private Map<String, List<String>> validStrategy = new HashMap<>();
 
+  private String offPushType;
+
   @Data
   @ConfigurationProperties(prefix = "app.dispatcher.rocketmq")
   public static class RocketMQ {
