@@ -77,7 +77,7 @@ public class MessageHandler {
           this.taskExecutor.accept(header);
           String receiver = messageBody.getReceiver();
           List<TemailAccountLocation> statusList = gatewayLocator.locate(receiver);
-          log.info("Succeed to get {} locations: {} .", statusList, statusList);
+          log.info("Succeed to get {} locations: {} .", receiver, statusList);
           final AtomicReference<Boolean> containsMobile = new AtomicReference<>(false);
           statusList.forEach(status -> {
             if (StringUtils.equalsIgnoreCase(status.getPlatform(), "ios")
