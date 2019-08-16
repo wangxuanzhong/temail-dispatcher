@@ -67,7 +67,7 @@ public class MessageHandler {
     this.notificationMsgFactory = notificationMsgFactory;
   }
 
-  public  void onMessageReceived(String msg) throws Exception {
+  public void onMessageReceived(String msg) throws Exception {
     log.info("Dispatcher receive a message from MQ ：{}", msg);
     try {
       MessageBody messageBody = gson.fromJson(msg, MessageBody.class);
@@ -77,6 +77,7 @@ public class MessageHandler {
           this.taskExecutor.accept(header);
           String receiver = messageBody.getReceiver();
           List<TemailAccountLocation> statusList = gatewayLocator.locate(receiver);
+          log.info("Succeed to get {} locations: {} .", statusList, statusList);
           final AtomicReference<Boolean> containsMobile = new AtomicReference<>(false);
           statusList.forEach(status -> {
             if (StringUtils.equalsIgnoreCase(status.getPlatform(), "ios")

@@ -72,7 +72,6 @@ public class RemoteChannelStsLocator implements ChannelStsLocator {
         if (response != null) {
           List<TemailAccountLocation> statuses = response.getData().getStatuses();
           if (statuses != null) {
-            log.info("Succeed to get {} locations: {} .", temail, response);
             return statuses;
           }
         }
