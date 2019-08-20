@@ -12,12 +12,12 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class DisDescParamHelper {
 
-  private static boolean needEncode(CDTPPacket packet) {
+  private boolean needEncode(CDTPPacket packet) {
     //when command is 13000，do not encode
     return !(packet.getCommandSpace() == 1 && packet.getCommand() == 0x3000);
   }
 
-  public static void encodeParam(CDTPPacket packet, CDTPParams params) {
+  public void encodeParam(CDTPPacket packet, CDTPParams params) {
     if (!needEncode(packet)) {
       return;
     }
@@ -44,7 +44,7 @@ public class DisDescParamHelper {
     }
   }
 
-  public static void decodeHeader(MessageBody messageBody, CDTPHeader header) {
+  public void decodeHeader(MessageBody messageBody, CDTPHeader header) {
     if (!needDecode(messageBody)) {
       return;
     }
@@ -69,7 +69,7 @@ public class DisDescParamHelper {
 
   }
 
-  private static boolean needDecode(MessageBody body) {
+  private boolean needDecode(MessageBody body) {
     return (body.getEventType() != 52); //flag 13000 command
   }
 }

@@ -54,6 +54,7 @@ public class MessageHandler {
   private final Consumer<CDTPHeader> taskExecutor;
   private final ChannelStsLocator gatewayLocator;
   private final NotificationMessageFactory notificationMsgFactory;
+  private DisDescParamHelper descParamHelper;
 
   public MessageHandler(MQMsgSender producer, ChannelStsLocator gatewayLocator, String pushTopic,
       String pushTag, PacketTypeJudge judger, Consumer<CDTPHeader> taskExecutor,
@@ -66,6 +67,7 @@ public class MessageHandler {
     this.judger = judger;
     this.taskExecutor = taskExecutor;
     this.notificationMsgFactory = notificationMsgFactory;
+    this.descParamHelper = new DisDescParamHelper();
   }
 
   public void onMessageReceived(String msg) throws Exception {
@@ -76,7 +78,7 @@ public class MessageHandler {
         CDTPHeader header = gson
             .fromJson(messageBody.getHeader(), CDTPHeader.class);
         if (header != null) {
-          DisDescParamHelper.decodeHeader(messageBody, header);
+          descParamHelper.decodeHeader(messageBody, header);
           this.taskExecutor.accept(header);
           String receiver = messageBody.getReceiver();
           List<TemailAccountLocation> statusList = gatewayLocator.locate(receiver);

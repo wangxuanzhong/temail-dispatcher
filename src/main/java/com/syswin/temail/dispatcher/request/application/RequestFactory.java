@@ -61,10 +61,12 @@ public class RequestFactory {
   private DispatcherProperties properties;
   private CommandAwarePacketUtil packetUtil;
 
+  private DisDescParamHelper descParamHelper;
 
   public RequestFactory(DispatcherProperties properties, CommandAwarePacketUtil packetUtil) {
     this.properties = properties;
     this.packetUtil = packetUtil;
+    this.descParamHelper = new DisDescParamHelper();
   }
 
   public TemailRequest toRequest(CDTPPacket packet) {
@@ -77,7 +79,7 @@ public class RequestFactory {
     }
     CDTPParams params = packetUtil.buildParams(packet);
 
-    DisDescParamHelper.encodeParam(packet, params);
+    descParamHelper.encodeParam(packet, params);
     if (packetUtil.isBizServerValidType(packet.getCommandSpace())) {
       Map<String, String> requestHeaders = new HashMap<>();
       requestHeaders.put(TE_MAIL, packet.getHeader().getSender());
