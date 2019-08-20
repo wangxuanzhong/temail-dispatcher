@@ -30,8 +30,10 @@ import com.syswin.temail.dispatcher.codec.PacketTypeJudge;
 import com.syswin.temail.dispatcher.notify.entity.MessageBody;
 import com.syswin.temail.dispatcher.notify.entity.MqMessage;
 import com.syswin.temail.dispatcher.notify.entity.TemailAccountLocation;
+import com.syswin.temail.dispatcher.request.application.DisDescParamHelper;
 import com.syswin.temail.ps.common.entity.CDTPHeader;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -53,7 +55,6 @@ public class MessageHandler {
   private final ChannelStsLocator gatewayLocator;
   private final NotificationMessageFactory notificationMsgFactory;
 
-
   public MessageHandler(MQMsgSender producer, ChannelStsLocator gatewayLocator, String pushTopic,
       String pushTag, PacketTypeJudge judger, Consumer<CDTPHeader> taskExecutor,
       NotificationMessageFactory
@@ -72,8 +73,10 @@ public class MessageHandler {
     try {
       MessageBody messageBody = gson.fromJson(msg, MessageBody.class);
       if (messageBody != null) {
-        CDTPHeader header = gson.fromJson(messageBody.getHeader(), CDTPHeader.class);
+        CDTPHeader header = gson
+            .fromJson(messageBody.getHeader(), CDTPHeader.class);
         if (header != null) {
+          DisDescParamHelper.decodeHeader(messageBody, header);
           this.taskExecutor.accept(header);
           String receiver = messageBody.getReceiver();
           List<TemailAccountLocation> statusList = gatewayLocator.locate(receiver);

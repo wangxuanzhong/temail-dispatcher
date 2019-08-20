@@ -61,6 +61,7 @@ public class RequestFactory {
   private DispatcherProperties properties;
   private CommandAwarePacketUtil packetUtil;
 
+
   public RequestFactory(DispatcherProperties properties, CommandAwarePacketUtil packetUtil) {
     this.properties = properties;
     this.packetUtil = packetUtil;
@@ -74,8 +75,9 @@ public class RequestFactory {
       log.error(UNSUPPORTED_CMD_PREfIX + "：{}, request param：{}", cmdHex, packet);
       throw new DispatchException(UNSUPPORTED_CMD_PREfIX + "：" + combinedCommand, packet);
     }
-
     CDTPParams params = packetUtil.buildParams(packet);
+
+    DisDescParamHelper.encodeParam(packet, params);
     if (packetUtil.isBizServerValidType(packet.getCommandSpace())) {
       Map<String, String> requestHeaders = new HashMap<>();
       requestHeaders.put(TE_MAIL, packet.getHeader().getSender());
