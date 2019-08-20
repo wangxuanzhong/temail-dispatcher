@@ -14,10 +14,7 @@ public class DisDescParamHelper {
 
   private static boolean needEncode(CDTPPacket packet) {
     //when command is 13000，do not encode
-    if (packet.getCommandSpace() == 1 && packet.getCommand() == 0x3000) {
-      return false;
-    }
-    return true;
+    return !(packet.getCommandSpace() == 1 && packet.getCommand() == 0x3000);
   }
 
   public static void encodeParam(CDTPPacket packet, CDTPParams params) {
@@ -73,9 +70,6 @@ public class DisDescParamHelper {
   }
 
   private static boolean needDecode(MessageBody body) {
-    if (body.getEventType() == 52) {//flag 13000 command
-      return false;
-    }
-    return true;
+    return (body.getEventType() != 52); //flag 13000 command
   }
 }
