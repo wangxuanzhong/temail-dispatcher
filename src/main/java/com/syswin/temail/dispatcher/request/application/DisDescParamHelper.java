@@ -51,18 +51,23 @@ public class DisDescParamHelper {
     if (!needDecode(messageBody)) {
       return;
     }
-    Decoder urlDecoder = Base64.getUrlDecoder();
-    String at = header.getAt();
-    String topic = header.getTopic();
-    String extraData = header.getExtraData();
-    if (at != null) {
-      header.setAt(new String(urlDecoder.decode(at.getBytes())));
-    }
-    if (topic != null) {
-      header.setTopic(new String(urlDecoder.decode(topic.getBytes())));
-    }
-    if (extraData != null) {
-      header.setExtraData(new String(urlDecoder.decode(extraData.getBytes())));
+    try {
+      Decoder urlDecoder = Base64.getUrlDecoder();
+      String at = header.getAt();
+      String topic = header.getTopic();
+      String extraData = header.getExtraData();
+      if (at != null) {
+        header.setAt(new String(urlDecoder.decode(at.getBytes())));
+      }
+      if (topic != null) {
+        header.setTopic(new String(urlDecoder.decode(topic.getBytes())));
+      }
+      if (extraData != null) {
+        header.setExtraData(new String(urlDecoder.decode(extraData.getBytes())));
+      }
+      log.info("decoded header is {}", header);
+    } catch (Exception e) {
+      log.error("decode mq message header error, header is {}", header, e);
     }
 
   }
