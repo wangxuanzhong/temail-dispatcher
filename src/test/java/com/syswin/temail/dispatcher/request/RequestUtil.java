@@ -121,7 +121,6 @@ public class RequestUtil {
 
   @Test
   public void decode() {
-
     String s = "eyJmcm9tIjoibGh6MTg4QHN5c3Rvb250ZXN0LmNvbSIsImZyb21OaWNrTmFtZSI6IuWQjeS6hiIsIm1zZ0lkIjoiOTUwNmU5M2MtYjY5OC00YzNmLTgxNTUtMTdiNjlkMmNmYWViIiwicGFyZW50TXNnSWQiOiIiLCJzZXNzaW9uRXh0RGF0YSI6IntcImF2YXRhckhvc3RcIjpcImh0dHA6Ly9tc2dzZWFsLnN5c3Rvb250ZXN0LmNvbS90ZW1haWxpbWFnZXMvXCIsXCJjb250YWN0VHlwZVwiOjEsXCJpc0VtYWlsXCI6ZmFsc2UsXCJuYW1lXCI6XCJcdTU0MGRcdTRlODZcIn0iLCJzdG9yZVR5cGUiOjEsInRvIjoibGh6MTU1QHN5c3Rvb250ZXN0LmNvbSIsInR5cGUiOjB9";
     System.out.println(new String(Base64.getUrlDecoder().decode(s)));
   }

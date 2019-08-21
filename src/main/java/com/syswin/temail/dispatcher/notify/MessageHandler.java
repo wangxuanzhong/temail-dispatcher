@@ -30,10 +30,9 @@ import com.syswin.temail.dispatcher.codec.PacketTypeJudge;
 import com.syswin.temail.dispatcher.notify.entity.MessageBody;
 import com.syswin.temail.dispatcher.notify.entity.MqMessage;
 import com.syswin.temail.dispatcher.notify.entity.TemailAccountLocation;
-import com.syswin.temail.dispatcher.request.application.DisDescParamHelper;
+import com.syswin.temail.dispatcher.request.application.DispatchCODEC;
 import com.syswin.temail.ps.common.entity.CDTPHeader;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -54,7 +53,6 @@ public class MessageHandler {
   private final Consumer<CDTPHeader> taskExecutor;
   private final ChannelStsLocator gatewayLocator;
   private final NotificationMessageFactory notificationMsgFactory;
-  private DisDescParamHelper descParamHelper;
 
   public MessageHandler(MQMsgSender producer, ChannelStsLocator gatewayLocator, String pushTopic,
       String pushTag, PacketTypeJudge judger, Consumer<CDTPHeader> taskExecutor,
@@ -67,7 +65,6 @@ public class MessageHandler {
     this.judger = judger;
     this.taskExecutor = taskExecutor;
     this.notificationMsgFactory = notificationMsgFactory;
-    this.descParamHelper = new DisDescParamHelper();
   }
 
   public void onMessageReceived(String msg) throws Exception {
@@ -78,7 +75,7 @@ public class MessageHandler {
         CDTPHeader header = gson
             .fromJson(messageBody.getHeader(), CDTPHeader.class);
         if (header != null) {
-          descParamHelper.decodeHeader(messageBody, header);
+          DispatchCODEC.getHeaderDecoder().decodeHeader(messageBody, header);
           this.taskExecutor.accept(header);
           String receiver = messageBody.getReceiver();
           List<TemailAccountLocation> statusList = gatewayLocator.locate(receiver);
